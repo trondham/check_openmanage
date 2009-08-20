@@ -1,0 +1,429 @@
+3.5.0
+------------------
+
+* New option '-a' or '--all' turns on checking of everything
+* The manual page (POD info) is removed from the script and is now in
+  a separate file, to make check_openmanage fully ePN compatible
+* ePN is no longer disabled by default, check_openmanage no longer has
+  an opinion on whether it should run under ePN or not
+* The '-m' or '--man' option is no longer available
+* The option '-v' or '--verbose' is renamed to '-d' or '--debug'
+* The '-g' or '--global' option is removed. Checking the global health
+  status is now default if applicable
+* Checking intrusion detection is now turned on by default
+* The option '--snmp' is removed
+* The option '--state' now has a shorter equivalent '-s'
+* The basename stuff and options '--only-critical' and
+  '--only-warning' are now replaced by an option '--only'
+* If plugin is run by Nagios, redirect stderr to stdout
+
+3.4.9   2009-08-07
+------------------
+
+* Fixed a bug that could cause errors and weird results when checking
+  cooling devices (fans) via SNMP. Thanks to Ken McKinlay for spotting
+  this bug and reporting it.
+
+3.4.8   2009-07-31
+------------------
+
+* For failed physical drives, check_openmanage will now output the
+  drive's vendor, model and size in GB or TB.
+
+3.4.7   2009-07-24
+------------------
+
+* The -s|--snmp option was redundant and no longer does anything. SNMP
+  is triggered automatically if the -H|--hostname option is
+  present. The -s|--snmp option is kept for compatibility, but has no
+  effect.
+
+3.4.6   2009-07-07
+------------------
+
+* Added support for performance data (temperatures) from attached
+  storage enclosures such as the MD1000
+
+3.4.5   2009-06-22
+------------------
+
+* Fixed a regression in the --htmlinfo option when it is not supplied
+  with an argument
+
+3.4.4   2009-06-22
+------------------
+
+* New option --htmlinfo adds clickable HTML links in the plugin's
+  output
+
+3.4.3   2009-06-11
+------------------
+
+* Fixed a regression bug in CPU and power supply reporting that only
+  affects verbose output
+* If blacklisting is used, the global health check (via the --global
+  option) is now negated. Checking the global health doesn't make
+  sense when one or more components is blacklisted. Thanks to Rene
+  Beaulieu for reporting this bug
+* The PNP4Nagios template is now included in the tarball and zip
+  archive
+
+3.4.2   2009-06-03
+------------------
+
+* Improved memory error reporting, when using omreport
+* Collect performance data from pwrmonitoring (amperage probes) that
+  were previously ignored when using omreport
+
+3.4.1   2009-05-25
+------------------
+
+* Improved memory error reporting, when using SNMP
+* Other small ehnancements
+
+3.4.0   2009-05-25
+------------------
+
+* The plugin is now compatible with the Nagios embedded Perl
+  interpreter (ePN) in theory. However, the plugin will not not use
+  ePN by default. We don't want any "accidents".
+* License is now GPLv3, previously only specified as "GPL"
+* New options --only-critical and --only-warning. With these options
+  the plugin will only print critical or warning alerts, respectively.
+* Bugfixes and speed enhancements in the storage section, when
+  checking enclosure components via omreport
+* The --okinfo option is now less verbose and more to the point
+* Lots of code refactoring for readability, maintainability and
+  robustness
+
+3.3.2   2009-05-05
+------------------
+
+* Fixed a bug in the storage section, when checking controllers. This
+  is an obscure bug that only manifests itself in the odd case where a
+  server has multiple controllers, and one of the controllers are
+  missing some of the OIDs, in which case these OIDs will be missing
+  for the other controllers as well. The change is minor and only
+  includes using get_table() instead of get_entries() to collect the
+  SNMP result. Thanks to Stephan Bovet for reporting this bug.
+
+3.3.1   2009-04-28
+------------------
+
+* The --perfdata option can now optionally take an argument
+  "multiline", which makes the plugin produce multiline performance
+  data output in a Nagios 3.x way. Not really needed, but the plugin
+  output is prettier.
+* Added comment within the 10 first lines to disable the nagios
+  embedded perl (ePN) interpreter by default for Nagios 3.x
+* Improvements in the performance data output. Units are now included
+
+3.3.0   2009-04-07
+------------------
+
+* Added --global option, which turns on checking of everything. If
+  used with SNMP, the global system health status is also probed, to
+  protect the user against bugs in the plugin. If used with omreport,
+  the overall chassis health is used.
+* Support for SNMP version 3
+* New check added: esmhealth. This checks the overall health of the
+  ESM log, i.e. the fill grade. More than 80% means a warning message
+* Fixed alert log reporting to use the same format as for the ESM log
+* Output messages are now sorted by severity
+* Minor changes in how out-of-date controller firmware/driver is
+  reported
+* Code refactoring and cleanup
+
+3.2.7   2009-03-29
+------------------
+
+* Use "omreport about" to collect OMSA version. Slightly faster than
+  "omreport system version". This should give a small speedup in
+  certain configurations
+* Fixed typo in output when a logical drive is rebuilding. Thanks to
+  Andreas Olsson for reporting
+* Improved reporting of ESM log content
+* Added omreport.sh as alternate omreport path
+* Lots of other small fixes and enhancements
+
+Plus: A few changes to make the plugin work with old PowerEdge models
+(e.g. 2550, 2450) and/or old OMSA versions (e.g. version 4.5):
+
+* Use the chassisModelName OID to determine if SNMP works (instead of
+  BaseboardType)
+* No longer require a response when checking baseboard type via
+  SNMP. If there is no response, we assume that we're not dealing with
+  a blade server
+
+Thanks to Christian McHugh for help with testing and debugging this
+stuff
+
+3.2.6   2009-03-05
+------------------
+
+* Use 'omreport system operatingsystem' to collect OS info, instead of
+  'omreport system' version which is incredibly slow. This should speed
+  things up in certain configurations.
+* A few speedups, don't collect information that isn't needed
+* Man page fixes
+
+3.2.5   2009-02-24
+------------------
+
+* New option --linebreak to specify the separator between line in case
+  of multiline output
+* Added support for 64bit Windows. Thanks to Patrick Hemmen for a patch
+* [Patrick Hemmen] Added install.bat for Windows installation
+* [Patrick Hemmen] Improvements on install.sh. Will now install in
+  /usr/lib64 for x86_64
+* RPMs are now architecture dependent, because of different libdir
+
+3.2.4   2009-02-17
+------------------
+
+* New option -o|--ok-info to display extra information when everything
+  is ok. The plugin can now display storage firmware and driver info,
+  DRAC and BMC firmware, and OMSA version
+* Support for setting custom minimum temperature thresholds via the
+  -c|--critical and -w|--warning options
+* Better and more detailed temperature error reporting
+* Bugfix in the amperage report (including performance data). The
+  plugin now takes into account the correct unit and measurement for
+  amperage probes (other than watts)
+* New option --port lets the user specify the remote SNMP port number
+
+3.2.3   2009-02-09
+------------------
+
+* Regression fix: Use the older Processor Device SNMP OIDs for older
+  PowerEdge models, that don't have the new Processor Device Status
+  OIDs. Thanks to Nicole Hähnel for reporting this bug.
+* Default output (when there are no alerts) now shows RAC firmware,
+  BMC firmware, info about controllers and enclosures (firmware,
+  driver).
+
+3.2.2   2009-02-03
+------------------
+
+* Regression fix: Ignore unoccupied CPU slots with SNMP probing. This
+  fixes a bug introduced in versjon 3.2.1, which would output
+  something like this if one or more CPU slots were empty: CPU 1 needs
+  attention ()
+
+3.2.1   2009-02-03
+------------------
+
+* Use Processor Device Status Table OIDs instead of Processor Device
+  Table when checking CPUs via SNMP
+* Bugfix: don't report throttled CPUs as warnings when checking via
+  SNMP (same as for checking locally)
+
+3.2.0   2009-01-27
+------------------
+
+* New options --state and --short-state for displaying service state
+  along with the alert
+* Lots of small fixes for code readability and maintainability
+
+3.1.1   2009-01-12
+------------------
+
+* Support for running natively on Windows (using omreport.exe). Thanks
+  to Peter Jestico for a patch.
+* Support for compiled Windows version, i.e. check_openmanage.exe is
+  now a legal script name.
+* Exit with error if script basename is illegal/unknown
+* Various small fixes
+
+3.1.0   2008-12-26
+------------------
+
+* Use of alternate basenames for checking only one class of components
+* Added support for checking the ESM log via SNMP
+* Code refactoring for robustness and maintainability
+* Numerous small fixes and enhancements
+* Added install script in distribution tarball
+
+3.0.2   2008-12-20
+------------------
+
+* The script no longer aborts if it can't get system information via
+  SNMP. Give a warning instead, as this is not a critical error
+* Increased robustness when checking controllers
+
+3.0.1   2008-12-11
+------------------
+
+* Man page fix in the 'check' section. Thanks to Ansgar Dahlen for
+  reporting this.
+* Allow invalid command error from 'omreport chassis pwrmonitoring'
+* Various small fixes
+
+3.0.0   2008-12-04
+------------------
+
+* Use unique IDs for storage components with regard to blacklisting,
+  which means that the blacklisting API has changed
+* Added checks for storage components: connectors (channels),
+  enclosures, enclosure fans, enclosure power supplies, enclosure
+  temperature probes and enclosure management modules (EMMs)
+* Improved verbose output
+* New option -t|--timeout for setting the plugin timeout
+* New option -w|--warning for setting custom temperature warning
+  thresholds
+* New option -c|--critical for setting custom temperature critical
+  thresholds
+* Option --check can no longer be specified in its short form (-c)
+* Code cleanup and improvements
+
+2.1.1   2008-11-24
+------------------
+
+* The workaround for the OMSA bug introduced in OMSA 5.5.0 didn't take
+  multiple controllers into account. This has been fixed.
+
+2.1.0   2008-11-19
+------------------
+
+* New option -i|--info prefixes all alerts with the service tag
+* New option -e|--extinfo gives and extra line of output in case of an
+  alert (model and service tag)
+* New option --postmsg lets the user specify a post message string,
+  with info such as model, service tag etc.
+* Options -b|--blacklist and -c|--check can now be specified multiple
+  times (actually quite useful)
+
+2.0.9   2008-11-17
+------------------
+
+* Slightly improved output for alerts on logical drives (vdisks)
+* Now shows a rebuilding physical disk as a warning, as this is
+  usually accompanied by a degraded vdisk. Previous versions didn't
+  show this at all (omreport classifies it as "OK").
+
+2.0.8   2008-11-14
+------------------
+
+* Slightly improved output for charging controller batteries
+
+2.0.7   2008-11-12
+------------------
+
+* Bugfix for reporting physical drives with predictive failure (both
+  via NRPE and SNMP)
+
+2.0.6   2008-10-30
+------------------
+
+* Fix bug in option handling (ambiguous options)
+* Slightly improved output if checking the storage subsystem is turned
+  off
+* Don't complain if there are no logical drives. This is OK. Thanks to
+  Jamie Henderson for reporting this
+
+2.0.5   2008-10-29
+------------------
+
+* Fix bug in SNMP status level table
+
+2.0.4   2008-10-29
+------------------
+
+* Added workaround for a BUG introduced in OpenManage 5.5.0. OM
+  sometimes adds a newline in the controller driver version name,
+  which leads to problems parsing the output. Thanks to Hiren Patel
+  for bringing this to my attention.
+
+2.0.3   2008-10-28
+------------------
+
+* (snmp) Improved handling of cases where OM is not working properly
+
+2.0.2   2008-10-27
+------------------
+
+* Fixed issue where controller number for physical disks can't be
+  established via SNMP (now identifies as controller no. -1)
+
+2.0.1   2008-10-23
+------------------
+
+* Correctly identifies and reports error condition in which OpenManage
+  has stopped working (it happens)
+
+2.0.0   2008-10-23
+------------------
+
+* SNMP support
+* Same options for checking, blacklisting etc. supported with SNMP
+* Same output with SNMP as with NRPE
+
+1.2.1   2008-09-25
+------------------
+
+* Collects performance data if the option '-p' or '--perfdata' is
+  supplied.
+* New blacklisting directives ctrl_fw and ctrl_driver
+  added. Suppresses the "special" warning messages concerning outdated
+  controller firmware and driver. Useful if you can't or won't
+  upgrade.
+
+1.1.2   2008-08-06
+------------------
+
+* Fix getting system model and serial number for newer blades
+
+1.1.1   2008-08-06
+------------------
+
+* Three new checks added:
+  - System battery probes (typical CMOS battery). Newer poweredge
+    models have these
+  - Power consumption monitoring (if the server supports it)
+  - ESM log, with same functionality as the alert log check. Disabled
+    by default.
+
+1.1.0   2008-08-04
+------------------
+
+* Internal refactoring: use ssv-formatted output from openmanage,
+  resulting in slightly faster execution and increased robustness.
+* If /usr/bin/omreport doesn't exist, try
+  /opt/dell/srvadmin/oma/bin/omreport.
+* Allow for no instrumented/redundant power supplies. Needed on
+  low-end poweredge models and blades.
+
+1.0.3   2008-07-25
+------------------
+
+* Openmanage reports non-critical warning about throttled CPUs on new
+  hardware models. Most og us use ondemand CPU frequency scaling (with
+  throttled CPUs as a result). This specific non-critical warning (CPU
+  Throttled) is ignored from now on.
+* Remove superfluous Celcius sign when reporting temperatures.
+
+1.0.2   2008-07-25
+------------------
+
+* Accommodate blade systems with no fans or powersupplies, i.e. accept
+  errors from omreport when trying to check fans or powersupplies on
+  blade servers.
+* Accommodate newer hardware with slightly different omreport
+  options. Use the newer options if they exist. Not really necessary
+  yet, but deprecated options may be removed in future versions of
+  Dell OpenManage.
+
+1.0.1   2008-07-18
+------------------
+
+* When everything is OK, check_openmanage now outputs the same info as
+  Gerhard Lausser's excellent check_hpasm plugin does for HP servers:
+
+  OK - System: 'poweredge 2850', S/N: 'XXXXXXX', ROM: 'A06
+  10/03/2006', hardware working fine, 2 logical drives, 4 physical
+  drives
+
+1.0.0   2008-07-15
+------------------
+
+* Initial release
