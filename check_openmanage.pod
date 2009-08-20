@@ -1,0 +1,661 @@
+# Man page created with:
+#
+#  pod2man -s 3pm -r "`./check_openmanage -V | head -n 1`" -c 'Nagios plugin' check_openmanage.pod check_openmanage.3pm
+#
+# $Id$
+
+=head1 NAME
+
+check_openmanage - Nagios plugin for checking the hardware status on
+                   Dell servers running OpenManage
+
+=head1 SYNOPSIS
+
+check_openmanage [I<OPTION>]...
+
+=head1 DESCRIPTION
+
+check_openmanage is a plugin for Nagios which checks the hardware
+health of Dell servers running OpenManage Server Administrator
+(OMSA). The plugin checks the health of the storage subsystem, power
+supplies, memory modules, temperature probes etc., and gives an alert
+if any of the components are faulty or operate outside normal
+parameters.
+
+check_openmanage is designed to be used by either locally (using NRPE
+or similar) or remotely (using SNMP). In either mode, the output is
+(nearly) the same. Note that checking the alert log is not supported
+in SNMP mode.
+
+=head1 GENERAL OPTIONS
+
+=over 4
+
+=item -t, --timeout I<SECONDS>
+
+The number of seconds after which the plugin will abort. Default
+timeout is 30 seconds if the option is not present.
+
+=item -p, --perfdata [I<multline>]
+
+Collect performance data. Performance data collected include
+temperatures (in Celcius) and fan speeds (in rpm). On systems that
+support it, power consumption is also collected (in Watts).
+
+If given the argument C<multiline>, the plugin will output the
+performance data on multiple lines, for Nagios 3.x and above.
+
+=item -w, --warning I<STRING> or I<FILE>
+
+Override the machine-default temperature warning thresholds. Syntax is
+C<id1=max[/min],id2=max[/min],...>. The following example sets warning
+limits to max 50C for probe 0, and max 45C and min 10C for probe 1:
+
+check_openmanage -w 0=50,1=45/10
+
+The minimum limit can be omitted, if desired. Most often, you are only
+interested in setting the maximum thresholds.
+
+This parameter can be either a string with the limits, or a file
+containing the limits string. The option can be specified multiple
+times.
+
+=item -c, --critical I<STRING> or I<FILE>
+
+Override the machine-default temperature critical thresholds. Syntax
+and behaviour is the same as for warning thresholds described above.
+
+=item -o, --ok-info I<NUMBER>
+
+This option lets you define how much output you want the plugin to
+give when everything is OK, i.e. the verbosity level. The default
+value is 0 (one line of output). The output levels are cumulative.
+
+=over 4
+
+=item B<0>
+
+- Only one line (default)
+
+=item B<1>
+
+- BIOS and firmware info on a separate line
+
+=item B<2>
+
+- Storage controller and enclosure info on separate lines
+
+=item B<3>
+
+- OMSA version on separate line
+
+=back
+
+The reason that OMSA version is separated from the rest is that
+finding it requires running a really slow omreport command, when the
+plugin is run locally via NRPE.
+
+=item -i, --info
+
+Prefix any alerts with the service tag.
+
+=item -e, --extinfo
+
+Display a short summary of system information (model and service tag)
+in case of an alert.
+
+=item --htmlinfo [I<CODE>]
+
+Using this option will make the servicetag and model name into
+clickable HTML links in the output. The model name link will point to
+the official Dell documentation for that model, while the servicetag
+link will point to a website containing support info for that
+particular server.
+
+This option takes an optional argument, which should be your country
+code or C<me> for the middle east. If the country code is omitted the
+servicetag link will still work, but it will not be speficic for your
+country or area. Example for Germany:
+
+  check_openmanage --htmlinfo de
+
+If this option is used together with either the I<--extinfo> or
+I<--info> options, it is particularly useful. Only the most common
+country codes is supported at this time.
+
+=item --postmsg I<STRING> or I<FILE>
+
+User specified post message. Useful for displaying arbitrary or
+various system information at the end of alerts. The argument is
+either a string with the message, or a file containing that
+string. You can control the format with the following interpreted
+sequences:
+
+=over 4
+
+=item B<%m>
+
+System model
+
+=item B<%s>
+
+Service tag
+
+=item B<%b>
+
+BIOS version
+
+=item B<%d>
+
+BIOS release date
+
+=item B<%o>
+
+Operating system name
+
+=item B<%r>
+
+Operating system release
+
+=item B<%p>
+
+Number of physical drives
+
+=item B<%l>
+
+Number of logical drives
+
+=item B<%n>
+
+Line break. Will be a regular line break if run from a TTY, else an
+HTML line break.
+
+=item B<%%>
+
+A literal C<%>
+
+=back
+
+=item -s, --state
+
+Prefix each alert with its corresponding service state (i.e. warning,
+critical etc.). This is useful in case of several alerts from the same
+monitored system.
+
+=item --short-state
+
+Same as the B<--state> option above, except that the state is
+abbreviated to a single letter (W=warning, C=critical etc.).
+
+=item --linebreak=I<STRING>
+
+check_openmanage will sometimes report more than one line, e.g. if
+there are several alerts. If the script has a TTY, it will use regular
+linebreaks. If not (which is the case with NRPE) it will use HTML
+linebreaks. Sometimes it can be useful to control what the plugin uses
+as a line separator, and this option provides that control.
+
+The argument is the exact string to be used as the line
+separator. There are two exceptions, i.e. two keywords that translates
+to the following:
+
+=over 4
+
+=item B<REG>
+
+Regular linebreaks, i.e. "\n".
+
+=item B<HTML>
+
+HTML linebreaks, i.e. "<br/>".
+
+=back
+
+This is a rather special option that is normally not needed. The
+default behaviour should be sufficient for most users.
+
+=item -d, --debug
+
+Debug output. Will report status on everything, even if status is
+ok. Blacklisted or unchecked components are ignored (i.e. no output).
+
+NOTE: This option is intended for diagnostics and debugging purposes
+only. Do not use this option from within Nagios, i.e. in the Nagios
+config.
+
+=item -h, --help
+
+Display help text.
+
+=item -V, --version
+
+Display version info.
+
+=back
+
+=head1 SNMP OPTIONS
+
+=over 4
+
+=item -H, --hostname I<HOSTNAME>
+
+The transport address of the destination SNMP device. Using this
+option triggers SNMP mode.
+
+=item -P, --protocol I<PROTOCOL>
+
+SNMP protocol version. This option is optional and expects a digit
+(i.e.  C<1>, C<2> or C<3>) to define the SNMP version. The default is
+C<2>, i.e. SNMP version 2c.
+
+=item -C, --community I<COMMUNITY>
+
+This option expects a string that is to be used as the SNMP community
+name when using SNMP version 1 or 2c.  By default the community name
+is set to C<public> if the option is not present.
+
+=item --port I<PORT>
+
+SNMP port of the remote (monitored) system. Defaults to the well-known
+SNMP port 161.
+
+=item -U, --username I<SECURITYNAME>
+
+[SNMPv3] The User-based Security Model (USM) used by SNMPv3 requires
+that a securityName be specified. This option is required when using
+SNMP version 3, and expects a string 1 to 32 octets in lenght.
+
+=item --authpassword I<PASSWORD>, --authkey I<KEY>
+
+[SNMPv3] By default a securityLevel of C<noAuthNoPriv> is assumed.  If
+the --authpassword option is specified, the securityLevel becomes
+C<authNoPriv>.  The --authpassword option expects a string which is at
+least 1 octet in length as argument.
+
+Optionally, instead of the --authpassword option, the --authkey option
+can be used so that a plain text password does not have to be
+specified in a script.  The --authkey option expects a hexadecimal
+string produced by localizing the password with the
+authoritativeEngineID for the specific destination device.  The
+C<snmpkey> utility included with the Net::SNMP distribution can be
+used to create the hexadecimal string (see L<snmpkey>).
+
+=item --authprotocol I<ALGORITHM>
+
+[SNMPv3] Two different hash algorithms are defined by SNMPv3 which can
+be used by the Security Model for authentication. These algorithms are
+HMAC-MD5-96 C<MD5> (RFC 1321) and HMAC-SHA-96 C<SHA-1> (NIST FIPS PUB
+180-1). The default algorithm used by the plugin is HMAC-MD5-96.  This
+behavior can be changed by using this option. The option expects
+either the string C<md5> or C<sha> to be passed as argument to modify
+the hash algorithm.
+
+=item --privpassword I<PASSWORD>, --privkey I<KEY>
+
+[SNMPv3] By specifying the options --privkey or --privpassword, the
+securityLevel associated with the object becomes
+C<authPriv>. According to SNMPv3, privacy requires the use of
+authentication. Therefore, if either of these two options are present
+and the --authkey or --authpassword arguments are missing, the
+creation of the object fails.  The --privkey and --privpassword
+options expect the same input as the --authkey and --authpassword
+options respectively.
+
+=item --privprotocol I<ALGORITHM>
+
+[SNMPv3] The User-based Security Model described in RFC 3414 defines a
+single encryption protocol to be used for privacy.  This protocol,
+CBC-DES C<DES> (NIST FIPS PUB 46-1), is used by default or if the
+string C<des> is passed to the --privprotocol option. The Net::SNMP
+module also supports RFC 3826 which describes the use of
+CFB128-AES-128 C<AES> (NIST FIPS PUB 197) in the USM.  The AES
+encryption protocol can be selected by passing C<aes> or C<aes128> to
+the --privprotocol option.
+
+One of the following arguments are required: des, aes, aes128, 3des,
+3desde
+
+=back
+
+=head1 BLACKLISTING
+
+=over 4
+
+=item -b, --blacklist I<STRING> or I<FILE>
+
+Blacklist missing and/or failed components, if you do not plan to fix
+them. The parameter is either the blacklist string, or a file (that
+may or may not exist) containing the string. The blacklist string
+contains component names with component IDs separated by slash
+(/). Blacklisted components are left unchecked.
+
+TIP: Use the option C<-d> (or C<--debug>) to get the blacklist ID for
+devices. The ID is listed in a separate column in the debug output.
+
+NOTE: If blacklisting is in effect, the use of the I<--global> option
+is negated.
+
+=over 9
+
+=item B<Syntax:>
+
+component1=id1[,id2,...]/component2=id1[,id2,...]/...
+
+=item B<Example:>
+
+check_openmanage -b ps=0/fan=3,5/pdisk=1:0:0:1
+
+=back
+
+In the example we blacklist powersupply 0, fans 3 and 5, and
+physical disk 1:0:0:1. Legal component names include:
+
+=over 8
+
+=item B<ctrl>
+
+Controller
+
+=item B<ctrl_fw>
+
+Suppress the special warning message about old controller
+firmware. Use this if you can not or will not upgrade the firmware.
+
+=item B<ctrl_driver>
+
+Suppress the special warning message about old controller driver.
+Particularly useful on systems where you can not upgrade the driver.
+
+=item B<pdisk>
+
+Physical disk.
+
+=item B<vdisk>
+
+Logical drive (virtual disk)
+
+=item B<bat>
+
+Controller cache battery
+
+=item B<conn>
+
+Connector (channel)
+
+=item B<encl>
+
+Enclosure
+
+=item B<encl_fan>
+
+Enclosure fan
+
+=item B<encl_ps>
+
+Enclosure power supply
+
+=item B<encl_temp>
+
+Enclosure temperature probe
+
+=item B<encl_emm>
+
+Enclosure management module (EMM)
+
+=item B<dimm>
+
+Memory module
+
+=item B<fan>
+
+Fan
+
+=item B<ps>
+
+Powersupply
+
+=item B<temp>
+
+Temperature sensor
+
+=item B<cpu>
+
+Processor (CPU)
+
+=item B<volt>
+
+Voltage probe
+
+=item B<bp>
+
+System battery
+
+=item B<pm>
+
+Amperage probe (power consumption monitoring)
+
+=item B<intr>
+
+Intrusion sensor
+
+=back
+
+=back
+
+=head1 CHECK CONTROL
+
+=over 4
+
+=item --only I<KEYWORD>
+
+This option can be specifed once and expects a keyword. The different
+keywords and the behaviour of check_openmanage is described below.
+
+=over 4
+
+=item B<critical>
+
+Print only critical alerts. With this option any warning alerts are
+suppressed.
+
+=item B<warning>
+
+Print only warning alerts. With this option any critical alerts are
+suppressed.
+
+=item B<chassis>
+
+Check all chassis components and nothing else.
+
+=item B<storage>
+
+Only check storage
+
+=item B<memory>
+
+Only check memory modules
+
+=item B<fans>
+
+Only check fans
+
+=item B<power>
+
+Only check power supplies
+
+=item B<temp>
+
+Only check temperatures
+
+=item B<cpu>
+
+Only check processors
+
+=item B<voltage>
+
+Only check voltage probes
+
+=item B<batteries>
+
+Only check batteries
+
+=item B<amperage>
+
+Only check power usage
+
+=item B<intrusion>
+
+Only check chassis intrusion
+
+=item B<esmhealth>
+
+Only check ESM log overall health, i.e. fill grade
+
+=item B<esmlog>
+
+Only check the event log (ESM) content
+
+=item B<alertlog>
+
+Only check the alert log content
+
+=back
+
+=item --check I<STRING> or I<FILE>
+
+This parameter allows you to adjust which components that should be
+checked at all. This is a rougher approach than blacklisting, which
+require that you specify component id or index. The parameter should
+be either a string containing the adjustments, or a file containing
+the string. No errors are raised if the file does not exist.
+
+Note: This option is ignored with alternate basenames.
+
+=over 9
+
+=item B<Example:>
+
+check_openmanage --check storage=0,intrusion=1
+
+=back
+
+Legal values are described below, along with the default value.
+
+=over 4
+
+=item B<storage>
+
+Check storage subsystem (controllers, disks etc.). Default: ON
+
+=item B<memory>
+
+Check memory (dimms). Default: ON
+
+=item B<fans>
+
+Check chassis fans. Default: ON
+
+=item B<power>
+
+Check power supplies. Default: ON
+
+=item B<temp>
+
+Check temperature sensors. Default: ON
+
+=item B<cpu>
+
+Check CPUs. Default: ON
+
+=item B<voltage>
+
+Check voltage sensors. Default: ON
+
+=item B<batteries>
+
+Check system batteries. Default: ON
+
+=item B<amperage>
+
+Check amperage probes. Default: ON
+
+=item B<intrusion>
+
+Check chassis intrusion. Default: ON
+
+=item B<esmhealth>
+
+Check the ESM log health, i.e. fill grade. Default: ON
+
+=item B<esmlog>
+
+Check the ESM log content. Default: OFF
+
+=item B<alertlog>
+
+Check the alert log content. Default: OFF
+
+=back
+
+=back
+
+=head1 DIAGNOSTICS
+
+The option C<--debug> (or C<-d>) can be specified to display all
+monitored components.
+
+=head1 DEPENDENCIES
+
+If SNMP is requested, the perl module Net::SNMP is
+required. Otherwise, only a regular perl distribution is required to
+run the script. On the target (monitored) system, Dell Openmanage
+Server Administrator (OMSA) must be installed and running.
+
+=head1 EXIT STATUS
+
+If no errors are discovered, a value of 0 (OK) is returned. An exit
+value of 1 (WARNING) signifies one or more non-critical errors, while
+2 (CRITICAL) signifies one or more critical errors.
+
+The exit value 3 (UNKNOWN) is reserved for errors within the script,
+or errors getting values from Dell OMSA.
+
+=head1 AUTHOR
+
+Written by Trond H. Amundsen <t.h.amundsen@usit.uio.no>
+
+=head1 BUGS AND LIMITATIONS
+
+Storage info is not collected or checked on very old PowerEdge models
+and/or old OMSA versions, due to limitations in OMSA. The overall
+support on those models/versions by this plugin is not well tested.
+
+=head1 INCOMPATIBILITIES
+
+The plugin should work with the Nagios embedded perl interpreter
+(ePN). However, this is not thoroughly tested.
+
+=head1 REPORTING BUGS
+
+Report bugs to <t.h.amundsen@usit.uio.no>
+
+=head1 LICENSE AND COPYRIGHT
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=head1 SEE ALSO
+
+L<http://folk.uio.no/trondham/software/check_openmanage.html>
+
+=cut
