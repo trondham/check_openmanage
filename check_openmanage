@@ -3998,6 +3998,8 @@ if (defined $opt{perfdata} && !$opt{debug} && %perfdata) {
 
     print join $lb, map { "'$_'=$perfdata{$_}" } sort perfdata keys %perfdata;
 }
+
+# Print a linebreak at the end
 print "\n" if !$opt{debug};
 
 # Exit with proper exit code
