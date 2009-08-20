@@ -1,0 +1,82 @@
+README file for check_openmanage
+================================
+
+Files included in the tarball and zip archive:
+
+  check_openmanage       - The plugin
+  check_openmanage.3pm   - Man page
+  check_openmanage.pod   - Man page source
+  check_openmanage.php   - PNP4Nagios template
+  check_openmanage.spec  - RPM spec file
+  COPYING                - License information
+  INSTALL                - Install HOWTO
+  install.bat            - Windows install script
+  install.sh             - Linux/UNIX install script
+  README                 - This file
+
+
+About this program
+------------------
+
+check_openmanage is a plugin for Nagios which checks the hardware
+health of Dell PowerEdge and some PowerVault servers. It uses the Dell
+OpenManage Server Administrator (OMSA) software, which must be running
+on the monitored system. check_openmanage can be used remotely with
+SNMP or locally with NRPE, check_by_ssh or similar, whichever suits
+your needs and particular taste. The plugin checks the health of the
+storage subsystem, power supplies, memory modules, temperature probes
+etc., and gives an alert if any of the components are faulty or
+operate outside normal parameters.
+
+The plugin can give performance data with the '-p' or '--perfdata'
+switch. Performance data collected include temperatures, fan speeds
+and power usage (on servers that support it).
+
+Storage components checked:
+
+* Controllers
+* Physical drives
+* Logical drives
+* Cache batteries
+* Connectors (channels)
+* Enclosures
+* Enclosure fans
+* Enclosure power supplies
+* Enclosure temperature probes
+* Enclosure management modules (EMMs)
+
+Chassis components checked:
+
+* Processors
+* Memory modules
+* Cooling fans
+* Temperature probes
+* Power supplies
+* Batteries
+* Voltage probes
+* Power usage
+* Chassis intrusion
+
+Other:
+
+* ESM Log health
+* ESM Log content (default disabled)
+* Alert Log (default disabled, not SNMP)
+
+check_openmanage will identify blades and will not report "missing"
+power supplies, cooling fans etc. on blades. It will also accept that
+other components are "missing", unless for components that should be
+present in all servers. For example, all servers should have at least
+one temperature probe, but not all servers have logical drives
+(depends on the type and configuration of the controller).
+
+This nagios plugin is designed to be used by either NRPE or with
+SNMP. It is written in perl. In NRPE mode, it uses omreport to display
+status on various hardware components. In SNMP mode, it checks the
+same components as with omreport. Output is parsed and reported in a
+Nagios friendly way.
+
+More information avilable online:
+
+  http://folk.uio.no/trondham/software/check_openmanage.html
+

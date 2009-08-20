@@ -1,0 +1,20 @@
+Automatic installation
+----------------------
+
+Run the script install.sh to install automatically. The install.sh
+script will ask where to install the files, unless given the '-q'
+option, which will install the files in the default location.
+
+
+Manual installation
+-------------------
+
+To install check_openmanage, copy the file check_openmanage to the
+Nagios plugin directory (usually /usr/lib/nagios/plugins/contrib):
+
+  cp check_openmanage /usr/lib/nagios/plugins/contrib
+
+To install the manual page:
+
+  cp check_openmanage.3pm /usr/share/man/man3
+
