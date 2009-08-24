@@ -55,7 +55,7 @@ if (! isatty *STDOUT) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.0-beta8';
+$VERSION = '3.5.0-beta9';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1177,14 +1177,14 @@ sub check_controllers {
 	# Special case: old firmware
 	if (!blacklisted('ctrl_fw', $id) && defined $minfw) {
 	    chomp $firmware;
-	    my $msg = sprintf 'Controller %d (%s): Firmware is out of date (%s)',
+	    my $msg = sprintf q{Controller %d (%s): Firmware '%s' is out of date},
 	      $id, $name, $firmware;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: old driver
 	if (!blacklisted('ctrl_driver', $id) && defined $mindr) {
 	    chomp $driver;
-	    my $msg = sprintf 'Controller %d (%s): Driver is out of date (%s)',
+	    my $msg = sprintf q{Controller %d (%s): Driver '%s' is out of date},
 	      $id, $name, $driver;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
