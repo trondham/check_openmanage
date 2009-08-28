@@ -55,7 +55,7 @@ if (! isatty *STDOUT) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.0-beta9';
+$VERSION = '3.5.0-beta10';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1379,6 +1379,7 @@ sub check_virtual_disks {
     return if $#controllers == -1;
 
     my $id     = undef;
+    my $name   = undef;
     my $nexus  = undef;
     my $dev    = undef;
     my $state  = undef;
@@ -1386,17 +1387,17 @@ sub check_virtual_disks {
     my $layout = undef;
     my $size   = undef;
     my $progr  = undef;
+    my $ctrl   = undef;
     my @output = ();
 
     if ($snmp) {
 	my %vdisk_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.1'  => 'virtualDiskNumber',
-	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.2'  => 'virtualDiskName',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.3'  => 'virtualDiskDeviceName',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.4'  => 'virtualDiskState',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.6'  => 'virtualDiskLengthInMB',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.13' => 'virtualDiskLayout',
+	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.17' => 'virtualDiskTargetID',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.20' => 'virtualDiskComponentStatus',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.21' => 'virtualDiskNexusID',
 	    );
@@ -1451,7 +1452,7 @@ sub check_virtual_disks {
   VDISK:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $id     = $out->{virtualDiskNumber} - 1;
+	    $id     = $out->{virtualDiskTargetID};
 	    $dev    = $out->{virtualDiskDeviceName};
 	    $state  = $vdisk_state{$out->{virtualDiskState}};
 	    $status = $snmp_status{$out->{virtualDiskComponentStatus}};
@@ -1459,6 +1460,8 @@ sub check_virtual_disks {
 	    $size   = sprintf '%.2f GB', $out->{virtualDiskLengthInMB} / 1024;
 	    $progr  = q{};  # can't get this from SNMP(?)
 	    $nexus  = convert_nexus($out->{virtualDiskNexusID});
+	    $ctrl   = $nexus;  # We use the nexus id to get the controller id
+	    $ctrl   =~ s{\A (\d+):\d+ \z}{$1}xms;
 	}
 	else {
 	    $id     = $out->{ID};
@@ -1470,6 +1473,7 @@ sub check_virtual_disks {
 	    $progr  = ' [' . $out->{Progress} . ']';
 	    $size   =~ s{\A (.*GB).* \z}{$1}xms;
 	    $nexus  = join q{:}, $out->{ctrl}, $id;
+	    $ctrl   = $out->{ctrl};
 	}
 
 	next VDISK if blacklisted('vdisk', $nexus);
@@ -1477,20 +1481,20 @@ sub check_virtual_disks {
 
 	# Special case: Regenerating
 	if ($state eq 'Regenerating') {
-	    my $msg = sprintf 'Logical drive %d "%s" (%s, %s) is %s%s',
-	      $id, $dev, $layout, $size, $state, $progr;
+	    my $msg = sprintf q{Logical drive %d '%s' on ctrl %d (%s, %s) is %s%s},
+	      $id, $dev, $ctrl, $dev, $layout, $size, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
 	elsif ($status ne 'Ok') {
-	    my $msg = sprintf 'Logical drive %d "%s" (%s, %s) needs attention: %s',
-	      $id, $dev, $layout, $size, $state;
+	    my $msg = sprintf q{Logical drive %d '%s' on ctrl %d (%s, %s) needs attention: %s},
+	      $id, $dev, $ctrl, $layout, $size, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf 'Logical drive %d "%s" (%s, %s) is %s',
-	      $id, $dev, $layout, $size, $state;
+	    my $msg = sprintf q{Logical drive %d '%s' on ctrl %d (%s, %s) is %s},
+	      $id, $dev, $ctrl, $layout, $size, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
     }
@@ -1516,8 +1520,6 @@ sub check_cache_battery {
     if ($snmp) {
 	my %bat_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.1'  => 'batteryNumber',
-	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.2'  => 'batteryName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.4'  => 'batteryState',
 	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.6'  => 'batteryComponentStatus',
 	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.9'  => 'batteryNexusID',
@@ -1574,7 +1576,6 @@ sub check_cache_battery {
   BATTERY:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $id     = $out->{batteryNumber} - 1;
 	    $state  = $bat_state{$out->{batteryState}};
 	    $status = $snmp_status{$out->{batteryComponentStatus}};
 	    $learn  = exists $out->{batteryLearnState}
@@ -1583,6 +1584,8 @@ sub check_cache_battery {
 	      ? $bat_pred_cap{$out->{batteryPredictedCapacity}} : undef;
 	    $ctrl   = $out->{batteryConnectionControllerNumber} - 1;
 	    $nexus  = convert_nexus($out->{batteryNexusID});
+	    $id     = $nexus;
+	    $id     =~ s{\A \d+:(\d+) \z}{$1}xms;
 	}
 	else {
 	    $id     = $out->{'ID'};
@@ -1737,6 +1740,7 @@ sub check_enclosures {
     my $state    = undef;
     my $status   = undef;
     my $firmware = undef;
+    my $ctrl     = undef;
     my @output   = ();
 
     if ($snmp) {
@@ -1784,6 +1788,8 @@ sub check_enclosures {
 	    $firmware = exists $out->{enclosureFirmwareVersion}
 	      ? $out->{enclosureFirmwareVersion} : 'N/A';
 	    $nexus    = convert_nexus($out->{enclosureNexusID});
+	    $ctrl     = $nexus;
+	    $ctrl     =~ s{\A (\d+):.* \z}{$1}xms;
         }
         else {
             $id       = $out->{ID};
@@ -1793,6 +1799,7 @@ sub check_enclosures {
 	    $firmware = $out->{'Firmware Version'} ne 'Not Applicable'
 	      ? $out->{'Firmware Version'} : 'N/A';
 	    $nexus    = join q{:}, $out->{ctrl}, $id;
+	    $ctrl     = $out->{ctrl};
         }
 
         $name     =~ s{\s+\z}{}xms; # remove trailing whitespace
@@ -1810,8 +1817,8 @@ sub check_enclosures {
 
         next ENCLOSURE if blacklisted('encl', $nexus);
 
-	my $msg = sprintf 'Enclosure %s (%s) is %s',
-	  $nexus, $name, $state;
+	my $msg = sprintf 'Enclosure %s (%s) on controller %d is %s',
+	  $nexus, $name, $ctrl, $state;
         report('storage', $msg, $status2nagios{$status}, $nexus);
     }
     return;
