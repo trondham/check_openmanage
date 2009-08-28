@@ -50,12 +50,13 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 # that case, redirect all output to STDERR to STDOUT. Nagios ignores
 # output to STDERR.
 if (! isatty *STDOUT) {
-    open STDERR, '>&', 'STDOUT';
+    open STDERR, '>&', 'STDOUT'
+      or do { print "ERROR: Couldn't redirect STDERR to STDOUT\n"; exit 2; }
 }
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.0-beta10';
+$VERSION = '3.5.0-beta11';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
