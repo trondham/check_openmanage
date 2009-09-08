@@ -95,6 +95,12 @@ The reason that OMSA version is separated from the rest is that
 finding it requires running a really slow omreport command, when the
 plugin is run locally via NRPE.
 
+=item --omreport I<OMREPORT PATH>
+
+Specify full path to omreport, if it is not installed in any of the
+regular places. Usually this option is only needed on Windows, if
+omreport is not installed on the C: drive.
+
 =item -i, --info
 
 Prefix any alerts with the service tag.
