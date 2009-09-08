@@ -56,7 +56,7 @@ if (! isatty *STDOUT) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.0-beta11';
+$VERSION = '3.5.0-beta12';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -145,6 +145,7 @@ END_LICENSE
 	 'version'           => 0,
          'all'               => 0,
 	 'only'              => undef,
+	 'omreport'          => undef,
 	 'port'              => 161, # default SNMP port
 	 'hostname'          => undef,
 	 'community'         => 'public',  # SMNP v1 or v2c
@@ -178,6 +179,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'l|linebreak=s'      => \$opt{linebreak},
 	   'a|all'              => \$opt{all},
 	   'only=s'             => \$opt{only},
+	   'omreport=s'         => \$opt{omreport},
 	   'port=i'             => \$opt{port},
 	   'H|hostname=s'       => \$opt{hostname},
 	   'C|community=s'      => \$opt{community},
@@ -612,6 +614,12 @@ sub find_omreport {
 	 'c:\progra~1\dell\sysmgt\oma\bin\omreport.exe', # default on Windows
 	 'c:\progra~2\dell\sysmgt\oma\bin\omreport.exe', # default on Windows x64
 	);
+
+    # If user has specified path to omreport
+    if (defined $opt{omreport} and -x $opt{omreport}) {
+	$omreport = $opt{omreport};
+	return;
+    }
 
     # Find the one to use
   OMREPORT_PATH:
