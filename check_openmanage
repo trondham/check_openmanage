@@ -2122,13 +2122,13 @@ sub check_enclosure_temp {
 
 	# Default
 	if ($status ne 'Ok') {
-	    my $msg = sprintf '%s in enclosure %s [%s] is %s at %s (%s max)',
+	    my $msg = sprintf '%s in enclosure %s [%s] is %s C at %s (%s max)',
 	      $name, $encl_id, $encl_name, $state, $reading, $max_crit;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf '%s in enclosure %s [%s]: %s (%s max)',
+	    my $msg = sprintf '%s in enclosure %s [%s]: %s C (%s max)',
 	      $name, $encl_id, $encl_name, $reading, $max_crit;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
