@@ -7,7 +7,8 @@
 * ePN is no longer disabled by default, check_openmanage no longer has
   an opinion on whether it should run under ePN or not
 * The '-m' or '--man' option is no longer available
-* The option '-v' or '--verbose' is renamed to '-d' or '--debug'
+* The option '-v' or '--verbose' is renamed to '-d' or '--debug',
+  which makes more sense wrt. its usage
 * The '-g' or '--global' option is removed. Checking the global health
   status is now default if applicable
 * Checking intrusion detection is now turned on by default
@@ -16,6 +17,8 @@
 * The basename stuff and options '--only-critical' and
   '--only-warning' are now replaced by an option '--only'
 * If plugin is run by Nagios, redirect stderr to stdout
+* Added option '--omreport', that lets the user specify the full path
+  to the omreport binary
 
 3.4.9   2009-08-07
 ------------------
