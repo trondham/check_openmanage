@@ -3309,7 +3309,7 @@ sub check_esmlog_health {
     # fill grade of the log is more than 80% and the log should be
     # cleared
     if ($health eq 'Ok') {
-	my $msg = sprintf 'ESM log health is OK (less than 80%% full)';
+	my $msg = sprintf 'ESM log health is Ok (less than 80%% full)';
 	report('other', $msg, $E_OK);
     }
     elsif ($health eq 'Critical') {
