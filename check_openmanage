@@ -56,7 +56,7 @@ if (! isatty *STDOUT) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.0-beta12';
+$VERSION = '3.5.0-beta13';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1061,7 +1061,7 @@ sub check_global {
 	my $systemStateGlobalSystemStatus = '1.3.6.1.4.1.674.10892.1.200.10.1.2.1';
 	my $result = $snmp_session->get_request(-varbindlist => [$systemStateGlobalSystemStatus]);
 	if (!defined $result) {
-	    printf "SNMP [systemStateGlobalSystemStatus]: %s\n", $snmp_error;
+	    printf "SNMP ERROR [global]: %s\n", $snmp_error;
 	    exit $E_UNKNOWN;
 	}
 	$health = $status2nagios{$snmp_status{$result->{$systemStateGlobalSystemStatus}}};
@@ -1186,27 +1186,27 @@ sub check_controllers {
 	# Special case: old firmware
 	if (!blacklisted('ctrl_fw', $id) && defined $minfw) {
 	    chomp $firmware;
-	    my $msg = sprintf q{Controller %d (%s): Firmware '%s' is out of date},
+	    my $msg = sprintf q{Controller %d [%s]: Firmware '%s' is out of date},
 	      $id, $name, $firmware;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: old driver
 	if (!blacklisted('ctrl_driver', $id) && defined $mindr) {
 	    chomp $driver;
-	    my $msg = sprintf q{Controller %d (%s): Driver '%s' is out of date},
+	    my $msg = sprintf q{Controller %d [%s]: Driver '%s' is out of date},
 	      $id, $name, $driver;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Ok
 	if ($status eq 'Ok' or ($status eq 'Non-Critical'
 				and (defined $minfw or defined $mindr))) {
-	    my $msg = sprintf 'Controller %d (%s) is %s',
+	    my $msg = sprintf 'Controller %d [%s] is %s',
 	      $id, $name, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
         # Default
 	else {
-	    my $msg = sprintf 'Controller %d (%s) needs attention: %s',
+	    my $msg = sprintf 'Controller %d [%s] needs attention: %s',
 	      $id, $name, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
@@ -1256,7 +1256,7 @@ sub check_physical_disks {
 	my $result = $snmp_session->get_entries(-columns => [keys %pdisk_oid]);
 
 	if (!defined $result) {
-	    printf "SNMP [storage / pdisk]: %s.\n", $snmp_session->error;
+	    printf "SNMP ERROR [storage / pdisk]: %s.\n", $snmp_session->error;
 	    $snmp_session->close;
 	    exit $E_UNKNOWN;
 	}
@@ -1354,25 +1354,25 @@ sub check_physical_disks {
 
 	# Special case: Failure predicted
 	if ($status eq 'Non-Critical' and $fpred) {
-	    my $msg = sprintf '%s (%s %s, %s) on controller %d needs attention: Failure Predicted',
+	    my $msg = sprintf '%s [%s %s, %s] on controller %d needs attention: Failure Predicted',
 	      $name, $vendor, $product, $capacity, $ctrl;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: Rebuilding
 	elsif ($state eq 'Rebuilding') {
-	    my $msg = sprintf '%s (%s) on controller %d is %s%s',
+	    my $msg = sprintf '%s [%s] on controller %d is %s%s',
 	      $name, $capacity, $ctrl, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
 	elsif ($status ne 'Ok') {
-	    my $msg =  sprintf '%s (%s %s, %s) on controller %d needs attention: %s',
+	    my $msg =  sprintf '%s [%s %s, %s] on controller %d needs attention: %s',
 	      $name, $vendor, $product, $capacity, $ctrl, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf '%s (%s) on controller %d is %s',
+	    my $msg = sprintf '%s [%s] on controller %d is %s',
 	      $name, $capacity, $ctrl, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
@@ -1490,20 +1490,20 @@ sub check_virtual_disks {
 
 	# Special case: Regenerating
 	if ($state eq 'Regenerating') {
-	    my $msg = sprintf q{Logical drive %d '%s' on ctrl %d (%s, %s) is %s%s},
-	      $id, $dev, $ctrl, $dev, $layout, $size, $state, $progr;
+	    my $msg = sprintf q{Logical drive %d '%s' [%s, %s] on ctrl %d is %s%s},
+	      $id, $dev, $layout, $size, $ctrl, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
 	elsif ($status ne 'Ok') {
-	    my $msg = sprintf q{Logical drive %d '%s' on ctrl %d (%s, %s) needs attention: %s},
-	      $id, $dev, $ctrl, $layout, $size, $state;
+	    my $msg = sprintf q{Logical drive %d '%s' [%s, %s] on ctrl %d needs attention: %s},
+	      $id, $dev, $layout, $size, $ctrl, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf q{Logical drive %d '%s' on ctrl %d (%s, %s) is %s},
-	      $id, $dev, $ctrl, $layout, $size, $state;
+	    my $msg = sprintf q{Logical drive %d '%s' [%s, %s] on ctrl %d is %s},
+	      $id, $dev, $layout, $size, $ctrl, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
     }
@@ -1671,7 +1671,7 @@ sub check_connectors {
         my $result = $snmp_session->get_entries(-columns => [keys %conn_oid]);
 
         if (!defined $result) {
-            printf "SNMP [storage / channel]: %s.\n", $snmp_session->error;
+            printf "SNMP ERROR [storage / channel]: %s.\n", $snmp_session->error;
             $snmp_session->close;
             exit $E_UNKNOWN;
         }
@@ -1731,7 +1731,7 @@ sub check_connectors {
 
         next CHANNEL if blacklisted('conn', $nexus);
 
-	my $msg = sprintf '%s (%s) on controller %d is %s',
+	my $msg = sprintf '%s [%s] on controller %d is %s',
 	  $name, $type, $ctrl, $state;
         report('storage', $msg, $status2nagios{$status}, $nexus);
     }
@@ -1826,7 +1826,7 @@ sub check_enclosures {
 
         next ENCLOSURE if blacklisted('encl', $nexus);
 
-	my $msg = sprintf 'Enclosure %s (%s) on controller %d is %s',
+	my $msg = sprintf 'Enclosure %s [%s] on controller %d is %s',
 	  $nexus, $name, $ctrl, $state;
         report('storage', $msg, $status2nagios{$status}, $nexus);
     }
@@ -1918,13 +1918,13 @@ sub check_enclosure_fans {
 
 	# Default
 	if ($status ne 'Ok') {
-	    my $msg = sprintf '%s in enclosure %s (%s) needs attention: %s',
+	    my $msg = sprintf '%s in enclosure %s [%s] needs attention: %s',
 	      $name, $encl_id, $encl_name, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf '%s in enclosure %s (%s) is %s (speed=%s)',
+	    my $msg = sprintf '%s in enclosure %s [%s] is %s (speed=%s)',
 	      $name, $encl_id, $encl_name, $state, $speed;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
@@ -2012,13 +2012,13 @@ sub check_enclosure_pwr {
 
 	# Default
 	if ($status ne 'Ok') {
-	    my $msg = sprintf '%s in enclosure %s (%s) needs attention: %s',
+	    my $msg = sprintf '%s in enclosure %s [%s] needs attention: %s',
 	      $name, $encl_id, $encl_name, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf '%s in enclosure %s (%s) is %s',
+	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
 	      $name, $encl_id, $encl_name, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
@@ -2122,13 +2122,13 @@ sub check_enclosure_temp {
 
 	# Default
 	if ($status ne 'Ok') {
-	    my $msg = sprintf '%s in enclosure %s (%s) is %s at %s (%s max)',
+	    my $msg = sprintf '%s in enclosure %s [%s] is %s at %s (%s max)',
 	      $name, $encl_id, $encl_name, $state, $reading, $max_crit;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf '%s in enclosure %s (%s): %s (%s max)',
+	    my $msg = sprintf '%s in enclosure %s [%s]: %s (%s max)',
 	      $name, $encl_id, $encl_name, $reading, $max_crit;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
@@ -2225,13 +2225,13 @@ sub check_enclosure_emms {
 
 	# Default
 	if ($status ne 'Ok') {
-	    my $msg = sprintf '%s in enclosure %s (%s) needs attention: %s',
+	    my $msg = sprintf '%s in enclosure %s [%s] needs attention: %s',
 	      $name, $encl_id, $encl_name, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf '%s in enclosure %s (%s) is %s',
+	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
 	      $name, $encl_id, $encl_name, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
@@ -2264,7 +2264,7 @@ sub check_memory {
 	my $result = $snmp_session->get_entries(-columns => [keys %dimm_oid]);
 
 	if (!defined $result) {
-	    printf "SNMP [memory]: %s.\n", $snmp_session->error;
+	    printf "SNMP ERROR [memory]: %s.\n", $snmp_session->error;
 	    $snmp_session->close;
 	    exit $E_UNKNOWN;
 	}
@@ -2330,11 +2330,11 @@ sub check_memory {
 	if ($status ne 'Ok') {
 	    my $msg = undef;
 	    if (scalar @failures == 0) {
-		$msg = sprintf 'Memory module %d (%s, %s) needs attention (%s)',
+		$msg = sprintf 'Memory module %d [%s, %s] needs attention (%s)',
 		  $index, $location, $size, $status;
 	    }
 	    else {
-		$msg = sprintf 'Memory module %d (%s, %s) needs attention: %s',
+		$msg = sprintf 'Memory module %d [%s, %s] needs attention: %s',
 		  $index, $location, $size, (join q{, }, @failures);
 	    }
 
@@ -2342,7 +2342,7 @@ sub check_memory {
 	}
 	# Ok
 	else {
-	    my $msg = sprintf 'Memory module %d (%s, %s) is %s',
+	    my $msg = sprintf 'Memory module %d [%s, %s] is %s',
 	      $index, $location, $size, $status;
 	    report('chassis', $msg, $E_OK, $index);
 	}
@@ -2379,7 +2379,7 @@ sub check_fans {
 	    return 0;
 	}
 	elsif (!$blade && !defined $result) {
-	    printf "SNMP [cooling]: %s.\n", $snmp_session->error;
+	    printf "SNMP ERROR [cooling]: %s.\n", $snmp_session->error;
 	    $snmp_session->close;
 	    exit $E_UNKNOWN;
 	}
@@ -2420,13 +2420,13 @@ sub check_fans {
 	$count{fan}++;
 
 	if ($status ne 'Ok') {
-	    my $msg = sprintf 'Chassis fan %d (%s) needs attention: %s',
+	    my $msg = sprintf 'Chassis fan %d [%s] needs attention: %s',
 	      $index, $location, $status;
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	    report('chassis', $msg, $err, $index);
 	}
 	else {
-	    my $msg = sprintf 'Chassis fan %d (%s): %s',
+	    my $msg = sprintf 'Chassis fan %d [%s]: %s',
 	      $index, $location, $reading;
 	    report('chassis', $msg, $E_OK, $index);
 	}
@@ -2547,12 +2547,12 @@ sub check_powersupplies {
 	$count{power}++;
 
 	if ($status ne 'Ok') {
-	    my $msg = sprintf 'Power Supply %d (%s) needs attention: %s',
+	    my $msg = sprintf 'Power Supply %d [%s] needs attention: %s',
 	      $index, $type, $state;
 	    report('chassis', $msg, $status2nagios{$status}, $index);
 	}
 	else {
-	    my $msg = sprintf 'Power Supply %d (%s): %s',
+	    my $msg = sprintf 'Power Supply %d [%s]: %s',
 	      $index, $type, $state;
 	    report('chassis', $msg, $E_OK, $index);
 	}
@@ -2603,7 +2603,7 @@ sub check_temperatures {
 	my $result = $snmp_session->get_table(-baseoid => $temperatureProbeTable);
 
 	if (!defined $result) {
-	    printf "SNMP [temperatures]: %s.\n", $snmp_session->error;
+	    printf "SNMP ERROR [temperatures]: %s.\n", $snmp_session->error;
 	    $snmp_session->close;
 	    exit $E_UNKNOWN;
 	}
@@ -2665,55 +2665,55 @@ sub check_temperatures {
 	    # First check according to custom thresholds
 	    if (exists $crit_threshold{$index}{max} and $reading > $crit_threshold{$index}{max}) {
 		# Custom critical MAX
-		my $msg = sprintf 'Temperature Probe %d (%s) reads %d C (custom max=%d)',
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (custom max=%d)',
 		  $index, $location, $reading, $crit_threshold{$index}{max};
 		report('chassis', $msg, $E_CRITICAL, $index);
 	    }
 	    elsif (exists $warn_threshold{$index}{max} and $reading > $warn_threshold{$index}{max}) {
 		# Custom warning MAX
-		my $msg = sprintf 'Temperature Probe %d (%s) reads %d C (custom max=%d)',
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (custom max=%d)',
 		  $index, $location, $reading, $warn_threshold{$index}{max};
 		report('chassis', $msg, $E_WARNING, $index);
 	    }
 	    elsif (exists $crit_threshold{$index}{min} and $reading < $crit_threshold{$index}{min}) {
 		# Custom critical MIN
-		my $msg = sprintf 'Temperature Probe %d (%s) reads %d C (custom min=%d)',
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (custom min=%d)',
 		  $index, $location, $reading, $crit_threshold{$index}{min};
 		report('chassis', $msg, $E_CRITICAL, $index);
 	    }
 	    elsif (exists $warn_threshold{$index}{min} and $reading < $warn_threshold{$index}{min}) {
 		# Custom warning MIN
-		my $msg = sprintf 'Temperature Probe %d (%s) reads %d C (custom min=%d)',
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (custom min=%d)',
 		  $index, $location, $reading, $warn_threshold{$index}{min};
 		report('chassis', $msg, $E_WARNING, $index);
 	    }
 	    elsif ($status ne 'Ok' and $max_crit ne '[N/A]' and $reading > $max_crit) {
-		my $msg = sprintf 'Temperature Probe %d (%s) is critically high at %d C',
+		my $msg = sprintf 'Temperature Probe %d [%s] is critically high at %d C',
 		  $index, $location, $reading;
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
 	    elsif ($status ne 'Ok' and $max_warn ne '[N/A]' and $reading > $max_warn) {
-		my $msg = sprintf 'Temperature Probe %d (%s) is too high at %d C',
+		my $msg = sprintf 'Temperature Probe %d [%s] is too high at %d C',
 		  $index, $location, $reading;
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
 	    elsif ($status ne 'Ok' and $min_crit ne '[N/A]' and $reading < $min_crit) {
-		my $msg = sprintf 'Temperature Probe %d (%s) is critically low at %d C',
+		my $msg = sprintf 'Temperature Probe %d [%s] is critically low at %d C',
 		  $index, $location, $reading;
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
 	    elsif ($status ne 'Ok' and $min_warn ne '[N/A]' and $reading < $min_warn) {
-		my $msg = sprintf 'Temperature Probe %d (%s) is too low at %d C',
+		my $msg = sprintf 'Temperature Probe %d [%s] is too low at %d C',
 		  $index, $location, $reading;
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
 	    # Ok
 	    else {
-		my $msg = sprintf 'Temperature Probe %d (%s) reads %d C (min=%s/%s, max=%s/%s)',
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (min=%s/%s, max=%s/%s)',
 		  $index, $location, $reading, $min_warn, $min_crit, $max_warn, $max_crit;
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
@@ -2774,7 +2774,7 @@ sub check_processors {
 	}
 
 	if (!defined $result) {
-	    printf "SNMP [processors]: %s.\n", $snmp_session->error;
+	    printf "SNMP ERROR [processors]: %s.\n", $snmp_session->error;
 	    $snmp_session->close;
 	    exit $E_UNKNOWN;
 	}
@@ -2898,7 +2898,7 @@ sub check_volts {
         my $result = $snmp_session->get_table(-baseoid => $voltageProbeTable);
 
 	if (!defined $result) {
-	    printf "SNMP [voltage probes]: %s.\n", $snmp_session->error;
+	    printf "SNMP ERROR [voltage]: %s.\n", $snmp_session->error;
 	    $snmp_session->close;
 	    exit $E_UNKNOWN;
 	}
@@ -2935,7 +2935,7 @@ sub check_volts {
 	next VOLT if blacklisted('volt', $index);
 	$count{volt}++;
 
-	my $msg = sprintf 'Voltage sensor %d (%s) is %s',
+	my $msg = sprintf 'Voltage sensor %d [%s] is %s',
 	  $index, $location, $reading;
 	my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	report('chassis', $msg, $err, $index);
@@ -2998,7 +2998,7 @@ sub check_batteries {
 	next BATTERY if blacklisted('bp', $index);
 	$count{bat}++;
 
-	my $msg = sprintf 'Battery probe %d (%s) is %s',
+	my $msg = sprintf 'Battery probe %d [%s] is %s',
 	  $index, $location, $reading;
 	report('chassis', $msg, $status2nagios{$status}, $index);
     }
@@ -3123,7 +3123,7 @@ sub check_pwrmonitoring {
 	next AMP if $index !~ m{\A \d+ \z}xms;
 	$count{amp}++;
 
-	my $msg = sprintf 'Amperage probe %d (%s) reads %s %s',
+	my $msg = sprintf 'Amperage probe %d [%s] reads %s %s',
 	  $index, $location, $reading, $unit, $status;
 	report('chassis', $msg, $status2nagios{$status}, $index);
 
@@ -3282,7 +3282,7 @@ sub check_esmlog_health {
 	my $systemStateEventLogStatus = '1.3.6.1.4.1.674.10892.1.200.10.1.41.1';
 	my $result = $snmp_session->get_request(-varbindlist => [$systemStateEventLogStatus]);
 	if (!defined $result) {
-	    my $msg = sprintf 'SNMP ERROR getting systemStateEventLogStatus OID: %s',
+	    my $msg = sprintf 'SNMP ERROR [esmhealth]: %s',
 	      $snmp_session->error;
 	    report('other', $msg, $E_UNKNOWN);
 	}
@@ -3302,7 +3302,7 @@ sub check_esmlog_health {
     # fill grade of the log is more than 80% and the log should be
     # cleared
     if ($health eq 'Ok') {
-	my $msg = sprintf 'ESM log is health is OK (less than 80%% full)';
+	my $msg = sprintf 'ESM log health is OK (less than 80%% full)';
 	report('other', $msg, $E_OK);
     }
     elsif ($health eq 'Critical') {
