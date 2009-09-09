@@ -1354,25 +1354,25 @@ sub check_physical_disks {
 
 	# Special case: Failure predicted
 	if ($status eq 'Non-Critical' and $fpred) {
-	    my $msg = sprintf '%s [%s %s, %s] on controller %d needs attention: Failure Predicted',
+	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
 	      $name, $vendor, $product, $capacity, $ctrl;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: Rebuilding
 	elsif ($state eq 'Rebuilding') {
-	    my $msg = sprintf '%s [%s] on controller %d is %s%s',
+	    my $msg = sprintf '%s [%s] on ctrl %d is %s%s',
 	      $name, $capacity, $ctrl, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
 	elsif ($status ne 'Ok') {
-	    my $msg =  sprintf '%s [%s %s, %s] on controller %d needs attention: %s',
+	    my $msg =  sprintf '%s [%s %s, %s] on ctrl %d needs attention: %s',
 	      $name, $vendor, $product, $capacity, $ctrl, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf '%s [%s] on controller %d is %s',
+	    my $msg = sprintf '%s [%s] on ctrl %d is %s',
 	      $name, $capacity, $ctrl, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
