@@ -2713,8 +2713,15 @@ sub check_temperatures {
 	    }
 	    # Ok
 	    else {
-		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (min=%s/%s, max=%s/%s)',
-		  $index, $location, $reading, $min_warn, $min_crit, $max_warn, $max_crit;
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C',
+		  $index, $location, $reading;
+		if ($min_warn eq '[N/A]' and $min_crit eq '[N/A]') {
+		    $msg .= sprintf ' (max=%s/%s)', $max_warn, $max_crit;
+		}
+		else {
+		    $msg .= sprintf ' (min=%s/%s, max=%s/%s)',
+		      $min_warn, $min_crit, $max_warn, $max_crit;
+		}		    
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
