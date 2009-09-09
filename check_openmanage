@@ -3313,7 +3313,7 @@ sub check_esmlog_health {
 	report('other', $msg, $E_OK);
     }
     elsif ($health eq 'Critical') {
-	my $msg = sprintf 'ESM log is 100%% full!';
+	my $msg = sprintf 'ESM log is 100%% full';
 	report('other', $msg, $status2nagios{$health});
     }
     else {
