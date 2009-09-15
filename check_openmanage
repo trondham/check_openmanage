@@ -605,6 +605,12 @@ sub snmp_detect_blade {
 # Locate the omreport binary
 #
 sub find_omreport {
+    # If user has specified path to omreport
+    if (defined $opt{omreport} and -x $opt{omreport}) {
+	$omreport = $opt{omreport};
+	return;
+    }
+
     # Possible full paths for omreport
     my @omreport_paths
       = (
@@ -616,12 +622,6 @@ sub find_omreport {
 	 'c:\progra~1\dell\sysmgt\oma\bin\omreport.exe', # 8bit legacy default on Windows x32
 	 'c:\progra~2\dell\sysmgt\oma\bin\omreport.exe', # 8bit legacy default on Windows x64
 	);
-
-    # If user has specified path to omreport
-    if (defined $opt{omreport} and -x $opt{omreport}) {
-	$omreport = $opt{omreport};
-	return;
-    }
 
     # Find the one to use
   OMREPORT_PATH:
