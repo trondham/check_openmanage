@@ -12,13 +12,16 @@
 * The '-g' or '--global' option is removed. Checking the global health
   status is now default if applicable
 * Checking intrusion detection is now turned on by default
-* The option '--snmp' is removed
+* The obsolete option '--snmp' is removed
 * The option '--state' now has a shorter equivalent '-s'
 * The basename stuff and options '--only-critical' and
   '--only-warning' are now replaced by an option '--only'
 * If plugin is run by Nagios, redirect stderr to stdout
 * Added option '--omreport', that lets the user specify the full path
   to the omreport binary
+* Added non-8bit-legacy default search paths for omreport.exe for
+  Windows boxen
+* Minor changes to the plugin output, for consistency
 
 3.4.9   2009-08-07
 ------------------
