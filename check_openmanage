@@ -611,8 +611,8 @@ sub find_omreport {
 	 '/usr/bin/omreport',                            # default on Linux
 	 '/opt/dell/srvadmin/oma/bin/omreport.sh',       # alternate on Linux
 	 '/opt/dell/srvadmin/oma/bin/omreport',          # alternate on Linux
-	 'C:\Program Files (x86)\Dell\SysMgt\oma\bin\omreport.exe' # default on Windows x64
-	 'C:\Program Files\Dell\SysMgt\oma\bin\omreport.exe'       # default on Windows x32
+	 'C:\Program Files (x86)\Dell\SysMgt\oma\bin\omreport.exe', # default on Windows x64
+	 'C:\Program Files\Dell\SysMgt\oma\bin\omreport.exe',       # default on Windows x32
 	 'c:\progra~1\dell\sysmgt\oma\bin\omreport.exe', # 8bit legacy default on Windows x32
 	 'c:\progra~2\dell\sysmgt\oma\bin\omreport.exe', # 8bit legacy default on Windows x64
 	);
