@@ -193,7 +193,7 @@ monitored system.
 Same as the B<--state> option above, except that the state is
 abbreviated to a single letter (W=warning, C=critical etc.).
 
-=item --linebreak=I<STRING>
+=item --linebreak I<STRING>
 
 check_openmanage will sometimes report more than one line, e.g. if
 there are several alerts. If the script has a TTY, it will use regular
