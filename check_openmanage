@@ -239,7 +239,7 @@ $omreport = undef;
 	 );
 
 # Default line break
-$linebreak = isatty *STDOUT ? "\n" : '<br/>';
+$linebreak = isatty(*STDOUT) ? "\n" : '<br/>';
 
 # Line break from option
 if (defined $opt{linebreak}) {
