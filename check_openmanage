@@ -49,7 +49,7 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 # If we don't have a TTY, the plugin is probably run by Nagios. In
 # that case, redirect all output to STDERR to STDOUT. Nagios ignores
 # output to STDERR.
-if (! isatty *STDOUT) {
+if (! isatty(*STDOUT)) {
     open STDERR, '>&', 'STDOUT'
       or do { print "ERROR: Couldn't redirect STDERR to STDOUT\n"; exit 2; }
 }
