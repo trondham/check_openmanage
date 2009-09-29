@@ -23,7 +23,8 @@
   Windows boxen
 * Minor changes to the plugin output, for consistency
 * New blacklisting keyword 'bat_charge' disables warning messages
-  related to controller cache battery charging.
+  related to controller cache battery charging. Thanks to Robert
+  Heinzmann for a patch.
 
 3.4.9   2009-08-07
 ------------------
