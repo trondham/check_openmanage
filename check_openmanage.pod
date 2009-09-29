@@ -384,6 +384,11 @@ Logical drive (virtual disk)
 
 Controller cache battery
 
+=item B<bat_charge>
+
+Ignore warnings related to the controller cache battery charging
+cycle, which happens approximately every 40 days on Dell servers.
+
 =item B<conn>
 
 Connector (channel)
