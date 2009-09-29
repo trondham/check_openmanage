@@ -338,8 +338,8 @@ contains component names with component IDs separated by slash
 TIP: Use the option C<-d> (or C<--debug>) to get the blacklist ID for
 devices. The ID is listed in a separate column in the debug output.
 
-NOTE: If blacklisting is in effect, the use of the I<--global> option
-is negated.
+NOTE: If blacklisting is in effect, the global health of the system is
+not checked.
 
 =over 9
 
@@ -347,20 +347,26 @@ is negated.
 
 component1=id1[,id2,...]/component2=id1[,id2,...]/...
 
+The ID part can also be C<ALL>, in which all components of that type
+is blacklisted.
+
 =item B<Example:>
 
-check_openmanage -b ps=0/fan=3,5/pdisk=1:0:0:1
+check_openmanage -b ps=0/fan=3,5/pdisk=1:0:0:1/ctrl_driver=ALL
 
 =back
 
-In the example we blacklist powersupply 0, fans 3 and 5, and
-physical disk 1:0:0:1. Legal component names include:
+In the example we blacklist powersupply 0, fans 3 and 5, physical disk
+1:0:0:1, and warnings about out-of-date drivers for all
+controllers. Legal component names include:
 
 =over 8
 
 =item B<ctrl>
 
-Controller
+Storage controller. Note that if a controller is blacklisted, all
+components on that controller (such as physical and logical drives)
+are blacklisted as well.
 
 =item B<ctrl_fw>
 
