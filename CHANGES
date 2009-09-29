@@ -22,6 +22,8 @@
 * Added non-8bit-legacy default search paths for omreport.exe for
   Windows boxen
 * Minor changes to the plugin output, for consistency
+* New blacklisting keyword 'bat_charge' disables warning messages
+  related to controller cache battery charging.
 
 3.4.9   2009-08-07
 ------------------
