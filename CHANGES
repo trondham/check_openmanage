@@ -25,6 +25,8 @@
 * New blacklisting keyword 'bat_charge' disables warning messages
   related to controller cache battery charging. Thanks to Robert
   Heinzmann for a patch.
+* For blacklisting, the component ID kan now be "ALL", in which all
+  components of that type is blacklisted.
 
 3.4.9   2009-08-07
 ------------------
