@@ -393,7 +393,9 @@ Controller cache battery
 =item B<bat_charge>
 
 Ignore warnings related to the controller cache battery charging
-cycle, which happens approximately every 40 days on Dell servers.
+cycle, which happens approximately every 40 days on Dell servers. Note
+that using this blacklist keyword makes check_openmanage ignore
+non-critical cache battery errors.
 
 =item B<conn>
 
