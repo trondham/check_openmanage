@@ -3,7 +3,7 @@
 # PNP4Nagios template for check_openmanage
 # http://folk.uio.no/trondham/software/check_openmanage.html
 #
-# $Id: check_openmanage 15247 2009-10-01 12:08:30Z trondham $
+# $Id$
 #
 
 # Array with different colors
