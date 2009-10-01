@@ -1356,7 +1356,7 @@ sub check_physical_disks {
 
 	# Special case: Failure predicted
 	if ($status eq 'Non-Critical' and $fpred) {
-	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
+	    my $msg = sprintf '%s <tt>[%s %s, %s]</tt> on ctrl %d needs attention: Failure Predicted',
 	      $name, $vendor, $product, $capacity, $ctrl;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
