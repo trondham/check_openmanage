@@ -27,6 +27,8 @@
   Heinzmann for a patch.
 * For blacklisting, the component ID kan now be "ALL", in which all
   components of that type is blacklisted.
+* Man page is moved to manual section 8
+
 
 3.4.9   2009-08-07
 ------------------
