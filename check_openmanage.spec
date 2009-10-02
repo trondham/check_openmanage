@@ -8,7 +8,11 @@ Group:     Applications/System
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 URL:       http://folk.uio.no/trondham/software/%{name}.html
 Source0:   http://folk.uio.no/trondham/software/files/%{name}-%{version}.tar.gz
-Requires: perl
+BuildRequires: perl
+
+Requires: perl >= 5.6.0
+Requires: perl(POSIX)
+Requires: perl(Getopt::Long)
 
 %description
 check_openmanage is a plugin for Nagios which checks the hardware
@@ -24,22 +28,21 @@ outside normal parameters.
 %setup -q
 
 %build
-gzip %{name}.3pm
-mkdir -p %{buildroot}/%{_libdir}/nagios/plugins
-mkdir -p %{buildroot}/%{_mandir}/man3
+pod2man -s 8 -r "%{name} %{version}" -c "Nagios plugin" %{name}.pod %{name}.8
+gzip %{name}.8
 
 %install
 install -D -p -m 0755 %{name} %{buildroot}/%{_libdir}/nagios/plugins
-install -m 0644 %{name}.3pm.gz %{buildroot}/%{_mandir}/man3
+install -D -m 0644 %{name}.8.gz %{buildroot}/%{_mandir}/man8
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
 %doc README COPYING CHANGES
 %{_libdir}/nagios/plugins/%{name}
-%attr(0755, root, root) %{_mandir}/man3/%{name}.3pm.gz
+%attr(0755, root, root) %{_mandir}/man8/%{name}.8.gz
 
 %changelog
 * Fri Aug  7 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.9-1
