@@ -1,4 +1,4 @@
-Summary:   Nagios plugin to check hardware health on Dell servers
+Summary:   Nagios plugin to monitor hardware health on Dell servers
 Name:      check_openmanage
 Version:   3.5.0
 Release:   1%{?dist}
@@ -43,6 +43,7 @@ rm -rf %{buildroot}
 %doc README COPYING CHANGES
 %{_libdir}/nagios/plugins/%{name}
 %attr(0755, root, root) %{_mandir}/man8/%{name}.8.gz
+
 
 %changelog
 * Fri Aug  7 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.9-1
