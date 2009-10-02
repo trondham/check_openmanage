@@ -1,6 +1,6 @@
 Summary:   Nagios plugin to check hardware health on Dell servers
 Name:      check_openmanage
-Version:   3.4.9
+Version:   3.5.0
 Release:   1%{?dist}
 License:   GPL
 Packager:  Trond Hasle Amundsen <t.h.amundsen@usit.uio.no>
@@ -25,34 +25,20 @@ outside normal parameters.
 
 %build
 gzip %{name}.3pm
-mkdir -p %{buildroot}/%{_libdir}/nagios/plugins/contrib
+mkdir -p %{buildroot}/%{_libdir}/nagios/plugins
 mkdir -p %{buildroot}/%{_mandir}/man3
 
 %install
-install -d -m 0755 %{buildroot}/%{_libdir}/nagios/plugins/contrib
-install -m 0755 %{name} %{buildroot}/%{_libdir}/nagios/plugins/contrib
-install -m 0755 %{name}.3pm.gz %{buildroot}/%{_mandir}/man3
-pushd %{buildroot}/%{_libdir}/nagios/plugins/contrib
-ln -s %{name} %{name}_alertlog
-ln -s %{name} %{name}_batteries
-ln -s %{name} %{name}_cpu
-ln -s %{name} %{name}_esmlog
-ln -s %{name} %{name}_fans
-ln -s %{name} %{name}_intrusion
-ln -s %{name} %{name}_memory
-ln -s %{name} %{name}_power
-ln -s %{name} %{name}_pwrmonitor
-ln -s %{name} %{name}_storage
-ln -s %{name} %{name}_temperature
-ln -s %{name} %{name}_esmhealth
-popd
+install -D -p -m 0755 %{name} %{buildroot}/%{_libdir}/nagios/plugins
+install -m 0644 %{name}.3pm.gz %{buildroot}/%{_mandir}/man3
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root, -)
-%{_libdir}/nagios/plugins/contrib/%{name}*
+%doc README COPYING CHANGES
+%{_libdir}/nagios/plugins/%{name}
 %attr(0755, root, root) %{_mandir}/man3/%{name}.3pm.gz
 
 %changelog
