@@ -449,7 +449,7 @@ Voltage probe
 
 System battery
 
-=item B<pm>
+=item B<amp>
 
 Amperage probe (power consumption monitoring)
 
