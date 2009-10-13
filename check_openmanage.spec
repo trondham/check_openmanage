@@ -32,8 +32,10 @@ pod2man -s 8 -r "%{name} %{version}" -c "Nagios plugin" %{name}.pod %{name}.8
 gzip %{name}.8
 
 %install
-install -D -p -m 0755 %{name} %{buildroot}/%{_libdir}/nagios/plugins
-install -D -m 0644 %{name}.8.gz %{buildroot}/%{_mandir}/man8
+mkdir -p %{buildroot}/%{_libdir}/nagios/plugins
+mkdir -p %{buildroot}/%{_mandir}/man8
+install -p -m 0755 %{name} %{buildroot}/%{_libdir}/nagios/plugins
+install -m 0644 %{name}.8.gz %{buildroot}/%{_mandir}/man8
 
 %clean
 rm -rf %{buildroot}
