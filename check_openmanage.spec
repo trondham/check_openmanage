@@ -46,6 +46,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Oct 13 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.0-1
+- Version 3.5.0
+- New location for the manual page (section 3 -> 8)
+
 * Fri Aug  7 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.9-1
 - Version 3.4.9
 
