@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.1-beta1';
+$VERSION = '3.5.1-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3616,17 +3616,17 @@ sub get_sysinfo
 	$snmp ? get_snmp_chassis_bios() : get_omreport_chassis_bios();
     }
 
+    # Get OMSA information. Only if needed
+    if ($opt{okinfo} >= 3 or $opt{debug}) {
+	$snmp ? get_snmp_about() : get_omreport_about();
+    }
+
     # Return now if debug
     return if $opt{debug};
 
     # Get OS information. Only if needed
     if (defined $opt{postmsg} and $opt{postmsg} =~ m/[%][or]/xms) {
 	$snmp ? get_snmp_system_operatingsystem() : get_omreport_system_operatingsystem();
-    }
-
-    # Get OMSA information. Only if needed
-    if ($opt{okinfo} >= 3) {
-	$snmp ? get_snmp_about() : get_omreport_about();
     }
 
     return;
@@ -3797,8 +3797,10 @@ if ($snmp) {
 # Print messages
 if ($opt{debug}) {
     print "   System:      $sysinfo{model}\n";
-    print "   ServiceTag:  $sysinfo{serial}\n";
-    print "   BIOS/date:   $sysinfo{bios} $sysinfo{biosdate}\n";
+    print "   ServiceTag:  $sysinfo{serial}";
+    print q{ } x (25 - length $sysinfo{serial}), "OMSA version:    $sysinfo{om}\n";
+    print "   BIOS/date:   $sysinfo{bios} $sysinfo{biosdate}";
+    print q{ } x (25 - length "$sysinfo{bios} $sysinfo{biosdate}"), "Plugin version:  $VERSION\n";
     if ($#report_storage >= 0) {
 	print "-----------------------------------------------------------------------------\n";
 	print "   Storage Components                                                        \n";
