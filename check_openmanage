@@ -3816,7 +3816,7 @@ if ($opt{debug}) {
 	print "-----------------------------------------------------------------------------\n";
 	print "   Chassis Components                                                        \n";
 	print "=============================================================================\n";
-	print "  STATE  |  ID  |  MESSAGE TEXT                                          \n";
+	print "  STATE  |  ID  |  MESSAGE TEXT                                              \n";
 	print "---------+------+------------------------------------------------------------\n";
 	foreach (@report_chassis) {
 	    my ($msg, $level, $nexus) = @{$_};
