@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.0';
+$VERSION = '3.5.1-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -607,7 +607,7 @@ sub snmp_detect_blade {
 sub find_omreport {
     # If user has specified path to omreport
     if (defined $opt{omreport} and -x $opt{omreport}) {
-	$omreport = $opt{omreport};
+	$omreport = qq{"$opt{omreport}"};
 	return;
     }
 
