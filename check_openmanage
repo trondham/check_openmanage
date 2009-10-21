@@ -2898,7 +2898,7 @@ sub check_processors {
 	    }
 	    $man    = $out->{processorDeviceManufacturerName};
 	    $family = exists $cpu_family{$out->{processorDeviceFamily}}
-	      $cpu_family{$out->{processorDeviceFamily}} : undef;
+	      ? $cpu_family{$out->{processorDeviceFamily}} : undef;
 	    $speed  = $out->{processorDeviceCurrentSpeed};
 	    $brand  = $out->{processorDeviceBrandName};
 	}
