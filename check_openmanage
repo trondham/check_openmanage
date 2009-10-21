@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.1-beta2';
+$VERSION = '3.5.1-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -850,7 +850,7 @@ sub run_omreport {
 
 	next if !m/(.*?;){2}/xms;  # ignore lines with less than 3 fields
 	my @vals = split /;/xms;
-	if ($vals[0] =~ m/\A (Index|ID|Severity) \z/xms) {
+	if ($vals[0] =~ m/\A (Index|ID|Severity|Processor|Current\sSpeed) \z/xms) {
 	    @keys = @vals;
 	}
 	else {
@@ -1345,8 +1345,8 @@ sub check_physical_disks {
           ? sprintf '%.1fTB', ($capacity / 1000**4)
 	    : sprintf '%.0fGB', ($capacity / 1000**3);
 	$capacity = '450GB' if $capacity eq '449GB';  # quick fix for 450GB disks
+	$capacity = '300GB' if $capacity eq '299GB';  # quick fix for 300GB disks
 	$capacity = '146GB' if $capacity eq '147GB';  # quick fix for 146GB disks
-	$capacity = '300GB' if $capacity eq '299GB';  # quick fix for 146GB disks
 
 	# Capitalize only the first letter of the vendor name
 	$vendor = (substr $vendor, 0, 1) . lc (substr $vendor, 1, length $vendor);
@@ -2733,7 +2733,7 @@ sub check_temperatures {
 		else {
 		    $msg .= sprintf ' (min=%s/%s, max=%s/%s)',
 		      $min_warn, $min_crit, $max_warn, $max_crit;
-		}		    
+		}
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
@@ -2761,36 +2761,34 @@ sub check_processors {
     my $index   = undef;
     my $status  = undef;
     my $state   = undef;
-    my $oid_ver = 'new';
-    my @output  = ();
+    my $brand   = undef;
+    my $family  = undef;
+    my $man     = undef;
+    my $speed   = undef;
+    my $model   = undef;
+    my @output = ();
 
     if ($snmp) {
 
 	# NOTE: For some reason, older models don't have the
-	# "Processor Device Status" OIDs. We first check the newer
-	# (preferred) OIDs, and if that doesn't work, check the "old"
-	# OIDs.
+	# "Processor Device Status" OIDs. We check both the newer
+	# (preferred) OIDs and the old ones.
 
-	my %cpu_oid_new  # for newer models
+	my %cpu_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.1100.32.1.2.1' => 'processorDeviceStatusIndex',
-	     '1.3.6.1.4.1.674.10892.1.1100.32.1.5.1' => 'processorDeviceStatusStatus',
-	     '1.3.6.1.4.1.674.10892.1.1100.32.1.6.1' => 'processorDeviceStatusReading',
+             '1.3.6.1.4.1.674.10892.1.1100.30.1.2.1'  => 'processorDeviceIndex',
+             '1.3.6.1.4.1.674.10892.1.1100.30.1.5.1'  => 'processorDeviceStatus',
+             '1.3.6.1.4.1.674.10892.1.1100.30.1.8.1'  => 'processorDeviceManufacturerName',
+             '1.3.6.1.4.1.674.10892.1.1100.30.1.9.1'  => 'processorDeviceStatusState',
+             '1.3.6.1.4.1.674.10892.1.1100.30.1.10.1' => 'processorDeviceFamily',
+             '1.3.6.1.4.1.674.10892.1.1100.30.1.12.1' => 'processorDeviceCurrentSpeed',
+             '1.3.6.1.4.1.674.10892.1.1100.30.1.23.1' => 'processorDeviceBrandName',
+	     '1.3.6.1.4.1.674.10892.1.1100.32.1.2.1'  => 'processorDeviceStatusIndex',
+	     '1.3.6.1.4.1.674.10892.1.1100.32.1.5.1'  => 'processorDeviceStatusStatus',
+	     '1.3.6.1.4.1.674.10892.1.1100.32.1.6.1'  => 'processorDeviceStatusReading',
 	    );
 
-	my %cpu_oid_old  # for older models
-	  = (
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.2.1' => 'processorDeviceIndex',
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.5.1' => 'processorDeviceStatus',
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.9.1' => 'processorDeviceStatusState',
-	    );
-
-	my $result = $snmp_session->get_entries(-columns => [keys %cpu_oid_new]);
-
-	if (!defined $result) {
-	    $oid_ver = 'old';
-	    $result = $snmp_session->get_entries(-columns => [keys %cpu_oid_old]);
-	}
+	my $result = $snmp_session->get_entries(-columns => [keys %cpu_oid]);
 
 	if (!defined $result) {
 	    printf "SNMP ERROR [processors]: %s.\n", $snmp_session->error;
@@ -2798,12 +2796,7 @@ sub check_processors {
 	    exit $E_UNKNOWN;
 	}
 
-	if ($oid_ver eq 'new') {
-	    @output = @{ get_snmp_output($result, \%cpu_oid_new) };
-	}
-	else {
-	    @output = @{ get_snmp_output($result, \%cpu_oid_old) };
-	}
+	@output = @{ get_snmp_output($result, \%cpu_oid) };
     }
     else {
 	@output = @{ run_omreport("$omopt_chassis processors") };
@@ -2830,14 +2823,65 @@ sub check_processors {
 	 1024 => 'Throttled',           # Processor Throttled
 	);
 
+    # Mapping between family numbers from SNMP and actual CPU family
+    my %cpu_family
+      = (
+	 1   => 'Other',               2   => 'Unknown',              3   => '8086',
+	 4   => '80286',               5   => '386',                  6   => '486',
+	 7   => '8087',                8   => '80287',                9   => '80387',
+	 10  => '80487',               11  => 'Pentium',              12  => 'Pentium Pro',
+	 13  => 'Pentium II',          14  => 'Pentium with MMX',     15  => 'Celeron',
+	 16  => 'Pentium II Xeon',     17  => 'Pentium III',          18  => 'Pentium III Xeon',
+	 19  => 'Pentium III',         20  => 'Itanium',              21  => 'Xeon',
+	 22  => 'Pentium 4',           23  => 'Xeon MP',              24  => 'Itanium 2',
+	 25  => 'K5',                  26  => 'K6',                   27  => 'K6-2',
+	 28  => 'K6-3',                29  => 'Athlon',               30  => 'AMD2900',
+	 31  => 'K6-2+',               32  => 'Power PC',             33  => 'Power PC 601',
+	 34  => 'Power PC 603',        35  => 'Power PC 603+',        36  => 'Power PC 604',
+	 37  => 'Power PC 620',        38  => 'Power PC x704',        39  => 'Power PC 750',
+	 48  => 'Alpha',               49  => 'Alpha 21064',          50  => 'Alpha 21066',
+	 51  => 'Alpha 21164',         52  => 'Alpha 21164PC',        53  => 'Alpha 21164a',
+	 54  => 'Alpha 21264',         55  => 'Alpha 21364',          64  => 'MIPS',
+	 65  => 'MIPS R4000',          66  => 'MIPS R4200',           67  => 'MIPS R4400',
+	 68  => 'MIPS R4600',          69  => 'MIPS R10000',          80  => 'SPARC',
+	 81  => 'SuperSPARC',          82  => 'microSPARC II',        83  => 'microSPARC IIep',
+	 84  => 'UltraSPARC',          85  => 'UltraSPARC II',        86  => 'UltraSPARC IIi',
+	 87  => 'UltraSPARC III',      88  => 'UltraSPARC IIIi',      96  => '68040',
+	 97  => '68xxx',               98  => '68000',                99  => '68010',
+	 100 => '68020',               101 => '68030',                112 => 'Hobbit',
+	 120 => 'Crusoe TM5000',       121 => 'Crusoe TM3000',        122 => 'Efficeon TM8000',
+	 128 => 'Weitek',              131 => 'Athlon 64',            132 => 'Opteron',
+	 133 => 'Sempron',             134 => 'Turion 64 Mobile',     135 => 'Dual-Core Opteron',
+	 136 => 'Athlon 64 X2 DC',     137 => 'Turion 64 X2 M',       138 => 'Quad-Core Opteron',
+	 139 => '3rd gen Opteron',     144 => 'PA-RISC',              145 => 'PA-RISC 8500',
+	 146 => 'PA-RISC 8000',        147 => 'PA-RISC 7300LC',       148 => 'PA-RISC 7200',
+	 149 => 'PA-RISC 7100LC',      150 => 'PA-RISC 7100',         160 => 'V30',
+	 171 => 'Dual-Core Xeon 5200', 172 => 'Dual-Core Xeon 7200',  173 => 'Quad-Core Xeon 7300',
+	 174 => 'Quad-Core Xeon 7400', 175 => 'Multi-Core Xeon 7400', 176 => 'M1',
+	 177 => 'M2',                  180 => 'AS400',                182 => 'Athlon XP',
+	 183 => 'Athlon MP',           184 => 'Duron',                185 => 'Pentium M',
+	 186 => 'Celeron D',           187 => 'Pentium D',            188 => 'Pentium Extreme',
+	 189 => 'Core Solo',           190 => 'Core2',                191 => 'Core2 Duo',
+	 198 => 'Core i7',             199 => 'Dual-Core Celeron',    200 => 'IBM390',
+	 201 => 'G4',                  202 => 'G5',                   203 => 'ESA/390 G6',
+	 204 => 'z/Architectur',       210 => 'C7-M',                 211 => 'C7-D',
+	 212 => 'C7',                  213 => 'Eden',                 214 => 'Multi-Core Xeon',
+	 215 => 'Dual-Core Xeon 3xxx', 216 => 'Quad-Core Xeon 3xxx',  218 => 'Dual-Core Xeon 5xxx',
+	 219 => 'Quad-Core Xeon 5xxx', 221 => 'Dual-Core Xeon 7xxx',  222 => 'Quad-Core Xeon 7xxx',
+	 223 => 'Multi-Core Xeon 7xxx', 250 => 'i860',                251 => 'i960',
+	);
 
   CPU:
     foreach my $out (@output) {
 	if ($snmp) {
-	    if ($oid_ver eq 'new') {
+	    $index  = exists $out->{processorDeviceStatusIndex}
+	      ? $out->{processorDeviceStatusIndex} - 1
+		: $out->{processorDeviceIndex} - 1;
+	    $status = exists $out->{processorDeviceStatusStatus}
+	      ? $snmp_status{$out->{processorDeviceStatusStatus}}
+		: $snmp_status{$out->{processorDeviceStatus}};
+	    if (exists $out->{processorDeviceStatusReading}) {
 		my @states  = ();  # contains states for the CPU
-		$index  = $out->{processorDeviceStatusIndex} - 1;
-		$status = $snmp_status{$out->{processorDeviceStatusStatus}};
 
 		# get the combined state from the StatusReading OID
 		foreach my $mask (sort keys %cpu_reading) {
@@ -2850,15 +2894,21 @@ sub check_processors {
 		$state = join q{, }, @states;
 	    }
 	    else {
-		$index  = $out->{processorDeviceIndex} - 1;
-		$status = $snmp_status{$out->{processorDeviceStatus}};
 		$state  = $cpu_state{$out->{processorDeviceStatusState}};
 	    }
+	    $man    = $out->{processorDeviceManufacturerName};
+	    $family = $cpu_family{$out->{processorDeviceFamily}};
+	    $speed  = $out->{processorDeviceCurrentSpeed};
+	    $brand  = $out->{processorDeviceBrandName};
 	}
 	else {
 	    $index  = $out->{'Index'};
 	    $status = $out->{'Status'};
 	    $state  = $out->{'State'};
+	    $brand  = exists $out->{'Processor Brand'} ? $out->{'Processor Brand'} : undef;
+	    $family = exists $out->{'Processor Family'} ? $out->{'Processor Family'} : undef;
+	    $man    = exists $out->{'Processor Manufacturer'} ? $out->{'Processor Manufacturer'} : undef;
+	    $speed  = exists $out->{'Current Speed'} ? $out->{'Current Speed'} : undef;
 	}
 
 	next CPU if blacklisted('cpu', $index);
@@ -2876,16 +2926,30 @@ sub check_processors {
 
 	$count{cpu}++;
 
+	if (defined $brand) {
+	    $brand =~ s{\s\s+}{ }gxms;
+	    $brand =~ s{\(R\)}{}gxms;
+	    $brand =~ s{\sCPU}{}xms;
+	    $brand =~ s{\s\@}{}xms;
+	}
+	elsif (defined $family and defined $man and defined $speed) {
+	    $speed =~ s{\A (\d+) .*}{$1}xms;
+	    $brand = sprintf '%s %s %.2fGHz', $man, $family, $speed / 1000;
+	}
+	else {
+	    $brand = "unknown";
+	}
+
 	# Default
 	if ($status ne 'Ok') {
-	    my $msg = sprintf 'CPU %d needs attention: %s',
-	      $index, $state;
+	    my $msg = sprintf 'CPU %d [%s] needs attention: %s',
+	      $index, $brand, $state;
 	    report('chassis', $msg, $status2nagios{$status}, $index);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf 'CPU %d is %s',
-	      $index, $state;
+	    my $msg = sprintf 'CPU %d [%s] is %s',
+	      $index, $brand, $state;
 	    report('chassis', $msg, $E_OK, $index);
 	}
     }
