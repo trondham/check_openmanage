@@ -2942,13 +2942,13 @@ sub check_processors {
 
 	# Default
 	if ($status ne 'Ok') {
-	    my $msg = sprintf 'CPU %d [%s] needs attention: %s',
+	    my $msg = sprintf 'Processor %d [%s] needs attention: %s',
 	      $index, $brand, $state;
 	    report('chassis', $msg, $status2nagios{$status}, $index);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf 'CPU %d [%s] is %s',
+	    my $msg = sprintf 'Processor %d [%s] is %s',
 	      $index, $brand, $state;
 	    report('chassis', $msg, $E_OK, $index);
 	}
