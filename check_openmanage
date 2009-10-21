@@ -2868,7 +2868,7 @@ sub check_processors {
 	 212 => 'C7',                   213 => 'Eden',                 214 => 'Multi-Core Xeon',
 	 215 => 'Dual-Core Xeon 3xxx',  216 => 'Quad-Core Xeon 3xxx',  218 => 'Dual-Core Xeon 5xxx',
 	 219 => 'Quad-Core Xeon 5xxx',  221 => 'Dual-Core Xeon 7xxx',  222 => 'Quad-Core Xeon 7xxx',
-	 223 => 'Multi-Core Xeon 7xxx', 250 => 'i860',                251 => 'i960',
+	 223 => 'Multi-Core Xeon 7xxx', 250 => 'i860',                 251 => 'i960',
 	);
 
   CPU:
