@@ -1,4 +1,4 @@
-3.5.0   2009-10-22
+3.5.1   2009-10-22
 ------------------
 
 * CPU type, family etc. are now reported in case of a CPU failure (and
