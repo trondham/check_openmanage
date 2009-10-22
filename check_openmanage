@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.1';
+$VERSION = '3.5.2-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2765,7 +2765,6 @@ sub check_processors {
     my $family  = undef;
     my $man     = undef;
     my $speed   = undef;
-    my $model   = undef;
     my @output = ();
 
     if ($snmp) {
