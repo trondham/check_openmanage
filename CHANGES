@@ -1,3 +1,11 @@
+3.5.0   2009-10-22
+------------------
+
+* CPU type, family etc. are now reported in case of a CPU failure (and
+  in the debug output)
+* The debug output now reports Openmanage version and plugin version
+
+
 3.5.0   2009-10-13
 ------------------
 
