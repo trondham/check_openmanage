@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.1-beta3';
+$VERSION = '3.5.1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2930,8 +2930,8 @@ sub check_processors {
 
 	if (defined $brand) {
 	    $brand =~ s{\s\s+}{ }gxms;
-	    $brand =~ s{\(R\)}{}gxms;
-	    $brand =~ s{\sCPU}{}xms;
+	    $brand =~ s{\((R|tm)\)}{}gxms;
+	    $brand =~ s{\s(CPU|Processor)}{}xms;
 	    $brand =~ s{\s\@}{}xms;
 	}
 	elsif (defined $family and defined $man and defined $speed) {
