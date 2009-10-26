@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.2-beta1';
+$VERSION = '3.5.2-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -741,7 +741,7 @@ sub adjust_checks {
 	    print qq{ERROR: Wrong simultaneous usage of the "--only" and "--check" options\n};
 	    exit $E_UNKNOWN;
 	}
-	if (! exists $check{$opt{only}} and $opt{only} ne 'chassis') {
+	if (! exists $check{$opt{only}} && $opt{only} ne 'chassis') {
 	    print qq{ERROR: "$opt{only}" is not a known keyword for the "--only" option\n};
 	    exit $E_UNKNOWN;
 	}
