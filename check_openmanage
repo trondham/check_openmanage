@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.2-beta4';
+$VERSION = '3.5.2-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1616,7 +1616,7 @@ sub check_cache_battery {
 	# Special case: Charging
 	if ($state eq 'Charging') {
 	    next BATTERY if blacklisted('bat_charge', $nexus);
-	    my $msg = sprintf 'Cache battery %d in controller %d is %s (%s) [performance degraded]',
+	    my $msg = sprintf 'Cache battery %d in controller %d is %s (%s) [probably harmless]',
 	      $id, $ctrl, $state, $pred;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
