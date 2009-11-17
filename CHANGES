@@ -1,3 +1,13 @@
+3.5.2   2009-11-17
+------------------
+
+* Fix for undefined device name for logical drives (thanks to Pontus
+  Fuchs for a patch)
+* Fixed a bug in the PNP4Nagios template, that prevented the template
+  from working with PNP4Nagios 0.6. Thanks to the PNP4Nagios team for
+  the fix.
+* Other small fixes
+
 3.5.1   2009-10-22
 ------------------
 
