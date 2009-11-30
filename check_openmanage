@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.2';
+$VERSION = '3.5.3-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -825,6 +825,7 @@ sub run_omreport {
           | No\scontrollers\sfound                                     # No RAID controller
           | No\sbattery\sprobes\sfound\son\sthis\ssystem               # No battery probes
           | Invalid\scommand:\spwrmonitoring                           # Older OMSAs lack this command(?)
+          | Error\s:\sCurrent\sprobes\snot\sfound                      # No power monitoring capability
         }xms;
 
     # Errors that are OK on blade servers
