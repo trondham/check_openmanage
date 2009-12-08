@@ -843,7 +843,7 @@ sub run_omreport {
 
     # Openmanage sometimes puts a linebreak between "Error" and the
     # actual error text
-    $rawtext =~ s{\AError\s*\n}{Error: }xms;
+    $rawtext =~ s{^Error\s*\n}{Error: }xms;
 
     # Parse output, store in array
     for ((split m{\n}xms, $rawtext)) {
