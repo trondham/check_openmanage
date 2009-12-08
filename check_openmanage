@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.3-beta1';
+$VERSION = '3.5.3-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -825,7 +825,7 @@ sub run_omreport {
           | No\scontrollers\sfound                                     # No RAID controller
           | No\sbattery\sprobes\sfound\son\sthis\ssystem               # No battery probes
           | Invalid\scommand:\spwrmonitoring                           # Older OMSAs lack this command(?)
-          | Error\s:\sCurrent\sprobes\snot\sfound                      # No power monitoring capability
+#          | Current\sprobes\snot\sfound                                # No power monitoring capability
         }xms;
 
     # Errors that are OK on blade servers
@@ -839,11 +839,15 @@ sub run_omreport {
     return [] if !defined $rawtext;
 
     # Workaround for Openmanage BUG introduced in OMSA 5.5.0
-    $rawtext =~ s/\n;/;/gxms if $command eq 'storage controller';
+    $rawtext =~ s{\n;}{;}gxms if $command eq 'storage controller';
+
+    # Openmanage sometimes puts a linebreak between "Error" and the
+    # actual error text
+    $rawtext =~ s{\AError\s*\n}{Error: }xms;
 
     # Parse output, store in array
-    for ((split /\n/xms, $rawtext)) {
-	if (m/\A Error/xms) {
+    for ((split m{\n}xms, $rawtext)) {
+	if (m{\AError}xms) {
 	    next if m{$ok_errors}xms;
 	    next if ($blade and m{$ok_blade_errors}xms);
 	    report('other', "Problem running 'omreport $command': $_", $E_UNKNOWN);
