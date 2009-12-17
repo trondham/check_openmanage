@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.3-beta2';
+$VERSION = '3.5.3-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -615,6 +615,7 @@ sub find_omreport {
     my @omreport_paths
       = (
 	 '/usr/bin/omreport',                            # default on Linux
+	 '/opt/dell/srvadmin/bin/omreport',              # default on Linux with OMSA 6.2.0
 	 '/opt/dell/srvadmin/oma/bin/omreport.sh',       # alternate on Linux
 	 '/opt/dell/srvadmin/oma/bin/omreport',          # alternate on Linux
 	 'C:\Program Files (x86)\Dell\SysMgt\oma\bin\omreport.exe', # default on Windows x64
