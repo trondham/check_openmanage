@@ -56,7 +56,7 @@ if (! isatty(*STDOUT)) {
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.3';
+$VERSION = '3.5.4-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3198,7 +3198,7 @@ sub check_pwrmonitoring {
 	}
 	else {
 	    $index    = $out->{'Index'};
-	    next if $index !~ m/^\d+$/x;
+	    next AMP if (!defined $index || $index !~ m/^\d+$/x);
 	    $status   = $out->{'Status'};
 	    $reading  = $out->{'Reading'};
 	    $location = $out->{'Probe Name'};
