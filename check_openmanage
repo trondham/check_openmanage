@@ -34,11 +34,11 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 	     $E_UNKNOWN $FW_LOCK $USAGE $HELP $LICENSE
 	     $snmp_session $snmp_error $omreport $globalstatus $global
 	     $linebreak $omopt_chassis $omopt_system $blade
-	     $exit_code $snmp
+	     $exit_code $snmp $original_sigwarn
 	     %check %opt %perfdata %reverse_exitcode %status2nagios
 	     %snmp_status %snmp_probestatus %probestatus2nagios %sysinfo
 	     %blacklist %nagios_alert_count %count
-	     @controllers @enclosures
+	     @perl_warnings @controllers @enclosures
 	     @report_storage @report_chassis @report_other
 	  );
 
@@ -46,17 +46,18 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 # Initialization and global variables
 #---------------------------------------------------------------------
 
-# If we don't have a TTY, the plugin is probably run by Nagios. In
-# that case, redirect all output to STDERR to STDOUT. Nagios ignores
-# output to STDERR.
-if (! isatty(*STDOUT)) {
-    open STDERR, '>&', 'STDOUT'
-      or do { print "ERROR: Couldn't redirect STDERR to STDOUT\n"; exit 2; }
+# Small subrouting to collect any perl warnings during execution
+sub collect_perl_warning {
+  push @perl_warnings, [@_];
 }
+
+# Set the WARN signal to use our collect subroutine above
+$original_sigwarn = $SIG{__WARN__};
+$SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.4-beta1';
+$VERSION = '3.5.4-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -4090,6 +4091,18 @@ else {
 	}
     }
 }
+
+# Print any perl warnings that have occured
+if (@perl_warnings) {
+    foreach (@perl_warnings) {
+	chop @$_;
+	print "${linebreak}INTERNAL ERROR: @$_";
+    }
+    $exit_code = $E_UNKNOWN;
+}
+
+# Reset the WARN signal
+$SIG{__WARN__} = $original_sigwarn;
 
 # Print performance data
 if (defined $opt{perfdata} && !$opt{debug} && %perfdata) {
