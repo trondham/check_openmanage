@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.4-beta2';
+$VERSION = '3.5.4-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1624,17 +1624,31 @@ sub check_cache_battery {
 
 	# Special case: Charging
 	if ($state eq 'Charging') {
-	    next BATTERY if blacklisted('bat_charge', $nexus);
-	    my $msg = sprintf 'Cache battery %d in controller %d is %s (%s) [probably harmless]',
-	      $id, $ctrl, $state, $pred;
-	    report('storage', $msg, $E_WARNING, $nexus);
+	    if ($pred eq 'Failed') {
+		my $msg = sprintf 'Cache battery %d in controller %d is %s (%s) [replace battery]',
+		  $id, $ctrl, $state, $pred;
+		report('storage', $msg, $E_CRITICAL, $nexus);
+	    }
+	    else {
+		next BATTERY if blacklisted('bat_charge', $nexus);
+		my $msg = sprintf 'Cache battery %d in controller %d is %s (%s) [probably harmless]',
+		  $id, $ctrl, $state, $pred;
+		report('storage', $msg, $E_WARNING, $nexus);
+	    }
 	}
 	# Special case: Learning (battery learns its capacity)
 	elsif ($state eq 'Learning') {
-	    next BATTERY if blacklisted('bat_charge', $nexus);
-	    my $msg = sprintf 'Cache battery %d in controller %d is %s (%s) [probably harmless]',
-	      $id, $ctrl, $state, $learn;
-	    report('storage', $msg, $E_WARNING, $nexus);
+	    if ($learn eq 'Failed') {
+		my $msg = sprintf 'Cache battery %d in controller %d is %s (%s)',
+		  $id, $ctrl, $state, $learn;
+		report('storage', $msg, $E_CRITICAL, $nexus);
+	    }
+	    else {
+		next BATTERY if blacklisted('bat_charge', $nexus);
+		my $msg = sprintf 'Cache battery %d in controller %d is %s (%s) [probably harmless]',
+		  $id, $ctrl, $state, $learn;
+		report('storage', $msg, $E_WARNING, $nexus);
+	    }
 	}
 	# Special case: Power Low (first part of recharge cycle)
 	elsif ($state eq 'Power Low') {
