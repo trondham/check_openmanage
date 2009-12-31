@@ -1576,6 +1576,7 @@ sub check_cache_battery {
 	 36 => 'Learning',
 	);
 
+    # Specifies the learn state activity of the battery
     my %bat_learn_state
       = (
 	 1  => 'Failed',
@@ -1585,6 +1586,7 @@ sub check_cache_battery {
 	 16 => 'Idle',
 	);
 
+    # This property displays the battery's ability to be charged
     my %bat_pred_cap
       = (
 	 1 => 'Failed',  # The battery cannot be charged and needs to be replaced
