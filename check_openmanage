@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.4-beta3';
+$VERSION = '3.5.4-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -885,7 +885,7 @@ sub blacklisted {
 
     if (defined $blacklist{$name}) {
 	foreach my $comp (@{ $blacklist{$name} }) {
-	    if (defined $id and ($comp eq $id or $comp eq 'ALL')) {
+	    if (defined $id and ($comp eq $id or uc($comp) eq 'ALL')) {
 		$ret = 1;
 	    }
 	}
