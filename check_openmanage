@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.4-beta4';
+$VERSION = '3.5.4-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1107,6 +1107,8 @@ sub check_controllers {
     my $mindr    = undef;
     my $firmware = undef;
     my $driver   = undef;
+    my $minstdr  = undef;  # Minimum required Storport driver version (whats this?)
+    my $stdr     = undef;  # Storport driver version (whats this?)
     my @output   = ();
 
     if ($snmp) {
@@ -1121,6 +1123,8 @@ sub check_controllers {
 	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.41' => 'controllerDriverVersion',
 	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.44' => 'controllerMinFWVersion',
 	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.45' => 'controllerMinDriverVersion',
+	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.55' => 'FIXME_StorportDriverVersion',
+	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.56' => 'FIXME_StorportMinDriverVersion',
 	    );
 
 	# We use get_table() here for the odd case where a server has
@@ -1151,18 +1155,22 @@ sub check_controllers {
   CTRL:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $id       = $out->{'controllerNumber'} - 1;
-	    $name     = $out->{'controllerName'};
-	    $state    = $ctrl_state{$out->{'controllerState'}};
-	    $status   = $snmp_status{$out->{'controllerComponentStatus'}};
-	    $minfw    = exists $out->{'controllerMinFWVersion'}
-	      ? $out->{'controllerMinFWVersion'} : undef;
-	    $mindr    = exists $out->{'controllerMinDriverVersion'}
-	      ? $out->{'controllerMinDriverVersion'} : undef;
+	    $id       = $out->{controllerNumber} - 1;
+	    $name     = $out->{controllerName};
+	    $state    = $ctrl_state{$out->{controllerState}};
+	    $status   = $snmp_status{$out->{controllerComponentStatus}};
+	    $minfw    = exists $out->{controllerMinFWVersion}
+	      ? $out->{controllerMinFWVersion} : undef;
+	    $mindr    = exists $out->{controllerMinDriverVersion}
+	      ? $out->{controllerMinDriverVersion} : undef;
 	    $firmware = exists $out->{controllerFWVersion}
 	      ? $out->{controllerFWVersion} : 'N/A';
 	    $driver   = exists $out->{controllerDriverVersion}
 	      ? $out->{controllerDriverVersion} : 'N/A';
+	    $minstdr  = exists $out->{'FIXME_StorportMinDriverVersion'}
+	      ? $out->{FIXME_StorportMinDriverVersion} : undef;
+	    $stdr     = exists $out->{FIXME_StorportDriverVersion}
+	      ? $out->{FIXME_StorportDriverVersion} : 'N/A';
 	    $nexus    = convert_nexus($out->{controllerNexusID});
 	}
 	else {
@@ -1178,6 +1186,10 @@ sub check_controllers {
 	      ? $out->{'Firmware Version'} : 'N/A';
 	    $driver   = $out->{'Driver Version'} ne 'Not Applicable'
 	      ? $out->{'Driver Version'} : 'N/A';
+	    $minstdr  = $out->{'Minimum Required Storport Driver Version'} ne 'Not Applicable'
+	      ? $out->{'Minimum Required Storport Driver Version'} : undef;
+	    $stdr     = $out->{'Storport Driver Version'} ne 'Not Applicable'
+	      ? $out->{'Storport Driver Version'} : 'N/A';
 	    $nexus    = $id;
 	}
 
@@ -1204,6 +1216,13 @@ sub check_controllers {
 	    chomp $driver;
 	    my $msg = sprintf q{Controller %d [%s]: Driver '%s' is out of date},
 	      $id, $name, $driver;
+	    report('storage', $msg, $E_WARNING, $nexus);
+	}
+	# Special case: old storport driver
+	if (!blacklisted('ctrl_stdr', $id) && defined $minstdr) {
+	    chomp $stdr;
+	    my $msg = sprintf q{Controller %d [%s]: Storport driver '%s' is out of date},
+	      $id, $name, $stdr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Ok
