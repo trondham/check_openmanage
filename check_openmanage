@@ -46,7 +46,7 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 # Initialization and global variables
 #---------------------------------------------------------------------
 
-# Small subrouting to collect any perl warnings during execution
+# Small subroutine to collect any perl warnings during execution
 sub collect_perl_warning {
   push @perl_warnings, [@_];
 }
