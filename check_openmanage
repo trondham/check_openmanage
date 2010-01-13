@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.4-beta6';
+$VERSION = '3.5.4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1170,7 +1170,7 @@ sub check_controllers {
 	    $minstdr  = exists $out->{'FIXME_StorportMinDriverVersion'}
 	      ? $out->{FIXME_StorportMinDriverVersion} : undef;
 	    $stdr     = exists $out->{FIXME_StorportDriverVersion}
-	      ? $out->{FIXME_StorportDriverVersion} : 'N/A';
+	      ? $out->{FIXME_StorportDriverVersion} : undef;
 	    $nexus    = convert_nexus($out->{controllerNexusID});
 	}
 	else {
@@ -1191,7 +1191,7 @@ sub check_controllers {
 	      ? $out->{'Minimum Required Storport Driver Version'} : undef;
 	    $stdr     = (exists $out->{'Storport Driver Version'}
 			 and $out->{'Storport Driver Version'} ne 'Not Applicable')
-	      ? $out->{'Storport Driver Version'} : 'N/A';
+	      ? $out->{'Storport Driver Version'} : undef;
 	    $nexus    = $id;
 	}
 
@@ -1203,6 +1203,7 @@ sub check_controllers {
 	$sysinfo{'controller'}{$id}{'name'}     = $name;
 	$sysinfo{'controller'}{$id}{'driver'}   = $driver;
 	$sysinfo{'controller'}{$id}{'firmware'} = $firmware;
+	$sysinfo{'controller'}{$id}{'storport'} = $stdr;
 
 	next CTRL if blacklisted('ctrl', $nexus);
 
@@ -4063,12 +4064,16 @@ elsif ($exit_code == $E_OK && !$opt{debug}) {
 	    my @storageprint = ();
 	    foreach my $id (sort keys %{ $sysinfo{controller} }) {
 		chomp $sysinfo{controller}{$id}{driver};
-		push @storageprint, sprintf q{----- CTRL %s (%s): FW='%s', DR='%s'},
+		my $msg = sprintf q{----- Ctrl %s [%s]: Fw='%s', Dr='%s'},
 		  $sysinfo{controller}{$id}{id}, $sysinfo{controller}{$id}{name},
 		    $sysinfo{controller}{$id}{firmware}, $sysinfo{controller}{$id}{driver};
+		if (defined $sysinfo{controller}{$id}{storport}) {
+		    $msg .= sprintf q{, Storport: '%s'}, $sysinfo{controller}{$id}{storport};
+		}
+		push @storageprint, $msg;
 	    }
 	    foreach my $id (sort keys %{ $sysinfo{enclosure} }) {
-		push @storageprint, sprintf q{----- ENCL %s (%s): FW='%s'},
+		push @storageprint, sprintf q{----- Encl %s [%s]: Fw='%s'},
 		  $sysinfo{enclosure}{$id}->{id}, $sysinfo{enclosure}{$id}->{name},
 		    $sysinfo{enclosure}{$id}->{firmware};
 	    }
