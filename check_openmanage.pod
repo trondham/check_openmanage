@@ -378,6 +378,11 @@ firmware. Use this if you can not or will not upgrade the firmware.
 Suppress the special warning message about old controller driver.
 Particularly useful on systems where you can not upgrade the driver.
 
+=item B<ctrl_stdr>
+
+Suppress the special warning message about old Storport driver on
+Windows.
+
 =item B<pdisk>
 
 Physical disk.
