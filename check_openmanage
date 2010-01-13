@@ -1229,7 +1229,7 @@ sub check_controllers {
 	}
 	# Ok
 	if ($status eq 'Ok' or ($status eq 'Non-Critical'
-				and (defined $minfw or defined $mindr))) {
+				and (defined $minfw or defined $mindr or defined $minstdr))) {
 	    my $msg = sprintf 'Controller %d [%s] is %s',
 	      $id, $name, $state;
 	    report('storage', $msg, $E_OK, $nexus);
