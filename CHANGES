@@ -4,7 +4,7 @@
 * Added support for storport driver version for controllers, only
   applicable on servers running Windows.  A new blacklisting keyword
   for suppressing storport driver messages was added.
-* Made the "all" keyword in blacklisting case insensitive.
+* The "all" keyword in blacklisting is now case insensitive.
 * More fine-grained reporting in the rare case where a controller
   battery failes during learning and charging states.
 * New improved way of reporting perl warnings during execution of the
