@@ -347,12 +347,12 @@ not checked.
 
 component1=id1[,id2,...]/component2=id1[,id2,...]/...
 
-The ID part can also be C<ALL>, in which all components of that type
+The ID part can also be C<all>, in which all components of that type
 is blacklisted.
 
 =item B<Example:>
 
-check_openmanage -b ps=0/fan=3,5/pdisk=1:0:0:1/ctrl_driver=ALL
+check_openmanage -b ps=0/fan=3,5/pdisk=1:0:0:1/ctrl_driver=all
 
 =back
 
