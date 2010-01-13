@@ -1,3 +1,23 @@
+3.5.4   2010-01-13
+------------------
+
+* Added support for storport driver version for controllers, only
+  applicable on servers running Windows.  A new blacklisting keyword
+  for suppressing storport driver messages was added.
+* Made the "all" keyword in blacklisting case insensitive.
+* More fine-grained reporting in the rare case where a controller
+  battery failes during learning and charging states.
+* New improved way of reporting perl warnings during execution of the
+  plugin.
+
+
+3.5.3   2009-12-17
+------------------
+
+* Fix for path to omreport on Linux with OMSA 6.2.0
+* A couple of other small fixes
+
+
 3.5.2   2009-11-17
 ------------------
 
