@@ -1186,11 +1186,11 @@ sub check_controllers {
 	      ? $out->{'Firmware Version'} : 'N/A';
 	    $driver   = $out->{'Driver Version'} ne 'Not Applicable'
 	      ? $out->{'Driver Version'} : 'N/A';
-	    $minstdr  = defined $out->{'Minimum Required Storport Driver Version'}
-	      and $out->{'Minimum Required Storport Driver Version'} ne 'Not Applicable'
+	    $minstdr  = (exists $out->{'Minimum Required Storport Driver Version'}
+			 and $out->{'Minimum Required Storport Driver Version'} ne 'Not Applicable')
 	      ? $out->{'Minimum Required Storport Driver Version'} : undef;
-	    $stdr     = defined $out->{'Storport Driver Version'}
-	      and $out->{'Storport Driver Version'} ne 'Not Applicable'
+	    $stdr     = (exists $out->{'Storport Driver Version'}
+			 and $out->{'Storport Driver Version'} ne 'Not Applicable')
 	      ? $out->{'Storport Driver Version'} : 'N/A';
 	    $nexus    = $id;
 	}
