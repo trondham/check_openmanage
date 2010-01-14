@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.4';
+$VERSION = '3.5.5-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -951,17 +951,25 @@ sub custom_temperature_thresholds {
 # Gets the output from SNMP result according to the OIDs checked
 sub get_snmp_output {
     my ($result,$oidref) = @_;
+    my @temp   = ();
     my @output = ();
 
     foreach my $oid (keys %{ $result }) {
-	my @dummy = split /\./xms, $oid;
-	my $id = pop @dummy;
-	--$id;
-	my $foo = join q{.}, @dummy;
-	if (exists $oidref->{$foo}) {
-	    $output[$id]{$oidref->{$foo}} = $result->{$oid};
+	my $short = $oid;
+	$short =~ s{\A (.+) \. (\d+) \z}{$1}xms;
+	my $id = $2;
+	if (exists $oidref->{$short}) {
+	    $temp[$id]{$oidref->{$short}} = $result->{$oid};
 	}
     }
+
+    # Remove any empty indexes
+    foreach my $out (@temp) {
+	if (defined $out) {
+	    push @output, $out;
+	}
+    }
+
     return \@output;
 }
 
