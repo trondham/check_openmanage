@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.5-beta3';
+$VERSION = '3.5.5-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1290,8 +1290,8 @@ sub check_physical_disks {
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.24' => 'arrayDiskComponentStatus',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.26' => 'arrayDiskNexusID',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.31' => 'arrayDiskSmartAlertIndication',
-	     '1.3.6.1.4.1.674.10893.1.20.130.5.1.5'  => 'arrayDiskEnclosureConnectionEnclosureNumber',
 	     '1.3.6.1.4.1.674.10893.1.20.130.5.1.7'  => 'arrayDiskEnclosureConnectionControllerNumber',
+	     '1.3.6.1.4.1.674.10893.1.20.130.6.1.7'  => 'arrayDiskChannelConnectionControllerNumber',
 	    );
 	my $result = $snmp_session->get_entries(-columns => [keys %pdisk_oid]);
 
@@ -1349,13 +1349,19 @@ sub check_physical_disks {
 	    $status   = $snmp_status{$out->{arrayDiskComponentStatus}};
 	    $fpred    = $out->{arrayDiskSmartAlertIndication} == 2 ? 1 : 0;
 	    $progr    = q{};
-	    $ctrl     = exists $out->{arrayDiskEnclosureConnectionControllerNumber}
-	      ? $out->{arrayDiskEnclosureConnectionControllerNumber} - 1
-		: undef;
 	    $nexus    = convert_nexus($out->{arrayDiskNexusID});
 	    $vendor   = $out->{arrayDiskVendor};
 	    $product  = $out->{arrayDiskProductID};
 	    $capacity = $out->{arrayDiskLengthInMB} * 1024**2;
+	    if (exists $out->{arrayDiskEnclosureConnectionControllerNumber}) {
+		$ctrl = $out->{arrayDiskEnclosureConnectionControllerNumber} - 1;
+	    }
+	    elsif (exists $out->{arrayDiskChannelConnectionControllerNumber}) {
+		$ctrl = $out->{arrayDiskChannelConnectionControllerNumber} - 1;
+	    }
+	    else {
+		$ctrl = -1;
+	    }
 	}
 	else {
 	    $id       = $out->{'ID'};
@@ -1392,33 +1398,28 @@ sub check_physical_disks {
 	# Remove unnecessary trademark rubbish from vendor name
 	$vendor =~ s{\(tm\)\z}{}xms;
 
-	# On old hardware probed with SNMP, we don't get the
-	# controller number. This variable is for use in output
-	# strings.
-	my $ctrl_txt = defined $ctrl ? " on ctrl $ctrl" : q{};
-
 	# Special case: Failure predicted
 	if ($status eq 'Non-Critical' and $fpred) {
-	    my $msg = sprintf '%s [%s %s, %s]%s needs attention: Failure Predicted',
-	      $name, $vendor, $product, $capacity, $ctrl_txt;
+	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
+	      $name, $vendor, $product, $capacity, $ctrl;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: Rebuilding
 	elsif ($state eq 'Rebuilding') {
-	    my $msg = sprintf '%s [%s]%s is %s%s',
-	      $name, $capacity, $ctrl_txt, $state, $progr;
+	    my $msg = sprintf '%s [%s] on ctrl %d is %s%s',
+	      $name, $capacity, $ctrl, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
 	elsif ($status ne 'Ok') {
-	    my $msg =  sprintf '%s [%s %s, %s]%s needs attention: %s',
-	      $name, $vendor, $product, $capacity, $ctrl_txt, $state;
+	    my $msg =  sprintf '%s [%s %s, %s] on ctrl %d needs attention: %s',
+	      $name, $vendor, $product, $capacity, $ctrl, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf '%s [%s]%s is %s',
-	      $name, $capacity, $ctrl_txt, $state;
+	    my $msg = sprintf '%s [%s] on ctrl %d is %s',
+	      $name, $capacity, $ctrl, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
     }
