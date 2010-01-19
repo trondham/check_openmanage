@@ -1,3 +1,13 @@
+3.5.5   
+------------------
+
+* Fixed an SNMP bug where the plugin didn't handle OID indexes that
+  were not sequential.
+* Fixed an SNMP bug when checking old hardware such as the PE 2650 and
+  PE 750. The controller id for physical drives were collected and
+  displayed incorrectly. This release uses an additional OID to fetch
+  this info, which would otherwise be unavailable.
+
 3.5.4   2010-01-13
 ------------------
 
