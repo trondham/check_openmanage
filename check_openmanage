@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.5-beta2';
+$VERSION = '3.5.5-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1351,7 +1351,7 @@ sub check_physical_disks {
 	    $progr    = q{};
 	    $ctrl     = exists $out->{arrayDiskEnclosureConnectionControllerNumber}
 	      ? $out->{arrayDiskEnclosureConnectionControllerNumber} - 1
-		: -1;
+		: undef;
 	    $nexus    = convert_nexus($out->{arrayDiskNexusID});
 	    $vendor   = $out->{arrayDiskVendor};
 	    $product  = $out->{arrayDiskProductID};
@@ -1392,28 +1392,33 @@ sub check_physical_disks {
 	# Remove unnecessary trademark rubbish from vendor name
 	$vendor =~ s{\(tm\)\z}{}xms;
 
+	# On old hardware probed with SNMP, we don't get the
+	# controller number. This variable is for use in output
+	# strings.
+	my $ctrl_txt = defined $ctrl ? " on ctrl $ctrl" : q{};
+
 	# Special case: Failure predicted
 	if ($status eq 'Non-Critical' and $fpred) {
-	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
-	      $name, $vendor, $product, $capacity, $ctrl;
+	    my $msg = sprintf '%s [%s %s, %s]%s needs attention: Failure Predicted',
+	      $name, $vendor, $product, $capacity, $ctrl_txt;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: Rebuilding
 	elsif ($state eq 'Rebuilding') {
-	    my $msg = sprintf '%s [%s] on ctrl %d is %s%s',
-	      $name, $capacity, $ctrl, $state, $progr;
+	    my $msg = sprintf '%s [%s]%s is %s%s',
+	      $name, $capacity, $ctrl_txt, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
 	elsif ($status ne 'Ok') {
-	    my $msg =  sprintf '%s [%s %s, %s] on ctrl %d needs attention: %s',
-	      $name, $vendor, $product, $capacity, $ctrl, $state;
+	    my $msg =  sprintf '%s [%s %s, %s]%s needs attention: %s',
+	      $name, $vendor, $product, $capacity, $ctrl_txt, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf '%s [%s] on ctrl %d is %s',
-	      $name, $capacity, $ctrl, $state;
+	    my $msg = sprintf '%s [%s]%s is %s',
+	      $name, $capacity, $ctrl_txt, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
     }
