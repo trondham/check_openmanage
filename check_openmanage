@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.5-beta4';
+$VERSION = '3.5.5-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1338,9 +1338,9 @@ sub check_physical_disks {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $name   = $out->{arrayDiskName};
-	    if ($name =~ m{.*\d+:\d+:\d+\z}xms) {
+	    if (exists $out->{arrayDiskEnclosureID}) {
 		$id = join q{:}, ($out->{arrayDiskChannel}, $out->{arrayDiskEnclosureID},
-				 $out->{arrayDiskTargetID});
+				  $out->{arrayDiskTargetID});
 	    }
 	    else {
 		$id = join q{:}, ($out->{arrayDiskChannel}, $out->{arrayDiskTargetID});
