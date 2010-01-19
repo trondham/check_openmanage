@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.5-beta5';
+$VERSION = '3.5.5-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3066,7 +3066,7 @@ sub check_volts {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index    = $out->{voltageProbeIndex} - 1;
-	    $status   = $snmp_status{$out->{voltageProbeStatus}};
+	    $status   = $snmp_probestatus{$out->{voltageProbeStatus}};
 	    $reading  = exists $out->{voltageProbeReading}
 	      ? sprintf('%.3f V', $out->{voltageProbeReading}/1000)
 	      : $volt_discrete_reading{$out->{voltageProbeDiscreteReading}};
