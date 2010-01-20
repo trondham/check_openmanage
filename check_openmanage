@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.5-beta6';
+$VERSION = '3.5.5-beta7';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -596,7 +596,7 @@ sub snmp_detect_blade {
     # Identify blade. Older models (4th and 5th gen models) and/or old
     # OMSA (4.x) don't have this OID. If we get "noSuchInstance" or
     # similar, we assume that this isn't a blade
-    if ($result->{$DellBaseBoardType} eq '3') {
+    if (exists $result->{$DellBaseBoardType} && $result->{$DellBaseBoardType} eq '3') {
 	$blade = 1;
     }
     return;
