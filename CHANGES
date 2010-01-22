@@ -1,12 +1,19 @@
-3.5.5   
+3.5.5   2010-01-22
 ------------------
 
 * Fixed an SNMP bug where the plugin didn't handle OID indexes that
-  were not sequential.
+  were not sequential. Thanks to Gianluca Varenni for reporting.
 * Fixed an SNMP bug when checking old hardware such as the PE 2650 and
   PE 750. The controller id for physical drives were collected and
   displayed incorrectly. This release uses an additional OID to fetch
-  this info, which would otherwise be unavailable.
+  this info, which would otherwise be unavailable. Thanks to Gianluca
+  Varenni for reporting this bug.
+* Should use %snmp_probestatus, not %snmp_status when checking the
+  status of voltage probes. Thanks to Ken McKinlay for a patch.
+* Fix when identifying blades via SNMP with very old OMSA
+  versions. Patch from Ken McKinlay.
+* Better way of finding the ID of physical drives via SNMP
+
 
 3.5.4   2010-01-13
 ------------------
