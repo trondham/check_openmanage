@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.5';
+$VERSION = '3.5.6-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -100,7 +100,7 @@ OUTPUT OPTIONS:
    -i, --info          Prefix any alerts with the service tag
    -e, --extinfo       Append system info to alerts
    -s, --state         Prefix alerts with alert state
-   --short-state       Prefix alerts with alert state (abbreviated)
+   -S, --short-state   Prefix alerts with alert state (abbreviated)
    -o, --okinfo        Verbosity when check result is OK
    --htmlinfo          HTML output with clickable links
 
@@ -175,7 +175,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'htmlinfo:s'         => \$opt{htmlinfo},
 	   'postmsg=s'          => \$opt{postmsg},
 	   's|state'            => \$opt{state},
-	   'short-state'        => \$opt{shortstate},
+	   'S|short-state'      => \$opt{shortstate},
 	   'o|ok-info=i'        => \$opt{okinfo},
 	   'l|linebreak=s'      => \$opt{linebreak},
 	   'a|all'              => \$opt{all},
