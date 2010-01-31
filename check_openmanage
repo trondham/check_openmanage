@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.6-beta1';
+$VERSION = '3.5.6-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -102,7 +102,7 @@ OUTPUT OPTIONS:
    -s, --state         Prefix alerts with alert state
    -S, --short-state   Prefix alerts with alert state (abbreviated)
    -o, --okinfo        Verbosity when check result is OK
-   --htmlinfo          HTML output with clickable links
+   -I, --htmlinfo      HTML output with clickable links
 
 CHECK CONTROL AND BLACKLISTING:
 
@@ -172,7 +172,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'p|perfdata:s'       => \$opt{perfdata},
 	   'i|info'             => \$opt{info},
 	   'e|extinfo'          => \$opt{extinfo},
-	   'htmlinfo:s'         => \$opt{htmlinfo},
+	   'I|htmlinfo:s'       => \$opt{htmlinfo},
 	   'postmsg=s'          => \$opt{postmsg},
 	   's|state'            => \$opt{state},
 	   'S|short-state'      => \$opt{shortstate},
