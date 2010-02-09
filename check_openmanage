@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.6-beta3';
+$VERSION = '3.5.6-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1107,6 +1107,8 @@ sub check_global {
 # STORAGE: Check controllers
 #-----------------------------------------
 sub check_controllers {
+    return if blacklisted('ctrl', 'all');
+
     my $id       = undef;
     my $nexus    = undef;
     my $name     = undef;
@@ -1433,6 +1435,7 @@ sub check_physical_disks {
 #-----------------------------------------
 sub check_virtual_disks {
     return if $#controllers == -1;
+    return if blacklisted('vdisk', 'all');
 
     my $id     = undef;
     my $name   = undef;
@@ -1566,6 +1569,7 @@ sub check_virtual_disks {
 #-----------------------------------------
 sub check_cache_battery {
     return if $#controllers == -1;
+    return if blacklisted('bat', 'all');
 
     my $id     = undef;
     my $nexus  = undef;
@@ -1724,6 +1728,7 @@ sub check_cache_battery {
 #-----------------------------------------
 sub check_connectors {
     return if $#controllers == -1;
+    return if blacklisted('conn', 'all');
 
     my $id     = undef;
     my $nexus  = undef;
@@ -1819,6 +1824,8 @@ sub check_connectors {
 # STORAGE: Check enclosures
 #-----------------------------------------
 sub check_enclosures {
+    return if blacklisted('encl', 'all');
+
     my $id       = undef;
     my $nexus    = undef;
     my $name     = undef;
@@ -1915,6 +1922,7 @@ sub check_enclosures {
 #-----------------------------------------
 sub check_enclosure_fans {
     return if $#controllers == -1;
+    return if blacklisted('encl_fan', 'all');
 
     my $id        = undef;
     my $nexus     = undef;
@@ -2014,6 +2022,7 @@ sub check_enclosure_fans {
 #-----------------------------------------
 sub check_enclosure_pwr {
     return if $#controllers == -1;
+    return if blacklisted('encl_ps', 'all');
 
     my $id        = undef;
     my $nexus     = undef;
@@ -2108,6 +2117,7 @@ sub check_enclosure_pwr {
 #-----------------------------------------
 sub check_enclosure_temp {
     return if $#controllers == -1;
+    return if blacklisted('encl_temp', 'all');
 
     my $id        = undef;
     my $nexus     = undef;
@@ -2226,6 +2236,7 @@ sub check_enclosure_temp {
 #-----------------------------------------
 sub check_enclosure_emms {
     return if $#controllers == -1;
+    return if blacklisted('encl_emm', 'all');
 
     my $id        = undef;
     my $nexus     = undef;
@@ -2320,6 +2331,8 @@ sub check_enclosure_emms {
 # CHASSIS: Check memory modules
 #-----------------------------------------
 sub check_memory {
+    return if blacklisted('dimm', 'all');
+
     my $index    = undef;
     my $status   = undef;
     my $location = undef;
@@ -2431,6 +2444,8 @@ sub check_memory {
 # CHASSIS: Check fans
 #-----------------------------------------
 sub check_fans {
+    return if blacklisted('fan', 'all');
+
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -2525,6 +2540,8 @@ sub check_fans {
 # CHASSIS: Check power supplies
 #-----------------------------------------
 sub check_powersupplies {
+    return if blacklisted('ps', 'all');
+
     my $index    = undef;
     my $status   = undef;
     my $type     = undef;
@@ -2641,6 +2658,8 @@ sub check_powersupplies {
 # CHASSIS: Check temperatures
 #-----------------------------------------
 sub check_temperatures {
+    return if blacklisted('temp', 'all');
+
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -2822,6 +2841,8 @@ sub check_temperatures {
 # CHASSIS: Check processors
 #-----------------------------------------
 sub check_processors {
+    return if blacklisted('cpu', 'all');
+
     my $index   = undef;
     my $status  = undef;
     my $state   = undef;
@@ -3026,6 +3047,8 @@ sub check_processors {
 # CHASSIS: Check voltage probes
 #-----------------------------------------
 sub check_volts {
+    return if blacklisted('volt', 'all');
+
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -3096,6 +3119,8 @@ sub check_volts {
 # CHASSIS: Check batteries
 #-----------------------------------------
 sub check_batteries {
+    return if blacklisted('bp', 'all');
+
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -3158,6 +3183,8 @@ sub check_batteries {
 # CHASSIS: Check amperage probes (power monitoring)
 #-----------------------------------------
 sub check_pwrmonitoring {
+    return if blacklisted('amp', 'all');
+
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -3334,6 +3361,8 @@ sub check_pwrmonitoring {
 # CHASSIS: Check intrusion
 #-----------------------------------------
 sub check_intrusion {
+    return if blacklisted('intr', 'all');
+
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
