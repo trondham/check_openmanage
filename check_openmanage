@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.6-beta2';
+$VERSION = '3.5.6-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1260,6 +1260,7 @@ sub check_controllers {
 #-----------------------------------------
 sub check_physical_disks {
     return if $#controllers == -1;
+    return if blacklisted('pdisk', 'all');
 
     my $id       = undef;
     my $nexus    = undef;
