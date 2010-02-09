@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.6-beta4';
+$VERSION = '3.5.6-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1308,6 +1308,10 @@ sub check_physical_disks {
     }
     else {
 	foreach my $c (@controllers) {
+	    # This blacklists disks with broken firmware, which includes
+	    # illegal XML characters that makes openmanage choke on itself
+	    next if blacklisted('ctrl_pdisk', $c);
+
 	    push @output, @{ run_omreport("storage pdisk controller=$c") };
 	    map_item('ctrl', $c, \@output);
 	}
