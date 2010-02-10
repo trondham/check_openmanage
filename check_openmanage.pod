@@ -12,6 +12,7 @@ check_openmanage - Nagios plugin for checking the hardware status on
 =head1 SYNOPSIS
 
 check_openmanage [I<OPTION>]...
+check_openmanage -H I<hostname> [I<OPTION>]...
 
 =head1 DESCRIPTION
 
