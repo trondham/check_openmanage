@@ -110,7 +110,7 @@ Prefix any alerts with the service tag.
 Display a short summary of system information (model and service tag)
 in case of an alert.
 
-=item --htmlinfo [I<CODE>]
+=item -I, --htmlinfo [I<CODE>]
 
 Using this option will make the servicetag and model name into
 clickable HTML links in the output. The model name link will point to
@@ -188,7 +188,7 @@ Prefix each alert with its corresponding service state (i.e. warning,
 critical etc.). This is useful in case of several alerts from the same
 monitored system.
 
-=item --short-state
+=item -S, --short-state
 
 Same as the B<--state> option above, except that the state is
 abbreviated to a single letter (W=warning, C=critical etc.).
@@ -382,6 +382,14 @@ Particularly useful on systems where you can not upgrade the driver.
 
 Suppress the special warning message about old Storport driver on
 Windows.
+
+=item B<ctrl_pdisk>
+
+This blacklisting keyword exists as a possible workaround for physical
+drives with bad firmware which makes Openmanage choke. It takes the
+controller number as argument. Use this option to blacklist all
+physical drives on a specific controller. This blacklisting keyword is
+only available in local mode, i.e. not with SNMP.
 
 =item B<pdisk>
 
