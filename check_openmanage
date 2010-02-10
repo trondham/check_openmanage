@@ -827,7 +827,7 @@ sub run_omreport {
           | No\scontrollers\sfound                                     # No RAID controller
           | No\sbattery\sprobes\sfound\son\sthis\ssystem               # No battery probes
           | Invalid\scommand:\spwrmonitoring                           # Older OMSAs lack this command(?)
-#          | Current\sprobes\snot\sfound                                # No power monitoring capability
+#          | Current\sprobes\snot\sfound                                # OMSA + RHEL5.4 bug
         }xms;
 
     # Errors that are OK on blade servers
@@ -1118,8 +1118,8 @@ sub check_controllers {
     my $mindr    = undef;
     my $firmware = undef;
     my $driver   = undef;
-    my $minstdr  = undef;  # Minimum required Storport driver version (whats this?)
-    my $stdr     = undef;  # Storport driver version (whats this?)
+    my $minstdr  = undef;  # Minimum required Storport driver version
+    my $stdr     = undef;  # Storport driver version
     my @output   = ();
 
     if ($snmp) {
