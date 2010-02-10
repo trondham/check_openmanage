@@ -12,6 +12,7 @@ check_openmanage - Nagios plugin for checking the hardware status on
 =head1 SYNOPSIS
 
 check_openmanage [I<OPTION>]...
+
 check_openmanage -H I<hostname> [I<OPTION>]...
 
 =head1 DESCRIPTION
@@ -60,6 +61,11 @@ interested in setting the maximum thresholds.
 This parameter can be either a string with the limits, or a file
 containing the limits string. The option can be specified multiple
 times.
+
+NOTE: This option should only be used to narrow the field of OK
+temperatures wrt. the OMSA defaults. To expand the field of OK
+temperatures, increase the OMSA thresholds. See the plugin web page
+for more information.
 
 =item -c, --critical I<STRING> or I<FILE>
 
