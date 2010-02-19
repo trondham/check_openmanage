@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.6-beta5';
+$VERSION = '3.5.6-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -158,6 +158,7 @@ END_LICENSE
 	 'privpassword'      => undef, # SMNP v3
 	 'privkey'           => undef, # SMNP v3
 	 'privprotocol'      => undef, # SMNP v3
+         'use_get_table'     => 0,
        );
 
 # Get options
@@ -192,6 +193,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'privpassword=s'     => \$opt{privpassword},
 	   'privkey=s'          => \$opt{privkey},
 	   'privprotocol=s'     => \$opt{privprotocol},
+           'use-get_table'      => \$opt{use_get_table},
 	  ) or do { print $USAGE; exit $E_UNKNOWN };
 
 # If user requested help
@@ -1296,7 +1298,24 @@ sub check_physical_disks {
 	     '1.3.6.1.4.1.674.10893.1.20.130.5.1.7'  => 'arrayDiskEnclosureConnectionControllerNumber',
 	     '1.3.6.1.4.1.674.10893.1.20.130.6.1.7'  => 'arrayDiskChannelConnectionControllerNumber',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %pdisk_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $arrayDiskTable = '1.3.6.1.4.1.674.10893.1.20.130.4';
+	    my $arrayDiskEnclosureConnectionControllerNumber = '1.3.6.1.4.1.674.10893.1.20.130.5.1.7';
+	    my $arrayDiskChannelConnectionControllerNumber = '1.3.6.1.4.1.674.10893.1.20.130.6.1.7';
+
+	    $result  = $snmp_session->get_table(-baseoid => $arrayDiskTable);
+	    my $ext1 = $snmp_session->get_table(-baseoid => $arrayDiskEnclosureConnectionControllerNumber);
+	    my $ext2 = $snmp_session->get_table(-baseoid => $arrayDiskChannelConnectionControllerNumber);
+
+	    if (defined $result) {
+		defined $ext1 && map { $$result{$_} = $$ext1{$_} } keys %{ $ext1 };
+		defined $ext2 && map { $$result{$_} = $$ext2{$_} } keys %{ $ext2 };
+	    }
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %pdisk_oid]);
+	}
 
 	if (!defined $result) {
 	    printf "SNMP ERROR [storage / pdisk]: %s.\n", $snmp_session->error;
@@ -1464,7 +1483,14 @@ sub check_virtual_disks {
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.20' => 'virtualDiskComponentStatus',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.21' => 'virtualDiskNexusID',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %vdisk_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $virtualDiskTable = '1.3.6.1.4.1.674.10893.1.20.140.1';
+	    $result = $snmp_session->get_table(-baseoid => $virtualDiskTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %vdisk_oid]);
+	}
 
 	# No logical drives is OK
 	return if !defined $result;
@@ -1594,7 +1620,14 @@ sub check_cache_battery {
 	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.12' => 'batteryLearnState',
 	     '1.3.6.1.4.1.674.10893.1.20.130.16.1.5'  => 'batteryConnectionControllerNumber',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %bat_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $batteryTable = '1.3.6.1.4.1.674.10893.1.20.130.15';
+	    $result = $snmp_session->get_table(-baseoid => $batteryTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %bat_oid]);
+	}
 
 	# No cache battery is OK
 	return if !defined $result;
@@ -1753,7 +1786,14 @@ sub check_connectors {
 	     '1.3.6.1.4.1.674.10893.1.20.130.2.1.9'  => 'channelNexusID',
              '1.3.6.1.4.1.674.10893.1.20.130.2.1.11' => 'channelBusType',
             );
-        my $result = $snmp_session->get_entries(-columns => [keys %conn_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $channelTable = '1.3.6.1.4.1.674.10893.1.20.130.2';
+	    $result = $snmp_session->get_table(-baseoid => $channelTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %conn_oid]);
+	}
 
         if (!defined $result) {
             printf "SNMP ERROR [storage / channel]: %s.\n", $snmp_session->error;
@@ -1850,7 +1890,14 @@ sub check_enclosures {
 	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.25' => 'enclosureNexusID',
 	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.26' => 'enclosureFirmwareVersion',
             );
-        my $result = $snmp_session->get_entries(-columns => [keys %encl_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $enclosureTable = '1.3.6.1.4.1.674.10893.1.20.130.3';
+	    $result = $snmp_session->get_table(-baseoid => $enclosureTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %encl_oid]);
+	}
 
         # No enclosures is OK
         return if !defined $result;
@@ -1950,8 +1997,14 @@ sub check_enclosure_fans {
 	     '1.3.6.1.4.1.674.10893.1.20.130.8.1.4'  => 'fanConnectionEnclosureName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.8.1.5'  => 'fanConnectionEnclosureNumber',
 	    );
-
-	my $result = $snmp_session->get_entries(-columns => [keys %fan_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $fanTable = '1.3.6.1.4.1.674.10893.1.20.130.7';
+	    $result = $snmp_session->get_table(-baseoid => $fanTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %fan_oid]);
+	}
 
 	# No enclosure fans is OK
 	return if !defined $result;
@@ -2048,7 +2101,14 @@ sub check_enclosure_pwr {
 	     '1.3.6.1.4.1.674.10893.1.20.130.10.1.4' => 'powerSupplyConnectionEnclosureName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.10.1.5' => 'powerSupplyConnectionEnclosureNumber',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %ps_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $powerSupplyTable = '1.3.6.1.4.1.674.10893.1.20.130.9';
+	    $result = $snmp_session->get_table(-baseoid => $powerSupplyTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %ps_oid]);
+	}
 
 	# No enclosure power supplies is OK
 	return if !defined $result;
@@ -2151,7 +2211,14 @@ sub check_enclosure_temp {
 	     '1.3.6.1.4.1.674.10893.1.20.130.12.1.4'  => 'temperatureConnectionEnclosureName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.12.1.5'  => 'temperatureConnectionEnclosureNumber',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %temp_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $temperatureProbeTable = '1.3.6.1.4.1.674.10893.1.20.130.11';
+	    $result = $snmp_session->get_table(-baseoid => $temperatureProbeTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %temp_oid]);
+	}
 
 	# No enclosure temperature probes is OK
 	return if !defined $result;
@@ -2262,7 +2329,14 @@ sub check_enclosure_emms {
 	     '1.3.6.1.4.1.674.10893.1.20.130.14.1.4'  => 'enclosureManagementModuleConnectionEnclosureName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.14.1.5'  => 'enclosureManagementModuleConnectionEnclosureNumber',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %emms_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $enclosureManagementModuleTable = '1.3.6.1.4.1.674.10893.1.20.130.13';
+	    $result = $snmp_session->get_table(-baseoid => $enclosureManagementModuleTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %emms_oid]);
+	}
 
 	# No enclosure EMMs is OK
 	return if !defined $result;
@@ -2354,7 +2428,14 @@ sub check_memory {
 	     '1.3.6.1.4.1.674.10892.1.1100.50.1.14.1' => 'memoryDeviceSize',
 	     '1.3.6.1.4.1.674.10892.1.1100.50.1.20.1' => 'memoryDeviceFailureModes',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %dimm_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $memoryDeviceTable = '1.3.6.1.4.1.674.10892.1.1100.50.1';
+	    $result = $snmp_session->get_table(-baseoid => $memoryDeviceTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %dimm_oid]);
+	}
 
 	if (!defined $result) {
 	    printf "SNMP ERROR [memory]: %s.\n", $snmp_session->error;
@@ -2468,7 +2549,14 @@ sub check_fans {
 	     '1.3.6.1.4.1.674.10892.1.700.12.1.10.1' => 'coolingDeviceUpperCriticalThreshold',
 	     '1.3.6.1.4.1.674.10892.1.700.12.1.11.1' => 'coolingDeviceUpperNonCriticalThreshold',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %cool_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $coolingDeviceTable = '1.3.6.1.4.1.674.10892.1.700.12.1';
+	    $result = $snmp_session->get_table(-baseoid => $coolingDeviceTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %cool_oid]);
+	}
 
 	if ($blade && !defined $result) {
 	    return 0;
@@ -2563,7 +2651,14 @@ sub check_powersupplies {
 	     '1.3.6.1.4.1.674.10892.1.600.12.1.11.1' => 'powerSupplySensorState',
 	     '1.3.6.1.4.1.674.10892.1.600.12.1.12.1' => 'powerSupplyConfigurationErrorType',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %ps_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $powerDeviceTable = '1.3.6.1.4.1.674.10892.1.600.12.1';
+	    $result = $snmp_session->get_table(-baseoid => $powerDeviceTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %ps_oid]);
+	}
 
 	# No instrumented PSU is OK (blades, low-end servers)
 	return 0 if !defined $result;
@@ -2875,8 +2970,19 @@ sub check_processors {
 	     '1.3.6.1.4.1.674.10892.1.1100.32.1.5.1'  => 'processorDeviceStatusStatus',
 	     '1.3.6.1.4.1.674.10892.1.1100.32.1.6.1'  => 'processorDeviceStatusReading',
 	    );
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $processorDeviceTable = '1.3.6.1.4.1.674.10892.1.1100.30.1';
+	    my $processorDeviceStatusTable = '1.3.6.1.4.1.674.10892.1.1100.32.1';
 
-	my $result = $snmp_session->get_entries(-columns => [keys %cpu_oid]);
+	    my $res1 = $snmp_session->get_table(-baseoid => $processorDeviceTable);
+	    my $res2 = $snmp_session->get_table(-baseoid => $processorDeviceStatusTable);
+
+            $result = defined $res1 ? $res1 : $res2;
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %cpu_oid]);
+	}
 
 	if (!defined $result) {
 	    printf "SNMP ERROR [processors]: %s.\n", $snmp_session->error;
@@ -3139,7 +3245,14 @@ sub check_batteries {
 	     '1.3.6.1.4.1.674.10892.1.600.50.1.6.1' => 'batteryReading',
 	     '1.3.6.1.4.1.674.10892.1.600.50.1.7.1' => 'batteryLocationName',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %bat_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $batteryTable = '1.3.6.1.4.1.674.10892.1.600.50.1';
+	    $result = $snmp_session->get_table(-baseoid => $batteryTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %bat_oid]);
+	}
 
 	# No batteries is OK
 	return 0 if !defined $result;
@@ -3210,7 +3323,14 @@ sub check_pwrmonitoring {
 	     '1.3.6.1.4.1.674.10892.1.600.30.1.11.1' => 'amperageProbeUpperNonCriticalThreshold',
 	     '1.3.6.1.4.1.674.10892.1.600.30.1.16.1' => 'amperageProbeDiscreteReading',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %amp_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $amperageProbeTable = '1.3.6.1.4.1.674.10892.1.600.30.1';
+	    $result = $snmp_session->get_table(-baseoid => $amperageProbeTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %amp_oid]);
+	}
 
 	# No pwrmonitoring is OK
 	return 0 if !defined $result;
@@ -3379,7 +3499,14 @@ sub check_intrusion {
 	     '1.3.6.1.4.1.674.10892.1.300.70.1.5.1' => 'intrusionStatus',
 	     '1.3.6.1.4.1.674.10892.1.300.70.1.6.1' => 'intrusionReading',
 	    );
-	my $result = $snmp_session->get_entries(-columns => [keys %int_oid]);
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $intrusionTable = '1.3.6.1.4.1.674.10892.1.300.70.1';
+	    $result = $snmp_session->get_table(-baseoid => $intrusionTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %int_oid]);
+	}
 
 	# No intrusion is OK
 	return 0 if !defined $result;
