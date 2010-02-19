@@ -1623,7 +1623,14 @@ sub check_cache_battery {
 	my $result = undef;
 	if ($opt{use_get_table}) {
 	    my $batteryTable = '1.3.6.1.4.1.674.10893.1.20.130.15';
+            my $batteryConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.16';
+
 	    $result = $snmp_session->get_table(-baseoid => $batteryTable);
+            my $ext = $snmp_session->get_table(-baseoid => $batteryConnectionTable);
+
+	    if (defined $result) {
+                defined $ext && map { $$result{$_} = $$ext{$_} } keys %{ $ext };
+            }
 	}
 	else {
 	    $result = $snmp_session->get_entries(-columns => [keys %bat_oid]);
@@ -2000,7 +2007,14 @@ sub check_enclosure_fans {
 	my $result = undef;
 	if ($opt{use_get_table}) {
 	    my $fanTable = '1.3.6.1.4.1.674.10893.1.20.130.7';
+            my $fanConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.8';
+
 	    $result = $snmp_session->get_table(-baseoid => $fanTable);
+            my $ext = $snmp_session->get_table(-baseoid => $fanConnectionTable);
+
+	    if (defined $result) {
+                defined $ext && map { $$result{$_} = $$ext{$_} } keys %{ $ext };
+            }
 	}
 	else {
 	    $result = $snmp_session->get_entries(-columns => [keys %fan_oid]);
@@ -2104,7 +2118,14 @@ sub check_enclosure_pwr {
 	my $result = undef;
 	if ($opt{use_get_table}) {
 	    my $powerSupplyTable = '1.3.6.1.4.1.674.10893.1.20.130.9';
+            my $powerSupplyConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.10';
+
 	    $result = $snmp_session->get_table(-baseoid => $powerSupplyTable);
+            my $ext = $snmp_session->get_table(-baseoid => $powerSupplyConnectionTable);
+
+	    if (defined $result) {
+                defined $ext && map { $$result{$_} = $$ext{$_} } keys %{ $ext };
+            }
 	}
 	else {
 	    $result = $snmp_session->get_entries(-columns => [keys %ps_oid]);
@@ -2214,7 +2235,14 @@ sub check_enclosure_temp {
 	my $result = undef;
 	if ($opt{use_get_table}) {
 	    my $temperatureProbeTable = '1.3.6.1.4.1.674.10893.1.20.130.11';
+            my $temperatureConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.12';
+
 	    $result = $snmp_session->get_table(-baseoid => $temperatureProbeTable);
+            my $ext = $snmp_session->get_table(-baseoid => $temperatureConnectionTable);
+
+	    if (defined $result) {
+                defined $ext && map { $$result{$_} = $$ext{$_} } keys %{ $ext };
+            }
 	}
 	else {
 	    $result = $snmp_session->get_entries(-columns => [keys %temp_oid]);
@@ -2332,7 +2360,14 @@ sub check_enclosure_emms {
 	my $result = undef;
 	if ($opt{use_get_table}) {
 	    my $enclosureManagementModuleTable = '1.3.6.1.4.1.674.10893.1.20.130.13';
+            my $enclosureManagementModuleConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.14';
+
 	    $result = $snmp_session->get_table(-baseoid => $enclosureManagementModuleTable);
+            my $ext = $snmp_session->get_table(-baseoid => $enclosureManagementModuleConnectionTable);
+
+	    if (defined $result) {
+                defined $ext && map { $$result{$_} = $$ext{$_} } keys %{ $ext };
+            }
 	}
 	else {
 	    $result = $snmp_session->get_entries(-columns => [keys %emms_oid]);
@@ -2975,10 +3010,10 @@ sub check_processors {
 	    my $processorDeviceTable = '1.3.6.1.4.1.674.10892.1.1100.30.1';
 	    my $processorDeviceStatusTable = '1.3.6.1.4.1.674.10892.1.1100.32.1';
 
-	    my $res1 = $snmp_session->get_table(-baseoid => $processorDeviceTable);
-	    my $res2 = $snmp_session->get_table(-baseoid => $processorDeviceStatusTable);
+	    $result = $snmp_session->get_table(-baseoid => $processorDeviceTable);
+	    my $ext = $snmp_session->get_table(-baseoid => $processorDeviceStatusTable);
 
-            $result = defined $res1 ? $res1 : $res2;
+            defined $ext && map { $$result{$_} = $$ext{$_} } keys %{ $ext };
 	}
 	else {
 	    $result = $snmp_session->get_entries(-columns => [keys %cpu_oid]);
