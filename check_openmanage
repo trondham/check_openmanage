@@ -127,38 +127,38 @@ Written by $AUTHOR <$CONTACT>
 END_LICENSE
 
 # Options with default values
-%opt = ( 'blacklist'         => [],
-	 'check'             => [],
-	 'critical'          => [],
-	 'warning'           => [],
-	 'timeout'           => 30,  # default timeout is 30 seconds
-	 'debug'             => 0,
-	 'help'              => 0,
-	 'perfdata'          => undef,
-	 'info'              => 0,
-	 'extinfo'           => 0,
-	 'htmlinfo'          => undef,
-	 'postmsg'           => undef,
-	 'state'             => 0,
-	 'short-state'       => 0,
-	 'okinfo'            => 0,   # default "ok" output level
-	 'linebreak'         => undef,
-	 'version'           => 0,
-         'all'               => 0,
-	 'only'              => undef,
-	 'omreport'          => undef,
-	 'port'              => 161, # default SNMP port
-	 'hostname'          => undef,
-	 'community'         => 'public',  # SMNP v1 or v2c
-	 'protocol'          => 2,
-	 'username'          => undef, # SMNP v3
-	 'authpassword'      => undef, # SMNP v3
-	 'authkey'           => undef, # SMNP v3
-	 'authprotocol'      => undef, # SMNP v3
-	 'privpassword'      => undef, # SMNP v3
-	 'privkey'           => undef, # SMNP v3
-	 'privprotocol'      => undef, # SMNP v3
-         'use_get_table'     => 0,
+%opt = ( 'blacklist'         => [],       # blacklisting
+	 'check'             => [],       # check control
+	 'critical'          => [],       # temperature critical limits
+	 'warning'           => [],       # temperature warning limits
+	 'timeout'           => 30,       # default timeout is 30 seconds
+	 'debug'             => 0,        # debugging / verbose output
+	 'help'              => 0,        # display help output
+	 'perfdata'          => undef,    # output performance data
+	 'info'              => 0,        # display servicetag
+	 'extinfo'           => 0,        # display extra info
+	 'htmlinfo'          => undef,    # html tags in output
+	 'postmsg'           => undef,    # post message
+	 'state'             => 0,        # display alert type
+	 'short-state'       => 0,        # display alert type (short)
+	 'okinfo'            => 0,        # default "ok" output level
+	 'linebreak'         => undef,    # specify linebreak
+	 'version'           => 0,        # plugin version info
+         'all'               => 0,        # check everything
+	 'only'              => undef,    # only one component
+	 'omreport'          => undef,    # omreport path
+	 'port'              => 161,      # default SNMP port
+	 'hostname'          => undef,    # hostname or IP
+	 'community'         => 'public', # SMNP v1 or v2c
+	 'protocol'          => 2,        # default SNMP protocol 2c
+	 'username'          => undef,    # SMNP v3
+	 'authpassword'      => undef,    # SMNP v3
+	 'authkey'           => undef,    # SMNP v3
+	 'authprotocol'      => undef,    # SMNP v3
+	 'privpassword'      => undef,    # SMNP v3
+	 'privkey'           => undef,    # SMNP v3
+	 'privprotocol'      => undef,    # SMNP v3
+         'use_get_table'     => 0,        # hack for SNMPv3 on Windows with net-snmp
        );
 
 # Get options
