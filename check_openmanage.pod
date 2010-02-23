@@ -328,6 +328,14 @@ the --privprotocol option.
 One of the following arguments are required: des, aes, aes128, 3des,
 3desde
 
+=item --use-get_table
+
+This option exists as a workaround when using check_openmanage with
+SNMPv3 on Windows with net-snmp. Using this option will make
+check_openmanage use the Net::SNMP function get_table() instead of
+get_entries() while fetching values via SNMP. The latter is faster and
+is the default.
+
 =back
 
 =head1 BLACKLISTING
