@@ -1,3 +1,23 @@
+3.5.6   2010-02-23
+------------------
+
+* New option '--use-get_table' is added as a workaround for SNMPv3 on
+  Windows using net-snmp. This option will make check_openmanage use
+  the Net::SNMP function get_table() instead of get_entries() to
+  collect information via SNMP.
+* Include a blacklisting option 'ctrl_pdisk' which takes the
+  controller number as argument. This blacklisting option only works
+  with omreport and is a workaround for broken disk firmwares that
+  contain illegal XML characters. These characters makes openmanage
+  barf and exit with an error. Patch from Bas Couwenberg.
+* If the blacklisting keyword "all" is supplied for a component type,
+  that component type is not checked at all, i.e. the commands are
+  never executed. This will make check_openmanage execute faster if
+  blacklisting is heavily used.
+* Option '--htmlinfo' now has a shorter equivalent '-I'
+* The option '--short-state' now has a shorter equivalent '-S'
+
+
 3.5.5   2010-01-22
 ------------------
 
