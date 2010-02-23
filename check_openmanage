@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.6-beta6';
+$VERSION = '3.5.6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -560,7 +560,7 @@ sub snmp_initialize {
 	}
     }
     else {
-	print "You need perl module Net::SNMP to run $NAME in SNMP mode\n";
+	print "ERROR: You need perl module Net::SNMP to run $NAME in SNMP mode\n";
 	exit $E_UNKNOWN;
     }
     return;
