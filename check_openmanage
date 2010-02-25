@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.6';
+$VERSION = '3.5.7-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1371,8 +1371,12 @@ sub check_physical_disks {
 	    else {
 		$id = join q{:}, ($out->{arrayDiskChannel}, $out->{arrayDiskTargetID});
 	    }
-	    $state    = $pdisk_state{$out->{arrayDiskState}};
-	    $status   = $snmp_status{$out->{arrayDiskComponentStatus}};
+	    $state    = exists $out->{arrayDiskState}
+              ? $pdisk_state{$out->{arrayDiskState}}
+                : 'Unknown';
+	    $status   = exists $out->{arrayDiskComponentStatus}
+              ? $snmp_status{$out->{arrayDiskComponentStatus}}
+                : 'Unknown';
 	    $fpred    = $out->{arrayDiskSmartAlertIndication} == 2 ? 1 : 0;
 	    $progr    = q{};
 	    $nexus    = convert_nexus($out->{arrayDiskNexusID});
