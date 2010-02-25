@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta2';
+$VERSION = '3.5.7-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1416,11 +1416,11 @@ sub check_physical_disks {
 
 	# Calculate human readable capacity
 	$capacity = ceil($capacity / 1000**3) >= 1000
-          ? sprintf '%.1fTB', ($capacity / 1000**4)
-	    : sprintf '%.0fGB', ($capacity / 1000**3);
-	$capacity = '450GB' if $capacity eq '449GB';  # quick fix for 450GB disks
-	$capacity = '300GB' if $capacity eq '299GB';  # quick fix for 300GB disks
-	$capacity = '146GB' if $capacity eq '147GB';  # quick fix for 146GB disks
+          ? sprintf '%.1f TB', ($capacity / 1000**4)
+	    : sprintf '%.0f GB', ($capacity / 1000**3);
+	$capacity = '450 GB' if $capacity eq '449 GB';  # quick fix for 450GB disks
+	$capacity = '300 GB' if $capacity eq '299 GB';  # quick fix for 300GB disks
+	$capacity = '146 GB' if $capacity eq '147 GB';  # quick fix for 146GB disks
 
 	# Capitalize only the first letter of the vendor name
 	$vendor = (substr $vendor, 0, 1) . lc (substr $vendor, 1, length $vendor);
@@ -3169,7 +3169,7 @@ sub check_processors {
 	}
 	elsif (defined $family and defined $man and defined $speed) {
 	    $speed =~ s{\A (\d+) .*}{$1}xms;
-	    $brand = sprintf '%s %s %.2fGHz', $man, $family, $speed / 1000;
+	    $brand = sprintf '%s %s %.2f GHz', $man, $family, $speed / 1000;
 	}
 	else {
 	    $brand = "unknown";
