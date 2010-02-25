@@ -3166,6 +3166,7 @@ sub check_processors {
 	    $brand =~ s{\((R|tm)\)}{}gxms;
 	    $brand =~ s{\s(CPU|Processor)}{}xms;
 	    $brand =~ s{\s\@}{}xms;
+            $brand =~ s{(\d)GHz}{$1 GHz}xms;
 	}
 	elsif (defined $family and defined $man and defined $speed) {
 	    $speed =~ s{\A (\d+) .*}{$1}xms;
