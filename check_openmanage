@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta9';
+$VERSION = '3.5.7-beta10';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1145,8 +1145,8 @@ sub check_controllers {
 	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.41' => 'controllerDriverVersion',
 	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.44' => 'controllerMinFWVersion',
 	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.45' => 'controllerMinDriverVersion',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.55' => 'FIXME_StorportDriverVersion',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.56' => 'FIXME_StorportMinDriverVersion',
+	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.55' => 'controllerStorportDriverVersion',
+	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.56' => 'controllerMinRequiredStorportVer',
 	    );
 
 	# We use get_table() here for the odd case where a server has
@@ -1189,10 +1189,10 @@ sub check_controllers {
 	      ? $out->{controllerFWVersion} : 'N/A';
 	    $driver   = exists $out->{controllerDriverVersion}
 	      ? $out->{controllerDriverVersion} : 'N/A';
-	    $minstdr  = exists $out->{'FIXME_StorportMinDriverVersion'}
-	      ? $out->{FIXME_StorportMinDriverVersion} : undef;
-	    $stdr     = exists $out->{FIXME_StorportDriverVersion}
-	      ? $out->{FIXME_StorportDriverVersion} : undef;
+	    $minstdr  = exists $out->{'controllerMinRequiredStorportVer'}
+	      ? $out->{controllerMinRequiredStorportVer} : undef;
+	    $stdr     = exists $out->{controllerStorportDriverVersion}
+	      ? $out->{controllerStorportDriverVersion} : undef;
 	    $nexus    = convert_nexus($out->{controllerNexusID});
 	}
 	else {
