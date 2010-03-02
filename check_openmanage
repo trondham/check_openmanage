@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta10';
+$VERSION = '3.5.7-beta11';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -210,7 +210,12 @@ if ($opt{version}) {
 
 # Setting timeout
 $SIG{ALRM} = sub {
-    print "PLUGIN TIMEOUT: $NAME timed out after $opt{timeout} seconds\n";
+    print "PLUGIN TIMEOUT: $NAME timed out after $opt{timeout} seconds";
+    if (defined $opt{htmlinfo}) {
+        # check_openmanage.html#plugin-timeout-check-openmanage-timed-out-after-30-seconds
+        print ' [<a href="http://bit.ly/bPOygB">more info</a>]';
+    }
+    print "\n";
     exit $E_UNKNOWN;
 };
 alarm $opt{timeout};
@@ -560,7 +565,12 @@ sub snmp_initialize {
 	}
     }
     else {
-	print "ERROR: You need perl module Net::SNMP to run $NAME in SNMP mode\n";
+	print "ERROR: You need perl module Net::SNMP to run $NAME in SNMP mode";
+        if (defined $opt{htmlinfo}) {
+            # check_openmanage.html#error-you-need-perl-module-net-snmp-to-run-check-openmanage-in-snmp-mode
+            print ' [<a href="http://bit.ly/b4F0q1">more info</a>]';
+        }
+        print "\n";
 	exit $E_UNKNOWN;
     }
     return;
@@ -576,13 +586,23 @@ sub snmp_check {
 
     # Typically if remote host isn't responding
     if (!defined $result) {
-	printf "SNMP CRITICAL: %s\n", $snmp_session->error;
+	printf "SNMP CRITICAL: %s", $snmp_session->error;
+        if (defined $opt{htmlinfo}) {
+            # check_openmanage.html#snmp-critical-no-response-from-remote-host-10-1-2-3
+            print ' [<a href="http://bit.ly/bRyk4B">more info</a>]';
+        }
+        print "\n";
 	exit $E_CRITICAL;
     }
 
     # If OpenManage isn't installed or is not working
     if ($result->{$chassisModelName} =~ m{\A noSuch (Instance|Object) \z}xms) {
-	print "ERROR: (SNMP) OpenManage is not installed or is not working correctly\n";
+	print "ERROR: (SNMP) OpenManage is not installed or is not working correctly";
+        if (defined $opt{htmlinfo}) {
+            # check_openmanage.html#error-snmp-openmanage-is-not-installed-or-is-not-working-correctly
+            print ' [<a href="http://bit.ly/c7oKcK">more info</a>]';
+        }
+        print "\n";
 	exit $E_UNKNOWN;
     }
     return;
@@ -639,7 +659,12 @@ sub find_omreport {
     # Exit with status=UNKNOWN if OM is not installed, or we don't
     # have permission to execute the binary
     if (!defined $omreport) {
-	print "ERROR: Dell OpenManage Server Administrator (OMSA) is not installed\n";
+	print "ERROR: Dell OpenManage Server Administrator (OMSA) is not installed";
+        if (defined $opt{htmlinfo}) {
+            # check_openmanage.html#error-dell-openmanage-server-administrator-omsa-is-not-installed
+            print ' [<a href="http://bit.ly/a4M8Z6">more info</a>]';
+        }
+        print "\n";
 	exit $E_UNKNOWN;
     }
     return;
@@ -1356,7 +1381,7 @@ sub check_physical_disks {
 	 7  => 'Recovering',
 	 11 => 'Removed',
 	 15 => 'Resynching',
-         22 => 'Replacing', # this one is not defined in the v6.0.1 MIBs
+         22 => 'Replacing', # FIXME: this one is not defined in the OM 6.2.0.1 MIBs
 	 24 => 'Rebuilding',
 	 25 => 'No Media',
 	 26 => 'Formatting',
@@ -1545,7 +1570,7 @@ sub check_virtual_disks {
 	 8  => 'RAID-6',
 	 10 => 'RAID-10',
 	 12 => 'RAID-50',
-	 19 => 'Concatenated RAID 1',
+	 19 => 'Concatenated RAID-1',
 	 24 => 'RAID-60',
 	);
 
@@ -4360,6 +4385,10 @@ if (@perl_warnings) {
     foreach (@perl_warnings) {
 	chop @$_;
 	print "${linebreak}INTERNAL ERROR: @$_";
+        if (defined $opt{htmlinfo}) {
+            # check_openmanage.html#internal-error-blah-blah
+            print ' [<a href="http://bit.ly/aMDzE1">more info</a>]';
+        }
     }
     $exit_code = $E_UNKNOWN;
 }
