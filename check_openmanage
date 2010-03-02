@@ -1438,10 +1438,9 @@ sub check_physical_disks {
 	if ($fpred) {
 	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
 	      $name, $vendor, $product, $capacity, $ctrl;
-            if ($state ne 'Predictive failure') {
-                $msg .= " ($state)";
-            }
-	    report('storage', $msg, ($status2nagios{$status} == $E_CRITICAL ? $E_CRITICAL : $E_WARNING), $nexus);
+            $msg .= " ($state)" if $state ne 'Predictive failure';
+	    report('storage', $msg,
+                   ($status2nagios{$status} == $E_CRITICAL ? $E_CRITICAL : $E_WARNING), $nexus);
 	}
 	# Special case: Rebuilding / Replacing
 	elsif ($state =~ m{\A Rebuilding|Replacing \z}xms) {
