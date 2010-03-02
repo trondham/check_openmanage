@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta5';
+$VERSION = '3.5.7-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1437,13 +1437,13 @@ sub check_physical_disks {
 	# Special case: Failure predicted
 	if ($status eq 'Non-Critical' and $fpred) {
 	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
-	      $name, $vendor, $product, $capacity, $ctrl;
+	      $name,  $capacity, $ctrl;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: Rebuilding / Replacing
 	elsif ($state =~ m{\A Rebuilding|Replacing \z}xms) {
-	    my $msg = sprintf '%s [%s] on ctrl %d is %s%s',
-	      $name, $capacity, $ctrl, $state, $progr;
+	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d is %s%s',
+	      $name, $vendor, $product, $capacity, $ctrl, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
