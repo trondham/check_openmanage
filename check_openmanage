@@ -1441,7 +1441,7 @@ sub check_physical_disks {
             if ($state ne 'Predictive failure') {
                 $msg .= " ($state)";
             }
-	    report('storage', $msg, $E_WARNING, $nexus);
+	    report('storage', $msg, ($status2nagios{$status} == $E_CRITICAL ? $E_CRITICAL : $E_WARNING), $nexus);
 	}
 	# Special case: Rebuilding / Replacing
 	elsif ($state =~ m{\A Rebuilding|Replacing \z}xms) {
