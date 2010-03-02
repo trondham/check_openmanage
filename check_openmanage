@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta4';
+$VERSION = '3.5.7-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1356,6 +1356,7 @@ sub check_physical_disks {
 	 7  => 'Recovering',
 	 11 => 'Removed',
 	 15 => 'Resynching',
+         22 => 'Replacing', # this one is not defined in the v6.0.1 MIBs
 	 24 => 'Rebuilding',
 	 25 => 'No Media',
 	 26 => 'Formatting',
@@ -1439,8 +1440,8 @@ sub check_physical_disks {
 	      $name, $vendor, $product, $capacity, $ctrl;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
-	# Special case: Rebuilding
-	elsif ($state eq 'Rebuilding') {
+	# Special case: Rebuilding / Replacing
+	elsif ($state =~ m{\A Rebuilding|Replacing \z}xms) {
 	    my $msg = sprintf '%s [%s] on ctrl %d is %s%s',
 	      $name, $capacity, $ctrl, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
