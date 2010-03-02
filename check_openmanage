@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta7';
+$VERSION = '3.5.7-beta8';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1434,8 +1434,14 @@ sub check_physical_disks {
 	# Remove unnecessary trademark rubbish from vendor name
 	$vendor =~ s{\(tm\)\z}{}xms;
 
+	# Special case: Failure predicted and OK status
+	if ($status eq 'Ok' and $fpred) {
+	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
+	      $name, $vendor, $product, $capacity, $ctrl;
+	    report('storage', $msg, $E_WARNING, $nexus);
+	}
 	# Special case: Rebuilding / Replacing
-	if ($state =~ m{\A Rebuilding|Replacing \z}xms) {
+	elsif ($state =~ m{\A Rebuilding|Replacing \z}xms) {
 	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d is %s%s',
 	      $name, $vendor, $product, $capacity, $ctrl, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
@@ -1444,13 +1450,11 @@ sub check_physical_disks {
 	elsif ($status ne 'Ok') {
 	    my $msg =  sprintf '%s [%s %s, %s] on ctrl %d needs attention: %s',
 	      $name, $vendor, $product, $capacity, $ctrl, $state;
+            if ($fpred) {
+                # predictive failure
+                $msg .= ', Failure Predicted';
+            }
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
-	}
-	# Special case: Failure predicted
-	elsif ($status eq 'Non-Critical' and $fpred) {
-	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
-	      $name, $vendor, $product, $capacity, $ctrl;
-	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Ok
 	else {
