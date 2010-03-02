@@ -27,7 +27,7 @@ require 5.006;  # Perl v5.6.0 or newer is required
 use strict;
 use warnings;
 use POSIX qw(isatty ceil);
-use Getopt::Long qw(:config no_ignore_case);
+use Getopt::Long qw(:config no_ignore_case bundling);
 
 # Global (package) variables used throughout the code
 use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
@@ -57,7 +57,7 @@ $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta11';
+$VERSION = '3.5.7-beta12';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
