@@ -46,17 +46,12 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 # Initialization and global variables
 #---------------------------------------------------------------------
 
-# Small subroutine to collect any perl warnings during execution
-sub collect_perl_warning {
-    push @perl_warnings, [@_];
-}
-
-# Set the WARN signal to use our collect subroutine above
-$SIG{__WARN__} = \&collect_perl_warning;
+# Collect perl warnings in an array
+$SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta16';
+$VERSION = '3.5.7-beta17';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
