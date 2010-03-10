@@ -34,7 +34,7 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 	     $E_UNKNOWN $FW_LOCK $USAGE $HELP $LICENSE
 	     $snmp_session $snmp_error $omreport $globalstatus $global
 	     $linebreak $omopt_chassis $omopt_system $blade
-	     $exit_code $snmp $original_sigwarn
+	     $exit_code $snmp
 	     %check %opt %perfdata %reverse_exitcode %status2nagios
 	     %snmp_status %snmp_probestatus %probestatus2nagios %sysinfo
 	     %blacklist %nagios_alert_count %count
@@ -52,12 +52,11 @@ sub collect_perl_warning {
 }
 
 # Set the WARN signal to use our collect subroutine above
-$original_sigwarn = $SIG{__WARN__};
 $SIG{__WARN__} = \&collect_perl_warning;
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta15';
+$VERSION = '3.5.7-beta16';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -4438,6 +4437,9 @@ else {
     }
 }
 
+# Reset the WARN signal
+$SIG{__WARN__} = 'DEFAULT';
+
 # Print any perl warnings that have occured
 if (@perl_warnings) {
     foreach (@perl_warnings) {
@@ -4446,9 +4448,6 @@ if (@perl_warnings) {
     }
     $exit_code = $E_UNKNOWN;
 }
-
-# Reset the WARN signal
-$SIG{__WARN__} = $original_sigwarn;
 
 # Print performance data
 if (defined $opt{perfdata} && !$opt{debug} && %perfdata) {
