@@ -48,7 +48,7 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 
 # Small subroutine to collect any perl warnings during execution
 sub collect_perl_warning {
-  push @perl_warnings, [@_];
+    push @perl_warnings, [@_];
 }
 
 # Set the WARN signal to use our collect subroutine above
