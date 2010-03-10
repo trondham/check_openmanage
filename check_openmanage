@@ -84,7 +84,7 @@ GENERAL OPTIONS:
 
 SNMP OPTIONS:
 
-   -H, --hostname      Hostname or IP of the server (needed for SNMP)
+   -H, --hostname      Hostname or IP (required for SNMP)
    -C, --community     SNMP community string
    -P, --protocol      SNMP protocol version
    --port              SNMP port number
