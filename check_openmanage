@@ -35,10 +35,10 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 	     $snmp_session $snmp_error $omreport $globalstatus $global
 	     $linebreak $omopt_chassis $omopt_system $blade
 	     $exit_code $snmp
-	     %check %opt %perfdata %reverse_exitcode %status2nagios
+	     %check %opt %reverse_exitcode %status2nagios
 	     %snmp_status %snmp_probestatus %probestatus2nagios %sysinfo
 	     %blacklist %nagios_alert_count %count
-	     @perl_warnings @controllers @enclosures
+	     @perl_warnings @controllers @enclosures @perfdata
 	     @report_storage @report_chassis @report_other
 	  );
 
@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta17';
+$VERSION = '3.5.7-beta18';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -293,7 +293,7 @@ if (!$snmp && -f $FW_LOCK) {
     );
 
 # Performance data
-%perfdata = ();
+@perfdata = ();
 
 # Global health status
 $global         = 1;      # default is to check global status
@@ -2325,9 +2325,17 @@ sub check_enclosure_temp {
 	# Collect performance data
 	if (defined $opt{perfdata}) {
 	    $name =~ s{\A Temperature\sProbe\s(\d+) \z}{temp_$1}gxms;
-	    my $pkey = "enclosure_${encl_id}_${name}";
-	    my $pval = join q{;}, "${reading}C", $max_warn, $max_crit;
-	    $perfdata{$pkey} = $pval;
+	    my $label = "enclosure_${encl_id}_${name}";
+	    my $mini = $label;
+	    $mini =~ s{enclosure_(.+?)_temp_(.+?)}{e$1t$2}xms;
+	    push @perfdata, {
+			     label => $label,
+			     mini  => $mini,
+			     value => $reading,
+			     unit  => 'C',
+			     warn  => $max_warn,
+			     crit  => $max_crit,
+			    };
 	}
     }
     return;
@@ -2659,8 +2667,14 @@ sub check_fans {
 	    $pname =~ s{\s}{_}gxms;
 	    $pname =~ s{proc_}{cpu#}xms;
 	    my $pkey = join q{_}, 'fan', $index, $pname;
-	    my $pval = join q{;}, "${reading}RPM", $max_warn, $max_crit;
-	    $perfdata{$pkey} = $pval;
+	    push @perfdata, {
+			     label => $pkey,
+			     mini  => "f$index",
+			     value => $reading,
+			     unit  => 'RPM',
+			     warn  => $max_warn,
+			     crit  => $max_crit,
+			    };
 	}
     }
     return;
@@ -2966,8 +2980,14 @@ sub check_temperatures {
 		$pname =~ s{_temp\z}{}xms;
 		$pname =~ s{proc_}{cpu#}xms;
 		my $pkey = join q{_}, 'temp', $index, $pname;
-		my $pval = join q{;}, "${reading}C", $max_warn, $max_crit;
-		$perfdata{$pkey} = $pval;
+		push @perfdata, {
+				 label => $pkey,
+				 mini  => "t$index",
+				 value => $reading,
+				 unit  => 'C',
+				 warn  => $max_warn,
+				 crit  => $max_crit,
+				};
 	    }
 	}
     }
@@ -3551,11 +3571,16 @@ sub check_pwrmonitoring {
 	# Collect performance data
 	if (defined $opt{perfdata}) {
 	    next AMP if $reading !~ m{\A \d+(\.\d+)? \z}xms; # discrete reading (not number)
-	    my $pname = lc $location;
-	    $pname =~ s{\s}{_}gxms;
-	    my $pkey = join q{_}, 'pwr_mon', $index, $pname;
-	    my $pval = join q{;}, "$reading$unit", $max_warn, $max_crit;
-	    $perfdata{$pkey} = $pval;
+	    my $label = join q{_}, 'pwr_mon', $index, lc $location;
+	    $label =~ s{\s}{_}gxms;
+	    push @perfdata, {
+			     label => $label,
+			     mini  => "p$index",
+			     value => $reading,
+			     unit  => $unit,
+			     warn  => $max_warn,
+			     crit  => $max_crit,
+			    };
 	}
     }
 
@@ -3567,8 +3592,8 @@ sub check_pwrmonitoring {
 	my %used  = ();
 
 	# find used indexes
-	foreach (keys %perfdata) {
-	    if (m/\A pwr_mon_(\d+)/xms) {
+	foreach (@perfdata) {
+	    if ($_->{label} =~ m/\A pwr_mon_(\d+)/xms) {
 		$used{$1} = 1;
 	    }
 	}
@@ -3593,7 +3618,14 @@ sub check_pwrmonitoring {
 		# don't use an existing index
 		while (exists $used{$index}) { ++$index; }
 
-		$perfdata{"pwr_mon_${index}_${aname}"} = "$aval$aunit;0;0";
+		push @perfdata, {
+				 label => "pwr_mon_${index}_${aname}",
+				 mini  => "p$index",
+				 value => $aval,
+				 unit  => $unit,
+				 warn  => 0,
+				 crit  => 0,
+				};
 		++$index;
 	    }
 	}
@@ -4445,22 +4477,20 @@ if (@perl_warnings) {
 }
 
 # Print performance data
-if (defined $opt{perfdata} && !$opt{debug} && %perfdata) {
+if (defined $opt{perfdata} && !$opt{debug} && @perfdata) {
     my $lb = $opt{perfdata} eq 'multiline' ? "\n" : q{ };  # line break for perfdata
     print q{|};
 
-    sub perfdata {
-	my %order
-	  = (
-	     fan       => 0,
-	     pwr       => 1,
-	     temp      => 2,
-	     enclosure => 3,
-	    );
-	return ($order{(split /_/, $a, 2)[0]} cmp $order{(split /_/, $b, 2)[0]}) || $a cmp $b;
+    # Sort routine for performance data
+    sub perfsort {
+	my %order = ( fan => 0, pwr => 1, tem => 2, enc => 3, );
+	return ($order{(substr $a->{label}, 0, 3)} cmp $order{(substr $b->{label}, 0, 3)}) ||
+	  $a->{label} cmp $b->{label};
     }
 
-    print join $lb, map { "'$_'=$perfdata{$_}" } sort perfdata keys %perfdata;
+    # Print performance data sorted
+    my $type = $opt{perfdata} eq 'minimal' ? 'mini' : 'label';
+    print join $lb, map { "$_->{$type}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
 }
 
 # Print a linebreak at the end
