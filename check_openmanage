@@ -3622,7 +3622,7 @@ sub check_pwrmonitoring {
 				 label => "pwr_mon_${index}_${aname}",
 				 mini  => "p$index",
 				 value => $aval,
-				 unit  => $unit,
+				 unit  => $aunit,
 				 warn  => 0,
 				 crit  => 0,
 				};
