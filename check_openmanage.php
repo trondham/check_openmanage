@@ -58,7 +58,12 @@ foreach ($DS as $i) {
 
 	    $opt[$count] = "--slope-mode --vertical-label \"$vlabel\" --title \"$def_title: $title\" ";
 
-	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    if(isset($def[$count])){
+		$def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    }
+	    else {
+		$def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    }
 	    $def[$count] .= "AREA:var$i#$PWRcolor:\"$NAME[$i]\" " ;
 	    $def[$count] .= "LINE:var$i#000000: " ;
 	    $def[$count] .= "GPRINT:var$i:LAST:\"%6.0lf W last \" ";
@@ -165,7 +170,6 @@ foreach ($DS as $i) {
 	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
 	}
 	$def[$count] .= "LINE:var$i#".$colors[$t++].":\"$NAME[$i]\" " ;
-
 	$def[$count] .= "GPRINT:var$i:LAST:\"%6.0lf C last \" ";
 	$def[$count] .= "GPRINT:var$i:MAX:\"%6.0lf C max \" ";
 	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf C avg \\n\" ";
@@ -209,7 +213,6 @@ foreach ($DS as $i) {
 	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
 	}
 	$def[$count] .= "LINE:var$i#".$colors[$e++].":\"$NAME[$i]\" " ;
-
 	$def[$count] .= "GPRINT:var$i:LAST:\"%6.0lf C last \" ";
 	$def[$count] .= "GPRINT:var$i:MAX:\"%6.0lf C max \" ";
 	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf C avg \\n\" ";
