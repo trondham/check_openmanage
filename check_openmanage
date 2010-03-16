@@ -4489,7 +4489,7 @@ if (defined $opt{perfdata} && !$opt{debug} && @perfdata) {
 
     # Print performance data sorted
     my $type = $opt{perfdata} eq 'minimal' ? 'mini' : 'label';
-    print join $lb, map { "$_->{$type}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+    print join $lb, map { "$_->{$type}=$_->{value}$_->{unit};$_->{warn};$_->{crit};0;0" } sort perfsort @perfdata;
 }
 
 # Print a linebreak at the end
