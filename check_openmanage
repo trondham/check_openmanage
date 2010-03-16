@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7-beta19';
+$VERSION = '3.5.7-beta20';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2332,7 +2332,6 @@ sub check_enclosure_temp {
 			     label => $label,
 			     mini  => $mini,
 			     value => $reading,
-			     unit  => '',
 			     warn  => $max_warn,
 			     crit  => $max_crit,
 			    };
@@ -2666,12 +2665,10 @@ sub check_fans {
 	    my $pname = lc $location;
 	    $pname =~ s{\s}{_}gxms;
 	    $pname =~ s{proc_}{cpu#}xms;
-	    my $pkey = join q{_}, 'fan', $index, $pname;
 	    push @perfdata, {
-			     label => $pkey,
+			     label => "fan_${index}_${pname}",
 			     mini  => "f$index",
 			     value => $reading,
-			     unit  => '',
 			     warn  => $max_warn,
 			     crit  => $max_crit,
 			    };
@@ -2979,12 +2976,10 @@ sub check_temperatures {
 		$pname =~ s{\s}{_}gxms;
 		$pname =~ s{_temp\z}{}xms;
 		$pname =~ s{proc_}{cpu#}xms;
-		my $pkey = join q{_}, 'temp', $index, $pname;
 		push @perfdata, {
-				 label => $pkey,
+				 label => "temp_${index}_${pname}",
 				 mini  => "t$index",
 				 value => $reading,
-				 unit  => '',
 				 warn  => $max_warn,
 				 crit  => $max_crit,
 				};
@@ -3577,7 +3572,6 @@ sub check_pwrmonitoring {
 			     label => $label,
 			     mini  => "p${index}" . lc $unit,
 			     value => $reading,
-			     unit  => '',
 			     warn  => $max_warn,
 			     crit  => $max_crit,
 			    };
@@ -3621,7 +3615,6 @@ sub check_pwrmonitoring {
 				 label => "pwr_mon_${index}_${aname}",
 				 mini  => "p${index}a",
 				 value => $aval,
-				 unit  => '',
 				 warn  => 0,
 				 crit  => 0,
 				};
@@ -4489,7 +4482,7 @@ if (defined $opt{perfdata} && !$opt{debug} && @perfdata) {
 
     # Print performance data sorted
     my $type = $opt{perfdata} eq 'minimal' ? 'mini' : 'label';
-    print join $lb, map { "$_->{$type}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+    print join $lb, map { "$_->{$type}=$_->{value};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
 }
 
 # Print a linebreak at the end
