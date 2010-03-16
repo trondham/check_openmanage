@@ -3575,7 +3575,7 @@ sub check_pwrmonitoring {
 	    $label =~ s{\s}{_}gxms;
 	    push @perfdata, {
 			     label => $label,
-			     mini  => "p${index}w",
+			     mini  => "p${index}" . lc $unit,
 			     value => $reading,
 			     unit  => '',
 			     warn  => $max_warn,
