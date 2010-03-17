@@ -38,11 +38,18 @@ in SNMP mode.
 The number of seconds after which the plugin will abort. Default
 timeout is 30 seconds if the option is not present.
 
-=item -p, --perfdata [I<multline>]
+=item -p, --perfdata [I<multline> or I<minimal>]
 
 Collect performance data. Performance data collected include
 temperatures (in Celcius) and fan speeds (in rpm). On systems that
-support it, power consumption is also collected (in Watts).
+support it, power consumption is also collected (in Watts). This
+option takes one of two arguments, both of which are optional.
+
+If the argument C<minimal> is specified, the plugin will use shorter
+names for the performance data labels, e.g. C<t0> instead of
+C<temp_0_system_board_ambient>. This can be used as a workaround in
+cases where the plugin output needs shortening, for example if the
+1024 character limit of NRPE is reached.
 
 If given the argument C<multiline>, the plugin will output the
 performance data on multiple lines, for Nagios 3.x and above.
