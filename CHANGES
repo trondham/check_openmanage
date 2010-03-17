@@ -1,3 +1,33 @@
+3.5.7   
+------------------
+
+* Added robustness for received SNMP values that are not defined in
+  the MIB. Instead of throwing a perl warning when this happens, the
+  plugin will not report the undefined value.
+* Defined "Replacing" as a defined state for physical disks in SNMP
+  mode, even though this state is not defined in the MIB. It is
+  reported as such by omreport.
+* Physical disk brand/model is now reported when the state of the disk
+  is "Rebuilding" or "Replacing".
+* The state of a physical disk is reported in parentheses when the
+  predictive failure is detected. It is useful to know if a disk is
+  online, offline, spare or even failed when predictive failure is
+  reported.
+* Handling of physical disk predictive failure has been improved
+  overall.
+* Refactoring of the perfdata code. In conformance with the plugin
+  development guidelines, the UOM (unit of measure) previously
+  reported in the perfdata output has been removed.
+* The -p or --perfdata option now
+  takes an optional agrument 'minimal', which triggers shorter names
+  for the perfomance data labels. This shortens the output and is a
+  workaround for systems where the amount of output exceeds the 1024
+  char limit of NRPE.
+* The PNP4Nagios template has been updated. Users of check_openmanage
+  and PNP4Nagios are advised to upgrade. This version of
+  check_openmanage needs the new template.
+
+
 3.5.6   2010-02-23
 ------------------
 
