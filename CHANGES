@@ -1,4 +1,4 @@
-3.5.7   
+3.5.7   2010-03-19
 ------------------
 
 * Added robustness for received SNMP values that are not defined in
