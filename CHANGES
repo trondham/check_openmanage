@@ -9,7 +9,7 @@
   reported as such by omreport.
 * Physical disk brand/model is now reported when the state of the disk
   is "Rebuilding" or "Replacing".
-* The state of a physical disk is reported in parentheses when the
+* The state of a physical disk is reported in parentheses when
   predictive failure is detected. It is useful to know if a disk is
   online, offline, spare or even failed when predictive failure is
   reported.
