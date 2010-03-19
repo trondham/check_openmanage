@@ -48,7 +48,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Wed Mar 17 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.7-1
+* Wed Mar 19 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.7-1
 - Version 3.5.7
 
 * Tue Feb 23 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.6-1
