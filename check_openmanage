@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.7';
+$VERSION = '3.5.8-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -4015,23 +4015,35 @@ sub get_snmp_system_operatingsystem {
 # Fetch OMSA version via SNMP, put in sysinfo hash
 #
 sub get_snmp_about {
-    my %omsa_oid
-      = (
-	 '1.3.6.1.4.1.674.10892.1.100.10.0' => 'systemManagementSoftwareGlobalVersionName',
-	);
-    my $systemManagementSoftwareGroup = '1.3.6.1.4.1.674.10892.1.100';
-    my $result = $snmp_session->get_table(-baseoid => $systemManagementSoftwareGroup);
-    if (defined $result) {
-	foreach my $oid (keys %{ $result }) {
-	    if (exists $omsa_oid{$oid} and $omsa_oid{$oid} eq 'systemManagementSoftwareGlobalVersionName') {
-		$sysinfo{om} = ($result->{$oid});
-	    }
-	}
+#    my %omsa_oid
+#      = (
+#	 '1.3.6.1.4.1.674.10892.1.100.10.0' => 'systemManagementSoftwareGlobalVersionName',
+#	);
+#    my $systemManagementSoftwareGroup = '1.3.6.1.4.1.674.10892.1.100';
+#
+#    my $result = $snmp_session->get_table(-baseoid => $systemManagementSoftwareGroup);
+#    if (defined $result) {
+#	foreach my $oid (keys %{ $result }) {
+#	    if (exists $omsa_oid{$oid} and $omsa_oid{$oid} eq 'systemManagementSoftwareGlobalVersionName') {
+#		$sysinfo{om} = ($result->{$oid});
+#	    }
+#	}
+#    }
+#    else {
+#	my $msg = sprintf 'SNMP ERROR getting OMSA info: %s',
+#	  $snmp_session->error;
+#	report('other', $msg, $E_UNKNOWN);
+#    }
+
+    # systemManagementSoftwareGlobalVersionName
+    my $oid = '1.3.6.1.4.1.674.10892.1.100.10.0';
+    my $result = $snmp_session->get_request(-varbindlist => [$oid]);
+
+    if (defined $result && exists $result->{$oid} && $result->{$oid} ne q{}) {
+	$sysinfo{om} = $result->{$oid};
     }
     else {
-	my $msg = sprintf 'SNMP ERROR getting OMSA info: %s',
-	  $snmp_session->error;
-	report('other', $msg, $E_UNKNOWN);
+	$sysinfo{om} = 'unknown';
     }
     return;
 }
