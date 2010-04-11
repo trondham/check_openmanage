@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.8-beta1';
+$VERSION = '3.5.8-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2871,17 +2871,24 @@ sub check_temperatures {
 	if ($snmp) {
 	    $index    = $out->{temperatureProbeIndex} - 1;
 	    $status   = $snmp_probestatus{$out->{temperatureProbeStatus}};
-	    $reading  = $out->{temperatureProbeReading} / 10;
 	    $location = $out->{temperatureProbeLocationName};
-	    $max_crit = $out->{temperatureProbeUpperCriticalThreshold} / 10;
-	    $max_warn = $out->{temperatureProbeUpperNonCriticalThreshold} / 10;
+	    $reading  = exists $out->{temperatureProbeReading}
+	      ? $out->{temperatureProbeReading} / 10 : '[N/A]';
+	    $max_crit = exists $out->{temperatureProbeUpperCriticalThreshold}
+	      ? $out->{temperatureProbeUpperCriticalThreshold} / 10 : '[N/A]';
+	    $max_warn = exists $out->{temperatureProbeUpperNonCriticalThreshold}
+	      ? $out->{temperatureProbeUpperNonCriticalThreshold} / 10 : '[N/A]';
 	    $min_crit = exists $out->{temperatureProbeLowerCriticalThreshold}
 	      ? $out->{temperatureProbeLowerCriticalThreshold} / 10 : '[N/A]';
 	    $min_warn = exists $out->{temperatureProbeLowerNonCriticalThreshold}
 	      ? $out->{temperatureProbeLowerNonCriticalThreshold} / 10 : '[N/A]';
 	    $type     = get_hashval($out->{temperatureProbeType}, \%probe_type);
 	    $discrete = exists $out->{temperatureProbeDiscreteReading}
-	      ? $out->{temperatureProbeDiscreteReading} : undef;
+	      ? $out->{temperatureProbeDiscreteReading} : '[N/A]';
+	    # workaround for bad temp probes
+	    if ($type eq 'AmbientESM' and $reading !~ m{\A \d+(\.\d+)? \z}xms) {
+		$type = 'Discrete';
+	    }
 	}
 	else {
 	    $index    = $out->{'Index'};
@@ -2900,7 +2907,7 @@ sub check_temperatures {
 	$count{temp}++;
 
 	if ($type eq 'Discrete') {
-	    my $msg = sprintf 'Temperature probe %d (%s): is %s',
+	    my $msg = sprintf 'Temperature probe %d [%s] is %s',
 	      $index, $location, $discrete;
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	    report('chassis', $msg, $err, $index);
