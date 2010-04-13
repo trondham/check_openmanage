@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.8-beta3';
+$VERSION = '3.5.8-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3577,9 +3577,16 @@ sub check_pwrmonitoring {
 	next AMP if $index !~ m{\A \d+ \z}xms;
 	$count{amp}++;
 
-	my $msg = sprintf 'Amperage probe %d [%s] reads %s %s',
-	  $index, $location, $reading, $unit, $status;
-	report('chassis', $msg, $status2nagios{$status}, $index);
+	if ($type eq 'amperageProbeTypeIsDiscrete') {
+	    my $msg = sprintf 'Amperage probe %d [%s] is %s',
+	      $index, $location, $reading;
+	    report('chassis', $msg, $status2nagios{$status}, $index);
+	}
+	else {
+	    my $msg = sprintf 'Amperage probe %d [%s] reads %s %s',
+	      $index, $location, $reading, $unit;
+	    report('chassis', $msg, $status2nagios{$status}, $index);
+	}
 
 	# Collect performance data
 	if (defined $opt{perfdata}) {
