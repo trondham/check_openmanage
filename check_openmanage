@@ -2567,7 +2567,6 @@ sub check_memory {
 	    report('chassis', $msg, $E_OK, $index);
 	}
     }
-    return;
 }
 
 
@@ -3577,7 +3576,7 @@ sub check_pwrmonitoring {
 	next AMP if $index !~ m{\A \d+ \z}xms;
 	$count{amp}++;
 
-	if ($type eq 'amperageProbeTypeIsDiscrete') {
+	if (defined $type and $type eq 'amperageProbeTypeIsDiscrete') {
 	    my $msg = sprintf 'Amperage probe %d [%s] is %s',
 	      $index, $location, $reading;
 	    report('chassis', $msg, $status2nagios{$status}, $index);
