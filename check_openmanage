@@ -4378,7 +4378,7 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
 }
 elsif ($exit_code == $E_OK && !$opt{debug}) {
     if (defined $opt{htmlinfo}) {
-	printf q{OK - System: '<a href="%s">%s</a>', SN: '<a href="%s">%s</a>', hardware working fine},
+	printf q{OK - System: '<a href="%s">%s</a>', SN: '<a href="%s">%s</a>'},
 	  documentation_url($sysinfo{model}), $sysinfo{model},
 	    warranty_url($sysinfo{serial}), $sysinfo{serial};
     }
