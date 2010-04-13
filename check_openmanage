@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.8-beta4';
+$VERSION = '3.5.8-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -276,6 +276,7 @@ if (!$snmp && -f $FW_LOCK) {
      'amp'    => 0, # number of amperage probes
      'intr'   => 0, # number of intrusion probes
      'dimm'   => 0, # number of memory modules
+     'mem'    => 0, # total memory
      'fan'    => 0, # number of fan probes
      'cpu'    => 0, # number of CPUs
      'bat'    => 0, # number of batteries
@@ -2541,6 +2542,11 @@ sub check_memory {
 	}
 	$location =~ s{\A \s*(.*?)\s* \z}{$1}xms;
 
+	# calculate total memory
+	my $msize = $size;
+	$msize =~ s{\A (\d+) \s MB}{$1}xms;
+	$count{mem} += $msize;
+
 	next DIMM if blacklisted('dimm', $index);
 
 	# Ignore empty memory slots
@@ -4356,7 +4362,7 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
       = ( 'storage'     => "STORAGE OK - $count{pdisk} physical drives, $count{vdisk} logical drives",
 	  'fans'        => $count{fan} == 0 && $blade ? 'OK - blade system with no fan probes' : "FANS OK - $count{fan} fan probes checked",
 	  'temp'        => "TEMPERATURES OK - $count{temp} temperature probes checked",
-	  'memory'      => "MEMORY OK - $count{dimm} memory modules checked",
+	  'memory'      => "MEMORY OK - $count{dimm} memory modules, $count{mem} MB total memory",
 	  'power'       => $count{power} == 0 ? 'OK - no instrumented power supplies found' : "POWER OK - $count{power} power supplies checked",
 	  'cpu'         => "PROCESSORS OK - $count{cpu} processors checked",
 	  'voltage'     => "VOLTAGE OK - $count{volt} voltage probes checked",
@@ -4377,8 +4383,20 @@ elsif ($exit_code == $E_OK && !$opt{debug}) {
 	    warranty_url($sysinfo{serial}), $sysinfo{serial};
     }
     else {
-	printf q{OK - System: '%s', SN: '%s', hardware working fine},
+	printf q{OK - System: '%s', SN: '%s'},
 	  $sysinfo{model}, $sysinfo{serial};
+    }
+
+    if ($check{memory}) {
+	my $unit = 'MB';
+	if ($count{mem} >= 1024) {
+	    $count{mem} /= 1024;
+	    $unit = 'GB';
+	}
+	printf ', %d %s ram (%d dimms)', $count{mem}, $unit, $count{dimm};
+    }
+    else {
+	print ', not checking memory';
     }
 
     if ($check{storage}) {
