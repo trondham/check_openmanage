@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.8-beta2';
+$VERSION = '3.5.8-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3453,6 +3453,7 @@ sub check_pwrmonitoring {
     my $max_crit = undef;
     my $max_warn = undef;
     my $unit     = undef;
+    my $type     = undef;
     my @output = ();
 
     if ($snmp) {
@@ -3529,7 +3530,8 @@ sub check_pwrmonitoring {
 	if ($snmp) {
 	    $index    = $out->{amperageProbeIndex} - 1;
 	    $status   = $snmp_status{$out->{amperageProbeStatus}};
-	    $reading  = get_hashval($out->{amperageProbeType}, \%amp_type) eq 'amperageProbeTypeIsDiscrete'
+	    $type     = get_hashval($out->{amperageProbeType}, \%amp_type);
+	    $reading  = $type eq 'amperageProbeTypeIsDiscrete'
 	      ? get_hashval($out->{amperageProbeDiscreteReading}, \%amp_discrete)
 		: $out->{amperageProbeReading};
 	    $location = $out->{amperageProbeLocationName};
@@ -3539,7 +3541,15 @@ sub check_pwrmonitoring {
 	      ? $out->{amperageProbeUpperNonCriticalThreshold} : 0;
 	    $unit     = exists $amp_unit{$amp_type{$out->{amperageProbeType}}}
 	      ? $amp_unit{$amp_type{$out->{amperageProbeType}}} : 'mA';
-	    if ($unit eq 'hA') {
+
+	    # workaround for broken probes
+	    if (!defined $reading) {
+		$type = 'amperageProbeTypeIsDiscrete';
+		$reading = '[N/A]';
+	    }
+
+	    # calculate proper values and set unit for ampere probes
+	    if ($unit eq 'hA' and $type ne 'amperageProbeTypeIsDiscrete') {
 		$reading  /= 10;
 		$max_crit /= 10;
 		$max_warn /= 10;
@@ -3573,6 +3583,7 @@ sub check_pwrmonitoring {
 	# Collect performance data
 	if (defined $opt{perfdata}) {
 	    next AMP if $reading !~ m{\A \d+(\.\d+)? \z}xms; # discrete reading (not number)
+	    #next AMP if $type eq 'amperageProbeTypeIsDiscrete';
 	    my $label = join q{_}, 'pwr_mon', $index, lc $location;
 	    $label =~ s{\s}{_}gxms;
 	    push @perfdata, {
