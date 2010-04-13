@@ -3543,9 +3543,11 @@ sub check_pwrmonitoring {
 	      ? $amp_unit{$amp_type{$out->{amperageProbeType}}} : 'mA';
 
 	    # workaround for broken probes
+	    $reading = undef;
 	    if (!defined $reading) {
 		$type = 'amperageProbeTypeIsDiscrete';
 		$reading = '[N/A]';
+		$unit = q{};
 	    }
 
 	    # calculate proper values and set unit for ampere probes
