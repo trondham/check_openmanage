@@ -2567,6 +2567,7 @@ sub check_memory {
 	    report('chassis', $msg, $E_OK, $index);
 	}
     }
+    return;
 }
 
 
