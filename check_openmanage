@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.8-beta5';
+$VERSION = '3.5.8-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1556,8 +1556,6 @@ sub check_virtual_disks {
 	    $size   = sprintf '%.2f GB', $out->{virtualDiskLengthInMB} / 1024;
 	    $progr  = q{};  # can't get this from SNMP(?)
 	    $nexus  = convert_nexus($out->{virtualDiskNexusID});
-	    $ctrl   = $nexus;  # We use the nexus id to get the controller id
-	    $ctrl   =~ s{\A (\d+):\d+ \z}{$1}xms;
 	}
 	else {
 	    $id     = $out->{ID};
@@ -1580,20 +1578,20 @@ sub check_virtual_disks {
 
 	# Special case: Regenerating
 	if ($state eq 'Regenerating') {
-	    my $msg = sprintf q{Logical drive %d '%s' [%s, %s] on ctrl %d is %s%s},
-	      $id, $dev, $layout, $size, $ctrl, $state, $progr;
+	    my $msg = sprintf q{Logical drive '%s' [%s, %s] is %s%s},
+	      $dev, $layout, $size, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
 	elsif ($status ne 'Ok') {
-	    my $msg = sprintf q{Logical drive %d '%s' [%s, %s] on ctrl %d needs attention: %s},
-	      $id, $dev, $layout, $size, $ctrl, $state;
+	    my $msg = sprintf q{Logical drive '%s' [%s, %s] needs attention: %s},
+	      $dev, $layout, $size, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
 	else {
-	    my $msg = sprintf q{Logical drive %d '%s' [%s, %s] on ctrl %d is %s},
-	      $id, $dev, $layout, $size, $ctrl, $state;
+	    my $msg = sprintf q{Logical drive '%s' [%s, %s] is %s},
+	      $dev, $layout, $size, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
     }
