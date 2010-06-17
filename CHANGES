@@ -1,3 +1,17 @@
+3.5.8   2010-06-17
+------------------
+
+* Remove reporting of which controller a logical drive is "attached"
+  to, since this information can't be reliably extracted via SNMP.
+* avoid collecting Lun ID via SNMP for virtual disks, we don't use it
+* report total memory and number of dimms in the ok output
+* difference in reporting if amperage probes have discrete readings
+* workaround for broken amperage probes
+* added workaround for bad temperature probes that yields no reading
+  in SNMP mode
+* get OMSA version via SNMP slightly more efficiently
+
+
 3.5.7   2010-03-19
 ------------------
 
