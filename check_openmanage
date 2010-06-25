@@ -26,7 +26,7 @@
 require 5.006;  # Perl v5.6.0 or newer is required
 use strict;
 use warnings;
-use POSIX qw(isatty ceil isdigit);
+use POSIX qw(isatty ceil);
 use Getopt::Long qw(:config no_ignore_case);
 
 # Global (package) variables used throughout the code
@@ -2317,7 +2317,7 @@ sub check_enclosure_temp {
 	elsif ($status ne 'Ok') {
 	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
 	      $name, $encl_id, $encl_name, $state;
-	    if (defined $reading && isdigit($reading)) {
+	    if (defined $reading && $reading =~ m{\A -?\d+ \z}xms) {
 		# take into account that with certain states the
 		# reading doesn't exist or is not an integer
 		$msg .= sprintf ' at %s C (%s max)', $reading, $max_crit;
