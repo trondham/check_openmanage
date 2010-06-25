@@ -26,7 +26,7 @@
 require 5.006;  # Perl v5.6.0 or newer is required
 use strict;
 use warnings;
-use POSIX qw(isatty ceil);
+use POSIX qw(isatty ceil isdigit);
 use Getopt::Long qw(:config no_ignore_case);
 
 # Global (package) variables used throughout the code
@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.8';
+$VERSION = '3.5.9-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2307,10 +2307,21 @@ sub check_enclosure_temp {
 
 	next TEMP if blacklisted('encl_temp', $nexus);
 
+	# Inactive temp probes
+	if ($status eq 'Unknown' and $state eq 'Inactive') {
+	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
+	      $name, $encl_id, $encl_name, $state;
+	    report('storage', $msg, $E_OK, $nexus);
+	}
 	# Default
-	if ($status ne 'Ok') {
-	    my $msg = sprintf '%s in enclosure %s [%s] is %s C at %s (%s max)',
-	      $name, $encl_id, $encl_name, $state, $reading, $max_crit;
+	elsif ($status ne 'Ok') {
+	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
+	      $name, $encl_id, $encl_name, $state;
+	    if (defined $reading && isdigit($reading)) {
+		# take into account that with certain states the
+		# reading doesn't exist or is not an integer
+		$msg .= sprintf ' at %s C (%s max)', $reading, $max_crit;
+	    }
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
 	# Ok
@@ -2432,8 +2443,14 @@ sub check_enclosure_emms {
 
 	next EMM if blacklisted('encl_emm', $nexus);
 
+	# Not installed
+	if ($status eq 'Unknown' and $state eq 'Not Installed') {
+	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
+	      $name, $encl_id, $encl_name, $state;
+	    report('storage', $msg, $E_OK, $nexus);
+	}
 	# Default
-	if ($status ne 'Ok') {
+	elsif ($status ne 'Ok') {
 	    my $msg = sprintf '%s in enclosure %s [%s] needs attention: %s',
 	      $name, $encl_id, $encl_name, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
