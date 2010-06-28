@@ -136,7 +136,7 @@ foreach ($DS as $i) {
 	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf RPM avg \\n\" ";
     }
 	
-    # TEMPERATURES (Celcius)
+    # TEMPERATURES (Celsius)
     if(preg_match('/^temp_/', $NAME[$i]) || preg_match('/^t\d+$/', $NAME[$i])){
 	if ($visited_temp == 0) {
 	    ++$count;
@@ -162,7 +162,7 @@ foreach ($DS as $i) {
 	    $critThresh = $CRIT[$i];
 	}
 
-	$opt[$count] = "--slope-mode --vertical-label \"Celcius\" --title \"$def_title: Chassis Temperatures\" ";
+	$opt[$count] = "--slope-mode --vertical-label \"Celsius\" --title \"$def_title: Chassis Temperatures\" ";
 	if(isset($def[$count])){
 	    $def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
 	}
@@ -175,7 +175,7 @@ foreach ($DS as $i) {
 	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf C avg \\n\" ";
     }
 	
-    # ENCLOSURE TEMPERATURES (Celcius)
+    # ENCLOSURE TEMPERATURES (Celsius)
     if(preg_match('/^enclosure_(?<id>.+?)_temp_\d+$/', $NAME[$i], $matches)
        || preg_match('/^e(?<id>.+?)t\d+$/', $NAME[$i], $matches)){
 	$this_id = $matches['id'];
@@ -204,7 +204,7 @@ foreach ($DS as $i) {
 	    $critThresh = $CRIT[$i];
 	}
 
-	$opt[$count] = "--slope-mode --vertical-label \"Celcius\" --title \"$def_title: Enclosure $enclosure_id Temperatures\" ";
+	$opt[$count] = "--slope-mode --vertical-label \"Celsius\" --title \"$def_title: Enclosure $enclosure_id Temperatures\" ";
 
 	if(isset($def[$count])){
 	    $def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
