@@ -2308,11 +2308,11 @@ sub check_enclosure_temp {
 	    $state     = $out->{'State'};
 	    $status    = $out->{'Status'};
 	    $unit      = 'FIXME';
-	    $reading   = $out->{'Reading'}; $reading =~ s{\s*C}{}xms;
-	    $max_warn  = $out->{'Maximum Warning Threshold'}; $max_warn =~ s{\s*C}{}xms;
-	    $max_crit  = $out->{'Maximum Failure Threshold'}; $max_crit =~ s{\s*C}{}xms;
-	    $min_warn  = $out->{'Minimum Warning Threshold'}; $min_warn =~ s{\s*C}{}xms;
-	    $min_crit  = $out->{'Minimum Failure Threshold'}; $min_crit =~ s{\s*C}{}xms;
+	    $reading   = $out->{'Reading'};
+	    $max_warn  = $out->{'Maximum Warning Threshold'};
+	    $max_crit  = $out->{'Maximum Failure Threshold'};
+	    $min_warn  = $out->{'Minimum Warning Threshold'};
+	    $min_crit  = $out->{'Minimum Failure Threshold'};
 	    $encl_id   = join q{:}, $out->{ctrl}, $out->{'encl_id'};
 	    $encl_name = $out->{encl_name};
 	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $id;
