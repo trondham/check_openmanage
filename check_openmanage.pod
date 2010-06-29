@@ -41,7 +41,7 @@ timeout is 30 seconds if the option is not present.
 =item -p, --perfdata [I<multline> or I<minimal>]
 
 Collect performance data. Performance data collected include
-temperatures (in Celcius) and fan speeds (in rpm). On systems that
+temperatures (in Celsius) and fan speeds (in rpm). On systems that
 support it, power consumption is also collected (in Watts). This
 option takes one of two arguments, both of which are optional.
 
