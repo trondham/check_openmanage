@@ -1,15 +1,30 @@
+3.5.9   2010-06-29
+------------------
+
+* More fine-grained reporting of temperature warnings for enclosure
+  temperature probes.
+* Max/min temperature limits for enclosure temp probes are reported in
+  the debug output
+* Report enclosure temperature probes that are "Inactive" as ok
+* Don't try to print out the reading of enclosure temperature probes
+  if the reading doesn't exist or is not an integer
+* Report enclosure EMMs that are "Not Installed" as ok, instead of
+  critical
+* Corrected typo in the PNP4Nagios template
+
+
 3.5.8   2010-06-17
 ------------------
 
 * Remove reporting of which controller a logical drive is "attached"
   to, since this information can't be reliably extracted via SNMP.
-* avoid collecting Lun ID via SNMP for virtual disks, we don't use it
-* report total memory and number of dimms in the ok output
-* difference in reporting if amperage probes have discrete readings
-* workaround for broken amperage probes
-* added workaround for bad temperature probes that yields no reading
+* Avoid collecting Lun ID via SNMP for virtual disks, we don't use it
+* Report total memory and number of dimms in the ok output
+* Difference in reporting if amperage probes have discrete readings
+* Workaround for broken amperage probes
+* Added workaround for bad temperature probes that yields no reading
   in SNMP mode
-* get OMSA version via SNMP slightly more efficiently
+* Get OMSA version via SNMP slightly more efficiently
 
 
 3.5.7   2010-03-19
