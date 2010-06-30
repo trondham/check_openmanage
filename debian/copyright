@@ -1,0 +1,27 @@
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
+Name: check_openmanage
+Maintainer: Trond Hasle Amundsen <t.h.amundsen@usit.uio.no>
+Source: http://folk.uio.no/trondham/software/check_openmanage.html
+
+Copyright: 2010, Trond Hasle Amundsen <t.h.amundsen@usit.uio.no>
+License: GPL-3
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; version 3 dated June, 2007.
+ .
+ On Debian GNU/Linux systems, the complete text of version 3 of the GNU
+ General Public License can be found in `/usr/share/common-licenses/GPL-3'
+
+Files: debian/*
+Copyright: 2010, Morten Werner Forsbring <werner@debian.org>
+Licence: GPL-3+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the License, or
+ (at your option) any later version.
+ .
+ On Debian systems, the complete text of the latest version of the GNU
+ General Public License can be found in `/usr/share/common-licenses/GPL'.
+ .
+ The complete text of version 3 of the GNU General Public License can
+ be found in `/usr/share/common-licenses/GPL-3'.

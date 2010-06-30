@@ -1,0 +1,21 @@
+Source: check-openmanage
+Section: admin
+Priority: extra
+Maintainer: Morten Werner Forsbring <werner@debian.org>
+Build-Depends: debhelper (>= 7), perl
+Standards-Version: 3.8.3
+Homepage: http://folk.uio.no/trondham/software/check_openmanage.html
+
+Package: check-openmanage
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}
+Suggests: nagios-nrpe-plugin | libnet-snmp-perl
+Description: Nagios plugin to monitor hardware health on Dell servers
+ check_openmanage is a plugin for Nagios which checks the hardware
+ health of Dell servers running OpenManage Server Administrator
+ (OMSA). The plugin can be used remotely with SNMP or locally with
+ NRPE, check_by_ssh or similar, whichever suits your needs and
+ particular taste. The plugin checks the health of the storage
+ subsystem, power supplies, memory modules, temperature probes etc.,
+ and gives an alert if any of the components are faulty or operate
+ outside normal parameters.

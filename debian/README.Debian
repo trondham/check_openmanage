@@ -1,0 +1,11 @@
+check-openmanage for Debian
+---------------------------
+
+If want to install Dell OpenManage Server Administrator on some of
+your Debian servers, take a look at the work done by SARA Reken- en
+Netwerkdiensten: https://subtrac.sara.nl/oss/omsa_2_deb
+
+Here is an old page from Dell also pointing to the work done by
+sara.nl: http://linux.dell.com/debian_9g.shtml
+
+ -- Morten Werner Forsbring <werner@debian.org>  Sun, 28 Feb 2010 20:01:17 +0100
