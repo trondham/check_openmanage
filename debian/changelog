@@ -2,7 +2,7 @@ check-openmanage (3.5.9-1) unstable; urgency=low
 
   * New upstream release.
 
- -- Morten Werner Forsbring <werner@debian.org>  Wed, 30 Jun 2010 13:21:20 +0200
+ -- Trond Hasle Amundsen <t.h.amundsen@usit.uio.no>  Wed, 30 Jun 2010 13:21:20 +0200
 
 check-openmanage (3.5.8-1) unstable; urgency=low
 
