@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.9';
+$VERSION = '3.5.10-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1421,6 +1421,7 @@ sub check_physical_disks {
 	$capacity = '450GB' if $capacity eq '449GB';  # quick fix for 450GB disks
 	$capacity = '300GB' if $capacity eq '299GB';  # quick fix for 300GB disks
 	$capacity = '146GB' if $capacity eq '147GB';  # quick fix for 146GB disks
+	$capacity = '100GB' if $capacity eq '99GB';   # quick fix for 100GB disks
 
 	# Capitalize only the first letter of the vendor name
 	$vendor = (substr $vendor, 0, 1) . lc (substr $vendor, 1, length $vendor);
