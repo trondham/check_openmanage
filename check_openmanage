@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.10-beta7';
+$VERSION = '3.5.10-beta8';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1290,6 +1290,7 @@ sub check_physical_disks {
     my $capacity = undef;  # disk length (size) in bytes
     my $media    = undef;  # media type (e.g. HDD, SSD)
     my $bus      = undef;  # bus protocol (e.g. SAS, SATA)
+    my $spare    = undef;  # spare state (e.g. global hotspare)
     my @output  = ();
 
     if ($snmp) {
@@ -1305,6 +1306,7 @@ sub check_physical_disks {
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.11' => 'arrayDiskLengthInMB',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.15' => 'arrayDiskTargetID',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.21' => 'arrayDiskBusType',
+	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.22' => 'arrayDiskSpareState',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.24' => 'arrayDiskComponentStatus',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.26' => 'arrayDiskNexusID',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.31' => 'arrayDiskSmartAlertIndication',
@@ -1350,6 +1352,16 @@ sub check_physical_disks {
 	}
     }
 
+    my %spare_state
+      = (
+	 1  => 'VD member',    # disk is a member of a virtual disk
+	 2  => 'DG member',    # disk is a member of a disk group
+	 3  => 'Global HS',    # disk is a global hot spare
+	 4  => 'Dedicated HS', # disk is a dedicated hot spare
+	 5  => 'no',           # not a spare
+	 99 => 'n/a',          # not applicable
+	);
+
     my %media_type
       = (
 	 1 => 'unknown',
@@ -1379,7 +1391,7 @@ sub check_physical_disks {
 	 7  => 'Recovering',
 	 11 => 'Removed',
 	 15 => 'Resynching',
-         22 => 'Replacing', # FIXME: this one is not defined in the OM 6.2.0.1 MIBs
+         22 => 'Replacing', # FIXME: this one is not defined in the OMSA MIBs
 	 24 => 'Rebuilding',
 	 25 => 'No Media',
 	 26 => 'Formatting',
@@ -1411,6 +1423,7 @@ sub check_physical_disks {
 	    $nexus    = convert_nexus($out->{arrayDiskNexusID});
 	    $vendor   = $out->{arrayDiskVendor};
 	    $product  = $out->{arrayDiskProductID};
+	    $spare    = get_hashval($out->{arrayDiskSpareState}, \%spare_state);
 	    $bus      = exists $out->{arrayDiskBusType}
 	      ? get_hashval($out->{arrayDiskBusType}, \%bus_type) : undef;
 	    $media    = exists $out->{arrayDiskMediaType}
@@ -1440,6 +1453,7 @@ sub check_physical_disks {
 	    $vendor   = $out->{'Vendor ID'};
 	    $product  = $out->{'Product ID'};
 	    $media    = $out->{'Media'};
+	    $spare    = $out->{'Hot Spare'};
 	    $bus      = $out->{'Bus Protocol'};
 	    $capacity = $out->{'Capacity'};
 	    $capacity =~ s{\A .*? \((\d+) \s bytes\) \z}{$1}xms;
@@ -1450,6 +1464,11 @@ sub check_physical_disks {
 
         $vendor  =~ s{\s+\z}{}xms; # remove trailing whitespace
         $product =~ s{\s+\z}{}xms; # remove trailing whitespace
+
+	# Hot spare stuff
+	if ($spare eq 'Global') { $spare = 'Global HS'; }
+	elsif ($spare eq 'Dedicated') { $spare = 'Dedicated HS'; }
+	elsif ($spare !~ m{\A Global|Dedicated}xms) { $spare = undef; }
 
 	# Calculate human readable capacity
 	$capacity = ceil($capacity / 1000**3) >= 1000
@@ -1496,6 +1515,7 @@ sub check_physical_disks {
 	else {
 	    my $msg = sprintf '%s [%s%s] on ctrl %d is %s',
 	      $name, $busmedia, $capacity, $ctrl, $state;
+	    if (defined $spare) { $msg .= " ($spare)"; }
 	    report('storage', $msg, $E_OK, $nexus);
 	}
     }
