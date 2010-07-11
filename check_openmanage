@@ -2033,16 +2033,15 @@ sub check_enclosures {
         $firmware =~ s{\s+\z}{}xms; # remove trailing whitespace
 
 	# store enclosure data for future use
-	push @enclosures, { 'id'    => $id,
-			    'ctrl'  => $out->{ctrl},
-			    'name'  => $name,
-			    'nexus' => $nexus };
-
-	# TEST
 	if ($snmp) {
 	    $snmp_enclosure{$out->{enclosureNumber}}{id}    = $id;
 	    $snmp_enclosure{$out->{enclosureNumber}}{name}  = $name;
 	    $snmp_enclosure{$out->{enclosureNumber}}{nexus} = $nexus;
+	}
+	else {
+	    push @enclosures, { 'id'    => $id,
+				'ctrl'  => $out->{ctrl},
+				'name'  => $name };
 	}
 
 	# Collecting some storage info
