@@ -37,7 +37,7 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 	     $exit_code $snmp
 	     %check %opt %reverse_exitcode %status2nagios
 	     %snmp_status %snmp_probestatus %probestatus2nagios %sysinfo
-	     %blacklist %nagios_alert_count %count
+	     %blacklist %nagios_alert_count %count %snmp_enclosure %snmp_controller
 	     @perl_warnings @controllers @enclosures @perfdata
 	     @report_storage @report_chassis @report_other
 	  );
@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.10-beta2';
+$VERSION = '3.5.10-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -260,6 +260,7 @@ if (!$snmp && -f $FW_LOCK) {
 # List of controllers and enclosures
 @controllers = ();  # controllers
 @enclosures  = ();  # enclosures
+%snmp_enclosure   = ();  # enclosures
 
 # Messages
 @report_storage = ();  # messages with associated nagios level (storage)
@@ -1172,7 +1173,7 @@ sub check_controllers {
   CTRL:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $id       = $out->{controllerNumber} - 1;
+#	    $id       = $out->{controllerNumber} - 1;
 	    $name     = $out->{controllerName};
 	    $state    = get_hashval($out->{controllerState}, \%ctrl_state);
 	    $status   = $snmp_status{$out->{controllerComponentStatus}};
@@ -1189,6 +1190,7 @@ sub check_controllers {
 	    $stdr     = exists $out->{controllerStorportDriverVersion}
 	      ? $out->{controllerStorportDriverVersion} : undef;
 	    $nexus    = convert_nexus($out->{controllerNexusID});
+	    $id       = $nexus;
 	}
 	else {
 	    $id       = $out->{ID};
@@ -1221,6 +1223,11 @@ sub check_controllers {
 	$sysinfo{'controller'}{$id}{'driver'}   = $driver;
 	$sysinfo{'controller'}{$id}{'firmware'} = $firmware;
 	$sysinfo{'controller'}{$id}{'storport'} = $stdr;
+
+	# TEST
+	if ($snmp) {
+	    $snmp_controller{$out->{controllerNumber}} = $nexus;
+	}
 
 	next CTRL if blacklisted('ctrl', $nexus);
 
@@ -1410,13 +1417,15 @@ sub check_physical_disks {
 	      ? get_hashval($out->{arrayDiskMediaType}, \%media_type) : undef;
 	    $capacity = $out->{arrayDiskLengthInMB} * 1024**2;
 	    if (exists $out->{arrayDiskEnclosureConnectionControllerNumber}) {
-		$ctrl = $out->{arrayDiskEnclosureConnectionControllerNumber} - 1;
+		$ctrl = $snmp_controller{$out->{arrayDiskEnclosureConnectionControllerNumber}};
 	    }
 	    elsif (exists $out->{arrayDiskChannelConnectionControllerNumber}) {
-		$ctrl = $out->{arrayDiskChannelConnectionControllerNumber} - 1;
+		$ctrl = $snmp_controller{$out->{arrayDiskChannelConnectionControllerNumber}};
 	    }
 	    else {
-		$ctrl = -1;
+		# last resort... use the nexus id
+		$ctrl = $nexus;
+		$ctrl =~ s{\A (\d+) : .* \z}{$1}xms;
 	    }
 	}
 	else {
@@ -1995,7 +2004,15 @@ sub check_enclosures {
 	# store enclosure data for future use
 	push @enclosures, { 'id'    => $id,
 			    'ctrl'  => $out->{ctrl},
-			    'name'  => $name };
+			    'name'  => $name,
+			    'nexus' => $nexus };
+
+	# TEST
+	if ($snmp) {
+	    $snmp_enclosure{$out->{enclosureNumber}}{id}    = $id;
+	    $snmp_enclosure{$out->{enclosureNumber}}{name}  = $name;
+	    $snmp_enclosure{$out->{enclosureNumber}}{nexus} = $nexus;
+	}
 
 	# Collecting some storage info
 	$sysinfo{'enclosure'}{$nexus}{'id'}       = $nexus;
@@ -2091,8 +2108,20 @@ sub check_enclosure_fans {
 	    $state     = get_hashval($out->{fanState}, \%fan_state);
 	    $status    = $snmp_status{$out->{fanComponentStatus}};
 	    $speed     = $out->{fanProbeCurrValue};
-	    $encl_id   = $out->{fanConnectionEnclosureNumber} - 1;
+	    #$encl_id   = $out->{fanConnectionEnclosureNumber} - 1;
 	    $encl_name = $out->{fanConnectionEnclosureName};
+
+	    $encl_id   = $snmp_enclosure{$out->{fanConnectionEnclosureNumber}}{nexus};
+
+#	  ENC:
+#	    foreach my $e (@enclosures) {
+#		print $e->{nexus}, "\n";
+#		if ($e->{id} == $out->{fanConnectionEnclosureNumber} - 1) {
+#		    $encl_id = $e->{nexus};
+#		    last ENC;
+#		}
+#	    }
+
 	    $nexus     = convert_nexus($out->{fanNexusID});
 	}
 	else {
@@ -2201,7 +2230,8 @@ sub check_enclosure_pwr {
 	    $name      = $out->{powerSupplyName};
 	    $state     = get_hashval($out->{powerSupplyState}, \%ps_state);
 	    $status    = $snmp_status{$out->{powerSupplyComponentStatus}};
-	    $encl_id   = $out->{powerSupplyConnectionEnclosureNumber} - 1;
+	    #$encl_id   = $out->{powerSupplyConnectionEnclosureNumber} - 1;
+	    $encl_id   = $snmp_enclosure{$out->{powerSupplyConnectionEnclosureNumber}}{nexus};
 	    $encl_name = $out->{powerSupplyConnectionEnclosureName};
 	    $nexus     = convert_nexus($out->{powerSupplyNexusID});
 	}
@@ -2333,7 +2363,8 @@ sub check_enclosure_temp {
 	      ? $out->{temperatureProbeMinWarning} : '[N/A]';
 	    $min_crit  = exists $out->{temperatureProbeMinCritical}
 	      ? $out->{temperatureProbeMinCritical} : '[N/A]';
-	    $encl_id   = $out->{temperatureConnectionEnclosureNumber} - 1;
+	    #$encl_id   = $out->{temperatureConnectionEnclosureNumber} - 1;
+	    $encl_id   = $snmp_enclosure{$out->{temperatureConnectionEnclosureNumber}}{nexus};
 	    $encl_name = $out->{temperatureConnectionEnclosureName};
 	    $nexus     = convert_nexus($out->{temperatureProbeNexusID});
 	}
@@ -2529,7 +2560,8 @@ sub check_enclosure_emms {
 	    $name      = $out->{enclosureManagementModuleName};
 	    $state     = get_hashval($out->{enclosureManagementModuleState}, \%emms_state);
 	    $status    = $snmp_status{$out->{enclosureManagementModuleComponentStatus}};
-	    $encl_id   = $out->{enclosureManagementModuleConnectionEnclosureNumber} - 1;
+	    #$encl_id   = $out->{enclosureManagementModuleConnectionEnclosureNumber} - 1;
+	    $encl_id   = $snmp_enclosure{$out->{enclosureManagementModuleConnectionEnclosureNumber}}{nexus};
 	    $encl_name = $out->{enclosureManagementModuleConnectionEnclosureName};
 	    $nexus     = convert_nexus($out->{enclosureManagementModuleNexusID});
 	}
