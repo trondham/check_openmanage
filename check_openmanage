@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.10-beta5';
+$VERSION = '3.5.10-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1930,6 +1930,8 @@ sub check_enclosures {
     my $status   = undef;
     my $firmware = undef;
     my $ctrl     = undef;
+    my $occupied_slots = undef; # number of occupied slots
+    my $total_slots    = undef; # number of total slots
     my @output   = ();
 
     if ($snmp) {
@@ -1942,6 +1944,8 @@ sub check_enclosures {
              '1.3.6.1.4.1.674.10893.1.20.130.3.1.24' => 'enclosureComponentStatus',
 	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.25' => 'enclosureNexusID',
 	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.26' => 'enclosureFirmwareVersion',
+	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.31' => 'enclosureOccupiedSlotCount', # new in OMSA 6.3.0
+	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.32' => 'enclosureTotalSlots', # new in OMSA 6.3.0
             );
 	my $result = undef;
 	if ($opt{use_get_table}) {
@@ -1986,6 +1990,13 @@ sub check_enclosures {
 	    $nexus    = convert_nexus($out->{enclosureNexusID});
 	    $ctrl     = $nexus;
 	    $ctrl     =~ s{\A (\d+):.* \z}{$1}xms;
+	    # for the next two, a value of 9999 means feature not available
+	    $occupied_slots = exists $out->{enclosureOccupiedSlotCount}
+	      && $out->{enclosureOccupiedSlotCount} != 9999
+		? $out->{enclosureOccupiedSlotCount} : undef;
+	    $total_slots    = exists $out->{enclosureTotalSlots}
+	      && $out->{enclosureTotalSlots} != 9999
+		? $out->{enclosureTotalSlots} : undef;
         }
         else {
             $id       = $out->{ID};
@@ -2021,8 +2032,15 @@ sub check_enclosures {
 
         next ENCLOSURE if blacklisted('encl', $nexus);
 
-	my $msg = sprintf 'Enclosure %s [%s] on controller %d is %s',
-	  $nexus, $name, $ctrl, $state;
+	my $msg = q{};
+	if (defined $occupied_slots && defined $total_slots) {
+	    $msg = sprintf 'Enclosure %s [%s, %d of %d slots occupied] on ctrl %d is %s',
+	      $nexus, $name, $occupied_slots, $total_slots, $ctrl, $state;
+	}
+	else {
+	    $msg = sprintf 'Enclosure %s [%s] on controller %d is %s',
+	      $nexus, $name, $ctrl, $state;
+	}
         report('storage', $msg, $status2nagios{$status}, $nexus);
     }
     return;
