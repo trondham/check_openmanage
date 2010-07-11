@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.10-beta4';
+$VERSION = '3.5.10-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3264,7 +3264,7 @@ sub check_processors {
          53  => 'Alpha 21164a',                         54  => 'Alpha 21264',
          55  => 'Alpha 21364',                          56  => 'Turion II Ultra Dual-Core Mobile M',
          57  => 'Turion II Dual-Core Mobile M',         58  => 'Athlon II Dual-Core Mobile M ',
-         59  => 'Opteron 6100',                         60  => undef,
+         59  => 'Opteron 6100',                         60  => 'Opteron 4100',
          61  => undef,                                  62  => undef,
          63  => undef,                                  64  => 'MIPS',
 	 65  => 'MIPS R4000',                           66  => 'MIPS R4200',
@@ -3337,16 +3337,16 @@ sub check_processors {
          199 => 'Dual-Core Celeron',                    200 => 'IBM390',
 	 201 => 'G4',                                   202 => 'G5',
          203 => 'ESA/390 G6',                           204 => 'z/Architectur',
-         205 => 'Core i5',                              206 => undef,
+         205 => 'Core i5',                              206 => 'Core i3',
          207 => undef,                                  208 => undef,
          209 => undef,                                  210 => 'C7-M',
          211 => 'C7-D',                                 212 => 'C7',
          213 => 'Eden',                                 214 => 'Multi-Core Xeon',
          215 => 'Dual-Core Xeon 3xxx',                  216 => 'Quad-Core Xeon 3xxx',
-         217 => undef,                                  218 => 'Dual-Core Xeon 5xxx',
+         217 => 'VIA Nano',                             218 => 'Dual-Core Xeon 5xxx',
 	 219 => 'Quad-Core Xeon 5xxx',                  220 => undef,
          221 => 'Dual-Core Xeon 7xxx',                  222 => 'Quad-Core Xeon 7xxx',
-         223 => 'Multi-Core Xeon 7xxx',                 224 => undef,
+         223 => 'Multi-Core Xeon 7xxx',                 224 => 'Multi-Core Xeon 3400',
          225 => undef,                                  226 => undef,
          227 => undef,                                  228 => undef,
          229 => undef,                                  230 => 'Embedded AMD Opteron Quad-Core',
