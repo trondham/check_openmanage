@@ -1921,6 +1921,8 @@ sub check_connectors {
 	    $nexus  = convert_nexus($out->{channelNexusID});
 	    $ctrl   = $nexus;
 	    $ctrl   =~ s{(\d+):\d+}{$1}xms;
+	    # workaround for ancient OMSA versions
+	    if (! defined $type) { $type = 'unknown'; }
         }
         else {
             $id     = $out->{'ID'};
@@ -1933,9 +1935,6 @@ sub check_connectors {
         }
 
         next CHANNEL if blacklisted('conn', $nexus);
-
-	# workaround for ancient OMSA versions
-	if (! defined $type) { $type = 'unknown'; }
 
 	my $msg = sprintf '%s [%s] on controller %d is %s',
 	  $name, $type, $ctrl, $state;
