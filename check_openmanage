@@ -1922,7 +1922,7 @@ sub check_connectors {
 	    $ctrl   = $nexus;
 	    $ctrl   =~ s{(\d+):\d+}{$1}xms;
 	    # workaround for ancient OMSA versions
-	    if (! defined $type) { $type = 'unknown'; }
+	    if (! defined $type) { $type = 'n/a'; }
         }
         else {
             $id     = $out->{'ID'};
