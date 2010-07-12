@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.10-beta8';
+$VERSION = '3.5.10-beta9';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1429,14 +1429,18 @@ sub check_physical_disks {
 	    $media    = exists $out->{arrayDiskMediaType}
 	      ? get_hashval($out->{arrayDiskMediaType}, \%media_type) : undef;
 	    $capacity = $out->{arrayDiskLengthInMB} * 1024**2;
+
+	    # try to find the controller where the disk belongs
 	    if (exists $out->{arrayDiskEnclosureConnectionControllerNumber}) {
+		# for disks that are attached to an enclosure
 		$ctrl = $snmp_controller{$out->{arrayDiskEnclosureConnectionControllerNumber}};
 	    }
 	    elsif (exists $out->{arrayDiskChannelConnectionControllerNumber}) {
+		# for disks that are not attached to an enclosure
 		$ctrl = $snmp_controller{$out->{arrayDiskChannelConnectionControllerNumber}};
 	    }
 	    else {
-		# last resort... use the nexus id
+		# last resort... use the nexus id (old/broken hardware)
 		$ctrl = $nexus;
 		$ctrl =~ s{\A (\d+) : .* \z}{$1}xms;
 	    }
@@ -2145,20 +2149,8 @@ sub check_enclosure_fans {
 	    $state     = get_hashval($out->{fanState}, \%fan_state);
 	    $status    = $snmp_status{$out->{fanComponentStatus}};
 	    $speed     = $out->{fanProbeCurrValue};
-	    #$encl_id   = $out->{fanConnectionEnclosureNumber} - 1;
 	    $encl_name = $out->{fanConnectionEnclosureName};
-
 	    $encl_id   = $snmp_enclosure{$out->{fanConnectionEnclosureNumber}}{nexus};
-
-#	  ENC:
-#	    foreach my $e (@enclosures) {
-#		print $e->{nexus}, "\n";
-#		if ($e->{id} == $out->{fanConnectionEnclosureNumber} - 1) {
-#		    $encl_id = $e->{nexus};
-#		    last ENC;
-#		}
-#	    }
-
 	    $nexus     = convert_nexus($out->{fanNexusID});
 	}
 	else {
@@ -2267,7 +2259,6 @@ sub check_enclosure_pwr {
 	    $name      = $out->{powerSupplyName};
 	    $state     = get_hashval($out->{powerSupplyState}, \%ps_state);
 	    $status    = $snmp_status{$out->{powerSupplyComponentStatus}};
-	    #$encl_id   = $out->{powerSupplyConnectionEnclosureNumber} - 1;
 	    $encl_id   = $snmp_enclosure{$out->{powerSupplyConnectionEnclosureNumber}}{nexus};
 	    $encl_name = $out->{powerSupplyConnectionEnclosureName};
 	    $nexus     = convert_nexus($out->{powerSupplyNexusID});
@@ -2400,7 +2391,6 @@ sub check_enclosure_temp {
 	      ? $out->{temperatureProbeMinWarning} : '[N/A]';
 	    $min_crit  = exists $out->{temperatureProbeMinCritical}
 	      ? $out->{temperatureProbeMinCritical} : '[N/A]';
-	    #$encl_id   = $out->{temperatureConnectionEnclosureNumber} - 1;
 	    $encl_id   = $snmp_enclosure{$out->{temperatureConnectionEnclosureNumber}}{nexus};
 	    $encl_name = $out->{temperatureConnectionEnclosureName};
 	    $nexus     = convert_nexus($out->{temperatureProbeNexusID});
@@ -2597,7 +2587,6 @@ sub check_enclosure_emms {
 	    $name      = $out->{enclosureManagementModuleName};
 	    $state     = get_hashval($out->{enclosureManagementModuleState}, \%emms_state);
 	    $status    = $snmp_status{$out->{enclosureManagementModuleComponentStatus}};
-	    #$encl_id   = $out->{enclosureManagementModuleConnectionEnclosureNumber} - 1;
 	    $encl_id   = $snmp_enclosure{$out->{enclosureManagementModuleConnectionEnclosureNumber}}{nexus};
 	    $encl_name = $out->{enclosureManagementModuleConnectionEnclosureName};
 	    $nexus     = convert_nexus($out->{enclosureManagementModuleNexusID});
