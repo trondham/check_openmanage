@@ -1,3 +1,27 @@
+3.5.10  2010-07-14
+------------------
+
+* If a physical disk is a hot spare, display this information in
+  the debug output
+* Report the bus protocol (e.g. SAS, SATA) and media type (e.g. HDD,
+  SDD) for physical disks in the debug output, if applicable
+* Minor fix for 100GB physical disks, write "100GB" instead of "99GB"
+* SNMP: Use new features of OMSA 6.3.0 to display occupied and total
+  slots in storage enclosures, if applicable. This information is not
+  available with omreport and check_openmanage will not display this
+  info in local mode.
+* SNMP: Added new processor IDs from the OMSA 6.3.0 MIBs
+* SNMP: Use connection tables in a proper way to determine controller
+  and enclosure IDs, for use with physical disks and enclosure
+  components (fan, temp sensors etc.). This fixes a long standing bug
+  for servers with more than one controller, if checked via SNMP.
+* SNMP: Use the nexus ID as last resort to find the controller for
+  physical disks. Workaround for older, broken OMSA versions.
+* SNMP: Identify enclosures (e.g. '2:0:0') properly so that the
+  reporting with SNMP corresponds to the same report with omreport.
+* SNMP: added a couple of workarounds for pre-historic OMSA versions
+
+
 3.5.9   2010-06-29
 ------------------
 
