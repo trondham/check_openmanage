@@ -1173,7 +1173,6 @@ sub check_controllers {
   CTRL:
     foreach my $out (@output) {
 	if ($snmp) {
-#	    $id       = $out->{controllerNumber} - 1;
 	    $name     = $out->{controllerName};
 	    $state    = get_hashval($out->{controllerState}, \%ctrl_state);
 	    $status   = $snmp_status{$out->{controllerComponentStatus}};
@@ -1224,7 +1223,7 @@ sub check_controllers {
 	$sysinfo{'controller'}{$id}{'firmware'} = $firmware;
 	$sysinfo{'controller'}{$id}{'storport'} = $stdr;
 
-	# TEST
+	# Store controller info for future use (SNMP)
 	if ($snmp) {
 	    $snmp_controller{$out->{controllerNumber}} = $nexus;
 	}
