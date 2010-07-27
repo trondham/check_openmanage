@@ -4051,7 +4051,7 @@ sub get_omreport_chassis_info {
 	my @lines = <$INFO>;
 	close $INFO;
 	foreach (@lines) {
-	    next if !m/\A (Chassis\sModel|Chassis\sService\sTag|Model|Service\sTag)/xms;
+	    next if !m/\A (Chassis\sModel|Chassis\sService\sTag|Model|Service\sTag|System\sRevision)/xms;
 	    my ($key, $val) = split /;/xms;
 	    $key =~ s{\s+\z}{}xms; # remove trailing whitespace
 	    $val =~ s{\s+\z}{}xms; # remove trailing whitespace
