@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.10';
+$VERSION = '3.5.11-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -369,6 +369,7 @@ $globalstatus   = $E_OK;  # default global health status is "OK"
      'biosdate' => 'N/A',  # BIOS release date
      'serial'   => 'N/A',  # serial number (service tag)
      'model'    => 'N/A',  # system model
+     'rev'      => undef,  # system revision
      'osname'   => 'N/A',  # OS name
      'osver'    => 'N/A',  # OS version
      'om'       => 'N/A',  # OMSA version
@@ -4060,6 +4061,9 @@ sub get_omreport_chassis_info {
 	    if ($key eq 'Chassis Service Tag' or $key eq 'Service Tag') {
 		$sysinfo{serial} = $val;
 	    }
+	    if ($key eq 'System Revision') {
+		$sysinfo{rev} = $val;
+	    }
 	}
     }
     return;
@@ -4132,6 +4136,7 @@ sub get_snmp_chassis_info {
       = (
 	 '1.3.6.1.4.1.674.10892.1.300.10.1.9.1'  => 'chassisModelName',
 	 '1.3.6.1.4.1.674.10892.1.300.10.1.11.1' => 'chassisServiceTagName',
+	 '1.3.6.1.4.1.674.10892.1.300.10.1.48.1' => 'chassisSystemRevisionName',
 	);
 
     my $chassisInformationTable = '1.3.6.1.4.1.674.10892.1.300.10.1';
@@ -4145,6 +4150,9 @@ sub get_snmp_chassis_info {
 	    }
 	    elsif (exists $chassis_oid{$oid} and $chassis_oid{$oid} eq 'chassisServiceTagName') {
 		$sysinfo{serial} = $result->{$oid};
+	    }
+	    elsif (exists $chassis_oid{$oid} and $chassis_oid{$oid} eq 'chassisSystemRevisionName') {
+		$sysinfo{rev} = $result->{$oid};
 	    }
 	}
     }
@@ -4433,7 +4441,7 @@ if ($snmp) {
 
 # Print messages
 if ($opt{debug}) {
-    print "   System:      $sysinfo{model}\n";
+    print "   System:      $sysinfo{model}", defined $sysinfo{rev} ? " $sysinfo{rev}\n" : "\n";
     print "   ServiceTag:  $sysinfo{serial}";
     print q{ } x (25 - length $sysinfo{serial}), "OMSA version:    $sysinfo{om}\n";
     print "   BIOS/date:   $sysinfo{bios} $sysinfo{biosdate}";
@@ -4554,13 +4562,14 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
 }
 elsif ($exit_code == $E_OK && !$opt{debug}) {
     if (defined $opt{htmlinfo}) {
-	printf q{OK - System: '<a href="%s">%s</a>', SN: '<a href="%s">%s</a>'},
+	printf q{OK - System: '<a href="%s">%s%s</a>', SN: '<a href="%s">%s</a>'},
 	  documentation_url($sysinfo{model}), $sysinfo{model},
-	    warranty_url($sysinfo{serial}), $sysinfo{serial};
+	    defined $sysinfo{rev} ? " $sysinfo{rev}" : q{},
+	      warranty_url($sysinfo{serial}), $sysinfo{serial};
     }
     else {
-	printf q{OK - System: '%s', SN: '%s'},
-	  $sysinfo{model}, $sysinfo{serial};
+	printf q{OK - System: '%s%s', SN: '%s'},
+	  $sysinfo{model}, defined $sysinfo{rev} ? " $sysinfo{rev}" : q{}, $sysinfo{serial};
     }
 
     if ($check{memory}) {
@@ -4630,13 +4639,14 @@ else {
     if ($opt{extinfo}) {
 	print $linebreak;
 	if (defined $opt{htmlinfo}) {
-	    printf '------ SYSTEM: <a href="%s">%s</a>, SN: <a href="%s">%s</a>',
+	    printf '------ SYSTEM: <a href="%s">%s%s</a>, SN: <a href="%s">%s</a>',
 	      documentation_url($sysinfo{model}), $sysinfo{model},
-		warranty_url($sysinfo{serial}), $sysinfo{serial};
+		defined $sysinfo{rev} ? " $sysinfo{rev}" : q{},
+		  warranty_url($sysinfo{serial}), $sysinfo{serial};
 	}
 	else {
-	    printf '------ SYSTEM: %s, SN: %s',
-	      $sysinfo{model}, $sysinfo{serial};
+	    printf '------ SYSTEM: %s%s, SN: %s',
+	      $sysinfo{model}, defined $sysinfo{rev} ? " $sysinfo{rev}" : q{}, $sysinfo{serial};
 	}
     }
     if (defined $opt{postmsg}) {
@@ -4655,8 +4665,9 @@ else {
 	}
 	if (defined $post) {
 	    print $linebreak;
+	    my $mod = defined $sysinfo{rev} ? "$sysinfo{model} $sysinfo{rev}" : $sysinfo{model};
 	    $post =~ s{[%]s}{$sysinfo{serial}}gxms;
-	    $post =~ s{[%]m}{$sysinfo{model}}gxms;
+	    $post =~ s{[%]m}{$mod}gxms;
 	    $post =~ s{[%]b}{$sysinfo{bios}}gxms;
 	    $post =~ s{[%]d}{$sysinfo{biosdate}}gxms;
 	    $post =~ s{[%]o}{$sysinfo{osname}}gxms;
