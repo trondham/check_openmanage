@@ -369,7 +369,7 @@ $globalstatus   = $E_OK;  # default global health status is "OK"
      'biosdate' => 'N/A',  # BIOS release date
      'serial'   => 'N/A',  # serial number (service tag)
      'model'    => 'N/A',  # system model
-     'rev'      => undef,  # system revision
+     'rev'      => q{},    # system revision
      'osname'   => 'N/A',  # OS name
      'osver'    => 'N/A',  # OS version
      'om'       => 'N/A',  # OMSA version
@@ -4062,7 +4062,7 @@ sub get_omreport_chassis_info {
 		$sysinfo{serial} = $val;
 	    }
 	    if ($key eq 'System Revision') {
-		$sysinfo{rev} = $val;
+		$sysinfo{rev} = q{ } . $val;
 	    }
 	}
     }
@@ -4152,7 +4152,7 @@ sub get_snmp_chassis_info {
 		$sysinfo{serial} = $result->{$oid};
 	    }
 	    elsif (exists $chassis_oid{$oid} and $chassis_oid{$oid} eq 'chassisSystemRevisionName') {
-		$sysinfo{rev} = $result->{$oid};
+		$sysinfo{rev} = q{ } . $result->{$oid};
 	    }
 	}
     }
@@ -4441,7 +4441,7 @@ if ($snmp) {
 
 # Print messages
 if ($opt{debug}) {
-    print "   System:      $sysinfo{model}", defined $sysinfo{rev} ? " $sysinfo{rev}\n" : "\n";
+    print "   System:      $sysinfo{model}$sysinfo{rev}\n";
     print "   ServiceTag:  $sysinfo{serial}";
     print q{ } x (25 - length $sysinfo{serial}), "OMSA version:    $sysinfo{om}\n";
     print "   BIOS/date:   $sysinfo{bios} $sysinfo{biosdate}";
@@ -4563,13 +4563,12 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
 elsif ($exit_code == $E_OK && !$opt{debug}) {
     if (defined $opt{htmlinfo}) {
 	printf q{OK - System: '<a href="%s">%s%s</a>', SN: '<a href="%s">%s</a>'},
-	  documentation_url($sysinfo{model}), $sysinfo{model},
-	    defined $sysinfo{rev} ? " $sysinfo{rev}" : q{},
-	      warranty_url($sysinfo{serial}), $sysinfo{serial};
+	  documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
+	    warranty_url($sysinfo{serial}), $sysinfo{serial};
     }
     else {
 	printf q{OK - System: '%s%s', SN: '%s'},
-	  $sysinfo{model}, defined $sysinfo{rev} ? " $sysinfo{rev}" : q{}, $sysinfo{serial};
+	  $sysinfo{model}, $sysinfo{rev}, $sysinfo{serial};
     }
 
     if ($check{memory}) {
@@ -4640,13 +4639,12 @@ else {
 	print $linebreak;
 	if (defined $opt{htmlinfo}) {
 	    printf '------ SYSTEM: <a href="%s">%s%s</a>, SN: <a href="%s">%s</a>',
-	      documentation_url($sysinfo{model}), $sysinfo{model},
-		defined $sysinfo{rev} ? " $sysinfo{rev}" : q{},
-		  warranty_url($sysinfo{serial}), $sysinfo{serial};
+	      documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
+		warranty_url($sysinfo{serial}), $sysinfo{serial};
 	}
 	else {
 	    printf '------ SYSTEM: %s%s, SN: %s',
-	      $sysinfo{model}, defined $sysinfo{rev} ? " $sysinfo{rev}" : q{}, $sysinfo{serial};
+	      $sysinfo{model}, $sysinfo{rev}, $sysinfo{serial};
 	}
     }
     if (defined $opt{postmsg}) {
@@ -4665,9 +4663,8 @@ else {
 	}
 	if (defined $post) {
 	    print $linebreak;
-	    my $mod = defined $sysinfo{rev} ? "$sysinfo{model} $sysinfo{rev}" : $sysinfo{model};
 	    $post =~ s{[%]s}{$sysinfo{serial}}gxms;
-	    $post =~ s{[%]m}{$mod}gxms;
+	    $post =~ s{[%]m}{$sysinfo{model}$sysinfo{rev}}gxms;
 	    $post =~ s{[%]b}{$sysinfo{bios}}gxms;
 	    $post =~ s{[%]d}{$sysinfo{biosdate}}gxms;
 	    $post =~ s{[%]o}{$sysinfo{osname}}gxms;
