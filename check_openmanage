@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.5.11-beta3';
+$VERSION = '3.5.11-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -683,9 +683,8 @@ sub get_blacklist {
 		open my $BL, '<', $black
 		  or do { report('other', "Couldn't open blacklist file $black: $!", $E_UNKNOWN)
 			    and return {} };
-		$tmp = <$BL>;
+		chomp($tmp = <$BL>);
 		close $BL;
-		chomp $tmp;
 	    }
 	    else {
 		$tmp = $black;
@@ -769,7 +768,7 @@ sub adjust_checks {
 	    if (-f $check) {
 		open my $CL, '<', $check
 		  or do { report('other', "Couldn't open check file $check: $!", $E_UNKNOWN) and return };
-		$tmp = <$CL>;
+		chomp($tmp = <$CL>);
 		close $CL;
 	    }
 	    else {
@@ -841,6 +840,11 @@ sub run_omreport {
 
     # Workaround for Openmanage BUG introduced in OMSA 5.5.0
     $rawtext =~ s{\n;}{;}gxms if $command eq 'storage controller';
+
+    # Report if no controllers found
+    if ($command eq 'storage controller' and $rawtext =~ m{No\scontrollers\sfound}xms) {
+	report('other', 'No storage controllers found (check OMSA installation)', $E_UNKNOWN);
+    }
 
     # Openmanage sometimes puts a linebreak between "Error" and the
     # actual error text
