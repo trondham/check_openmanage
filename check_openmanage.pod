@@ -653,6 +653,12 @@ Check the alert log content. Default: OFF
 
 =back
 
+=item --no-storage
+
+Turn off storage checking. This is an alias for C<--check storage=0>.
+
+=back
+
 =head1 DIAGNOSTICS
 
 The option C<--debug> (or C<-d>) can be specified to display all
