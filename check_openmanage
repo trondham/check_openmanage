@@ -177,7 +177,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'linebreak=s'        => \$opt{linebreak},
 	   'a|all'              => \$opt{all},
 	   'only=s'             => \$opt{only},
-	   'no-storage'         => \$opt{no_storage}
+	   'no-storage'         => \$opt{no_storage},
 	   'omreport=s'         => \$opt{omreport},
 	   'port=i'             => \$opt{port},
 	   'H|hostname=s'       => \$opt{hostname},
