@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.0-beta2';
+$VERSION = '3.6.0-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -103,6 +103,7 @@ CHECK CONTROL AND BLACKLISTING:
    -a, --all           Check everything, even log content
    -b, --blacklist     Blacklist missing and/or failed components
    --only              Only check a certain component or alert type
+   --no-storage        Don't check storage (short for '--check storage=0')
    --check             Fine-tune which components are checked
 
 For more information and advanced options, see the manual page or URL:
@@ -140,6 +141,7 @@ END_LICENSE
 	 'version'           => 0,        # plugin version info
          'all'               => 0,        # check everything
 	 'only'              => undef,    # only one component
+	 'no_storage'        => 0,        # don't check storage
 	 'omreport'          => undef,    # omreport path
 	 'port'              => 161,      # default SNMP port
 	 'hostname'          => undef,    # hostname or IP
@@ -175,6 +177,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'linebreak=s'        => \$opt{linebreak},
 	   'a|all'              => \$opt{all},
 	   'only=s'             => \$opt{only},
+	   'no-storage'         => \$opt{no_storage}
 	   'omreport=s'         => \$opt{omreport},
 	   'port=i'             => \$opt{port},
 	   'H|hostname=s'       => \$opt{hostname},
@@ -715,6 +718,11 @@ sub get_blacklist {
 #
 sub adjust_checks {
     my @cl = ();
+
+    # First, take the '--no-storage' option
+    if ($opt{no_storage}) {
+	$check{storage} = 0;
+    }
 
     # Adjust checking based on the '--all' option
     if ($opt{all}) {
