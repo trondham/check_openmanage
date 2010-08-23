@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.0-beta4';
+$VERSION = '3.6.0-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -851,7 +851,7 @@ sub run_omreport {
 
     # Report if no controllers found
     if ($command eq 'storage controller' and $rawtext =~ m{No\scontrollers\sfound}xms) {
-	report('storage', 'No storage controllers found', $E_UNKNOWN);
+	report('storage', 'Storage Error: No controllers found', $E_UNKNOWN);
     }
 
     # Openmanage sometimes puts a linebreak between "Error" and the
@@ -1167,7 +1167,7 @@ sub check_controllers {
 	if (!defined $result) {
 	    #printf "SNMP ERROR [storage / controller]: %s.\n", $snmp_session->error;
 	    #$snmp_session->close;
-	    report('storage', 'No storage controllers found', $E_UNKNOWN);
+	    report('storage', 'Storage Error: No controllers found', $E_UNKNOWN);
 	    return;
 	}
 
