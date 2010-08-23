@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.0-beta3';
+$VERSION = '3.6.0-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -74,8 +74,8 @@ $HELP = <<'END_HELP';
 
 GENERAL OPTIONS:
 
-   -p, --perfdata      Output performance data
-   -t, --timeout       Plugin timeout in seconds
+   -p, --perfdata      Output performance data [no]
+   -t, --timeout       Plugin timeout in seconds [30]
    -c, --critical      Customise temperature critical limits
    -w, --warning       Customise temperature warning limits
    -d, --debug         Debug output, reports everything
@@ -85,9 +85,9 @@ GENERAL OPTIONS:
 SNMP OPTIONS:
 
    -H, --hostname      Hostname or IP (required for SNMP)
-   -C, --community     SNMP community string
-   -P, --protocol      SNMP protocol version
-   --port              SNMP port number
+   -C, --community     SNMP community string [public]
+   -P, --protocol      SNMP protocol version [2]
+   --port              SNMP port number [161]
 
 OUTPUT OPTIONS:
 
@@ -103,8 +103,8 @@ CHECK CONTROL AND BLACKLISTING:
    -a, --all           Check everything, even log content
    -b, --blacklist     Blacklist missing and/or failed components
    --only              Only check a certain component or alert type
-   --no-storage        Don't check storage (short for '--check storage=0')
    --check             Fine-tune which components are checked
+   --no-storage        Don't check storage (short for '--check storage=0')
 
 For more information and advanced options, see the manual page or URL:
   http://folk.uio.no/trondham/software/check_openmanage.html
