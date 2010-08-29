@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.0-beta5';
+$VERSION = '3.6.0-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -832,7 +832,7 @@ sub run_omreport {
           | No\sinstrumented\spower\ssupplies\sfound\son\sthis\ssystem # No instrumented PS (blades/low-end)
 #          | No\scontrollers\sfound                                     # No RAID controller
           | No\sbattery\sprobes\sfound\son\sthis\ssystem               # No battery probes
-          | Invalid\scommand:\spwrmonitoring                           # Older OMSAs lack this command(?)
+          | Invalid\scommand:\spwrmonitoring                           # Old hardware
 #          | Current\sprobes\snot\sfound                                # OMSA + RHEL5.4 bug
         }xms;
 
@@ -851,7 +851,7 @@ sub run_omreport {
 
     # Report if no controllers found
     if ($command eq 'storage controller' and $rawtext =~ m{No\scontrollers\sfound}xms) {
-	report('storage', 'Storage Error: No controllers found', $E_UNKNOWN);
+	report('storage', 'STORAGE: No controllers found', $E_UNKNOWN);
     }
 
     # Openmanage sometimes puts a linebreak between "Error" and the
@@ -1165,14 +1165,9 @@ sub check_controllers {
 	my $result = $snmp_session->get_table(-baseoid => $controllerTable);
 
 	if (!defined $result) {
-	    #printf "SNMP ERROR [storage / controller]: %s.\n", $snmp_session->error;
-	    #$snmp_session->close;
-	    report('storage', 'Storage Error: No controllers found', $E_UNKNOWN);
+	    report('storage', 'STORAGE: No controllers found', $E_UNKNOWN);
 	    return;
 	}
-
-#	# No controllers is OK
-#	return if !defined $result;
 
 	@output = @{ get_snmp_output($result, \%ctrl_oid) };
     }
