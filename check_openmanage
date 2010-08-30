@@ -851,7 +851,7 @@ sub run_omreport {
 
     # Report if no controllers found
     if ($command eq 'storage controller' and $rawtext =~ m{No\scontrollers\sfound}xms) {
-	report('storage', 'STORAGE: No controllers found', $E_UNKNOWN);
+	report('storage', 'Storage Error! No controllers found', $E_UNKNOWN);
     }
 
     # Openmanage sometimes puts a linebreak between "Error" and the
@@ -1165,7 +1165,7 @@ sub check_controllers {
 	my $result = $snmp_session->get_table(-baseoid => $controllerTable);
 
 	if (!defined $result) {
-	    report('storage', 'STORAGE: No controllers found', $E_UNKNOWN);
+	    report('storage', 'Storage Error! No controllers found', $E_UNKNOWN);
 	    return;
 	}
 
