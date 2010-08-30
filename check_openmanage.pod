@@ -500,6 +500,10 @@ Intrusion sensor
 
 =over 4
 
+=item --no-storage
+
+Turn off storage checking. This is an alias for C<--check storage=0>.
+
 =item --only I<KEYWORD>
 
 This option can be specifed once and expects a keyword. The different
@@ -650,12 +654,6 @@ Check the ESM log content. Default: OFF
 Check the alert log content. Default: OFF
 
 =back
-
-=back
-
-=item --no-storage
-
-Turn off storage checking. This is an alias for C<--check storage=0>.
 
 =back
 
