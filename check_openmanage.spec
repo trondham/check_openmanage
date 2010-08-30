@@ -1,6 +1,6 @@
 Summary:   Nagios plugin to monitor hardware health on Dell servers
 Name:      check_openmanage
-Version:   3.5.10
+Version:   3.6.0
 Release:   1%{?dist}
 License:   GPL
 Packager:  Trond Hasle Amundsen <t.h.amundsen@usit.uio.no>
@@ -48,6 +48,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Aug 30 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.0-1
+- Version 3.6.0
+
 * Wed Jul 14 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.10-1
 - Version 3.5.10
 
