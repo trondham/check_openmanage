@@ -1,3 +1,22 @@
+3.6.0   2010-08-30
+------------------
+
+* Storage is no longer allowed to be absent. If the plugin doesn't
+  find a storage controller, it will give an alert. For diskless
+  systems or servers without a Dell controller that OMSA recognizes
+  you will now have to specify '--no-storage' or '--check storage=0'
+  to work around this.
+* Report the system revision (if applicable) wherever the model name
+  is printed. E.g. "PowerEdge 2950 III" instead of "PowerEdge 2950".
+* Small change in search path for omreport: The new location for OMSA
+  6.2.0 and later on Linux will be attempted first.
+* Small bugfix for the '--check' parameter, if the argument is a
+  filename. The file could not contain a linebreak, this has been
+  fixed.
+* Added an option '--no-storage', which is equivalent to the general
+  option '--check storage=0'.
+
+
 3.5.10  2010-07-14
 ------------------
 
