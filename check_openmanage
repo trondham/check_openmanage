@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.0';
+$VERSION = '3.6.1-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1436,14 +1436,17 @@ sub check_physical_disks {
 	      && $out->{arrayDiskSmartAlertIndication} == 2 ? 1 : 0;
 	    $progr    = q{};
 	    $nexus    = convert_nexus($out->{arrayDiskNexusID});
-	    $vendor   = $out->{arrayDiskVendor};
-	    $product  = $out->{arrayDiskProductID};
+	    $vendor   = exists $out->{arrayDiskVendor}
+	      ? $out->{arrayDiskVendor} : 'Unknown Vendor';
+	    $product  = exists $out->{arrayDiskProductID}
+	      ? $out->{arrayDiskProductID} : 'Unknown Product ID';
 	    $spare    = get_hashval($out->{arrayDiskSpareState}, \%spare_state);
 	    $bus      = exists $out->{arrayDiskBusType}
 	      ? get_hashval($out->{arrayDiskBusType}, \%bus_type) : undef;
 	    $media    = exists $out->{arrayDiskMediaType}
 	      ? get_hashval($out->{arrayDiskMediaType}, \%media_type) : undef;
-	    $capacity = $out->{arrayDiskLengthInMB} * 1024**2;
+	    $capacity = exists $out->{arrayDiskLengthInMB}
+	      ? $out->{arrayDiskLengthInMB} * 1024**2 : -1;
 
 	    # try to find the controller where the disk belongs
 	    if (exists $out->{arrayDiskEnclosureConnectionControllerNumber}) {
@@ -1490,13 +1493,19 @@ sub check_physical_disks {
 	elsif ($spare !~ m{\A Global|Dedicated}xms) { $spare = undef; }
 
 	# Calculate human readable capacity
-	$capacity = ceil($capacity / 1000**3) >= 1000
-          ? sprintf '%.1fTB', ($capacity / 1000**4)
-	    : sprintf '%.0fGB', ($capacity / 1000**3);
-	$capacity = '450GB' if $capacity eq '449GB';  # quick fix for 450GB disks
-	$capacity = '300GB' if $capacity eq '299GB';  # quick fix for 300GB disks
-	$capacity = '146GB' if $capacity eq '147GB';  # quick fix for 146GB disks
-	$capacity = '100GB' if $capacity eq '99GB';   # quick fix for 100GB disks
+	if ($capacity == -1) {
+	    # capacity is unknown
+	    $capacity = 'Unknown Size';
+	}
+	else {
+	    $capacity = ceil($capacity / 1000**3) >= 1000
+	      ? sprintf '%.1fTB', ($capacity / 1000**4)
+		: sprintf '%.0fGB', ($capacity / 1000**3);
+	    $capacity = '450GB' if $capacity eq '449GB';  # quick fix for 450GB disks
+	    $capacity = '300GB' if $capacity eq '299GB';  # quick fix for 300GB disks
+	    $capacity = '146GB' if $capacity eq '147GB';  # quick fix for 146GB disks
+	    $capacity = '100GB' if $capacity eq '99GB';   # quick fix for 100GB disks
+	}
 
 	# Capitalize only the first letter of the vendor name
 	$vendor = (substr $vendor, 0, 1) . lc (substr $vendor, 1, length $vendor);
