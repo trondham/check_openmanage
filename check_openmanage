@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.1-beta1';
+$VERSION = '3.6.1-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1472,13 +1472,16 @@ sub check_physical_disks {
 	    $progr    = ' [' . $out->{'Progress'} . ']';
 	    $ctrl     = $out->{'ctrl'};
 	    $nexus    = join q{:}, $out->{ctrl}, $id;
-	    $vendor   = $out->{'Vendor ID'};
-	    $product  = $out->{'Product ID'};
+	    $vendor   = $out->{'Vendor ID'} ne q{} ? $out->{'Vendor ID'} : 'Unknown Vendor';
+	    $product  = $out->{'Product ID'} ne q{} ? $out->{'Product ID'} : 'Unknown Product ID';
 	    $media    = $out->{'Media'};
 	    $spare    = $out->{'Hot Spare'};
 	    $bus      = $out->{'Bus Protocol'};
 	    $capacity = $out->{'Capacity'};
 	    $capacity =~ s{\A .*? \((\d+) \s bytes\) \z}{$1}xms;
+	    if ($capacity eq 'Unavailable') {
+		$capacity = -1;
+	    }
 	}
 
 	next PDISK if blacklisted('pdisk', $nexus);
