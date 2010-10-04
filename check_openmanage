@@ -104,7 +104,7 @@ CHECK CONTROL AND BLACKLISTING:
    -b, --blacklist     Blacklist missing and/or failed components
    --only              Only check a certain component or alert type
    --check             Fine-tune which components are checked
-   --no-storage        Don't check storage (short for '--check storage=0')
+   --no-storage        Don't check storage (alias for "--check storage=0")
 
 For more information and advanced options, see the manual page or URL:
   http://folk.uio.no/trondham/software/check_openmanage.html
