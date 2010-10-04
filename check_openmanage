@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.1-beta2';
+$VERSION = '3.6.1-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1204,10 +1204,9 @@ sub check_controllers {
 	    $stdr     = exists $out->{controllerStorportDriverVersion}
 	      ? $out->{controllerStorportDriverVersion} : undef;
 	    $nexus    = convert_nexus($out->{controllerNexusID});
-	    $id       = $nexus;
 	}
 	else {
-	    $id       = $out->{ID};
+	    $nexus    = $out->{ID};
 	    $name     = $out->{Name};
 	    $state    = $out->{State};
 	    $status   = $out->{Status};
@@ -1225,18 +1224,17 @@ sub check_controllers {
 	    $stdr     = (exists $out->{'Storport Driver Version'}
 			 and $out->{'Storport Driver Version'} ne 'Not Applicable')
 	      ? $out->{'Storport Driver Version'} : undef;
-	    $nexus    = $id;
 	}
 
 	$name =~ s{\s+\z}{}xms; # remove trailing whitespace
-	push @controllers, $id;
+	push @controllers, $nexus;
 
 	# Collecting some storage info
-	$sysinfo{'controller'}{$id}{'id'}       = $nexus;
-	$sysinfo{'controller'}{$id}{'name'}     = $name;
-	$sysinfo{'controller'}{$id}{'driver'}   = $driver;
-	$sysinfo{'controller'}{$id}{'firmware'} = $firmware;
-	$sysinfo{'controller'}{$id}{'storport'} = $stdr;
+	$sysinfo{'controller'}{$nexus}{'id'}       = $nexus;
+	$sysinfo{'controller'}{$nexus}{'name'}     = $name;
+	$sysinfo{'controller'}{$nexus}{'driver'}   = $driver;
+	$sysinfo{'controller'}{$nexus}{'firmware'} = $firmware;
+	$sysinfo{'controller'}{$nexus}{'storport'} = $stdr;
 
 	# Store controller info for future use (SNMP)
 	if ($snmp) {
@@ -1246,37 +1244,37 @@ sub check_controllers {
 	next CTRL if blacklisted('ctrl', $nexus);
 
 	# Special case: old firmware
-	if (!blacklisted('ctrl_fw', $id) && defined $minfw) {
+	if (!blacklisted('ctrl_fw', $nexus) && defined $minfw) {
 	    chomp $firmware;
 	    my $msg = sprintf q{Controller %d [%s]: Firmware '%s' is out of date},
-	      $id, $name, $firmware;
+	      $nexus, $name, $firmware;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: old driver
-	if (!blacklisted('ctrl_driver', $id) && defined $mindr) {
+	if (!blacklisted('ctrl_driver', $nexus) && defined $mindr) {
 	    chomp $driver;
 	    my $msg = sprintf q{Controller %d [%s]: Driver '%s' is out of date},
-	      $id, $name, $driver;
+	      $nexus, $name, $driver;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: old storport driver
-	if (!blacklisted('ctrl_stdr', $id) && defined $minstdr) {
+	if (!blacklisted('ctrl_stdr', $nexus) && defined $minstdr) {
 	    chomp $stdr;
 	    my $msg = sprintf q{Controller %d [%s]: Storport driver '%s' is out of date},
-	      $id, $name, $stdr;
+	      $nexus, $name, $stdr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Ok
 	if ($status eq 'Ok' or ($status eq 'Non-Critical'
 				and (defined $minfw or defined $mindr or defined $minstdr))) {
 	    my $msg = sprintf 'Controller %d [%s] is %s',
-	      $id, $name, $state;
+	      $nexus, $name, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
         # Default
 	else {
 	    my $msg = sprintf 'Controller %d [%s] needs attention: %s',
-	      $id, $name, $state;
+	      $nexus, $name, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
     }
@@ -1291,7 +1289,6 @@ sub check_physical_disks {
     return if $#controllers == -1;
     return if blacklisted('pdisk', 'all');
 
-    my $id       = undef;
     my $nexus    = undef;
     my $name     = undef;
     my $state    = undef;
@@ -1310,7 +1307,6 @@ sub check_physical_disks {
     if ($snmp) {
 	my %pdisk_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.1'  => 'arrayDiskNumber',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.2'  => 'arrayDiskName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.3'  => 'arrayDiskVendor',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.4'  => 'arrayDiskState',
@@ -1423,13 +1419,6 @@ sub check_physical_disks {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $name   = $out->{arrayDiskName};
-	    if (exists $out->{arrayDiskEnclosureID}) {
-		$id = join q{:}, ($out->{arrayDiskChannel}, $out->{arrayDiskEnclosureID},
-				  $out->{arrayDiskTargetID});
-	    }
-	    else {
-		$id = join q{:}, ($out->{arrayDiskChannel}, $out->{arrayDiskTargetID});
-	    }
 	    $state    = get_hashval($out->{arrayDiskState}, \%pdisk_state);
 	    $status   = $snmp_status{$out->{arrayDiskComponentStatus}};
 	    $fpred    = exists $out->{arrayDiskSmartAlertIndication}
@@ -1464,14 +1453,13 @@ sub check_physical_disks {
 	    }
 	}
 	else {
-	    $id       = $out->{'ID'};
 	    $name     = $out->{'Name'};
 	    $state    = $out->{'State'};
 	    $status   = $out->{'Status'};
 	    $fpred    = lc($out->{'Failure Predicted'}) eq 'yes' ? 1 : 0;
 	    $progr    = ' [' . $out->{'Progress'} . ']';
 	    $ctrl     = $out->{'ctrl'};
-	    $nexus    = join q{:}, $out->{ctrl}, $id;
+	    $nexus    = join q{:}, $out->{ctrl}, $out->{'ID'};
 	    $vendor   = $out->{'Vendor ID'} ne q{} ? $out->{'Vendor ID'} : 'Unknown Vendor';
 	    $product  = $out->{'Product ID'} ne q{} ? $out->{'Product ID'} : 'Unknown Product ID';
 	    $media    = $out->{'Media'};
@@ -1561,7 +1549,6 @@ sub check_virtual_disks {
     return if $#controllers == -1;
     return if blacklisted('vdisk', 'all');
 
-    my $id     = undef;
     my $name   = undef;
     my $nexus  = undef;
     my $dev    = undef;
@@ -1580,7 +1567,6 @@ sub check_virtual_disks {
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.4'  => 'virtualDiskState',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.6'  => 'virtualDiskLengthInMB',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.13' => 'virtualDiskLayout',
-	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.17' => 'virtualDiskTargetID',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.20' => 'virtualDiskComponentStatus',
 	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.21' => 'virtualDiskNexusID',
 	    );
@@ -1642,7 +1628,6 @@ sub check_virtual_disks {
   VDISK:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $id     = $out->{virtualDiskTargetID};
 	    $dev    = $out->{virtualDiskDeviceName};
 	    $state  = get_hashval($out->{virtualDiskState}, \%vdisk_state);
 	    $layout = get_hashval($out->{virtualDiskLayout}, \%vdisk_layout);
@@ -1652,7 +1637,6 @@ sub check_virtual_disks {
 	    $nexus  = convert_nexus($out->{virtualDiskNexusID});
 	}
 	else {
-	    $id     = $out->{ID};
 	    $dev    = $out->{'Device Name'};
 	    $state  = $out->{State};
 	    $status = $out->{Status};
@@ -1660,7 +1644,7 @@ sub check_virtual_disks {
 	    $size   = $out->{Size};
 	    $progr  = ' [' . $out->{Progress} . ']';
 	    $size   =~ s{\A (.*GB).* \z}{$1}xms;
-	    $nexus  = join q{:}, $out->{ctrl}, $id;
+	    $nexus  = join q{:}, $out->{ctrl}, $out->{ID};
 	    $ctrl   = $out->{ctrl};
 	}
 
@@ -1871,7 +1855,6 @@ sub check_connectors {
     return if $#controllers == -1;
     return if blacklisted('conn', 'all');
 
-    my $id     = undef;
     my $nexus  = undef;
     my $name   = undef;
     my $state  = undef;
@@ -1883,7 +1866,6 @@ sub check_connectors {
     if ($snmp) {
         my %conn_oid
           = (
-             '1.3.6.1.4.1.674.10893.1.20.130.2.1.1'  => 'channelNumber',
              '1.3.6.1.4.1.674.10893.1.20.130.2.1.2'  => 'channelName',
              '1.3.6.1.4.1.674.10893.1.20.130.2.1.3'  => 'channelState',
              '1.3.6.1.4.1.674.10893.1.20.130.2.1.8'  => 'channelComponentStatus',
@@ -1939,7 +1921,6 @@ sub check_connectors {
   CHANNEL:
     foreach my $out (@output) {
         if ($snmp) {
-            $id     = $out->{channelNumber} - 1;
             $name   = $out->{channelName};
             $status = $snmp_status{$out->{channelComponentStatus}};
             $state  = get_hashval($out->{channelState}, \%conn_state);
@@ -1951,13 +1932,12 @@ sub check_connectors {
 	    if (! defined $type) { $type = 'n/a'; }
         }
         else {
-            $id     = $out->{'ID'};
             $name   = $out->{'Name'};
             $state  = $out->{'State'};
             $status = $out->{'Status'};
             $type   = $out->{'Connector Type'};
 	    $ctrl   = $out->{ctrl};
-	    $nexus  = join q{:}, $out->{ctrl}, $id;
+	    $nexus  = join q{:}, $out->{ctrl}, $out->{'ID'};
         }
 
         next CHANNEL if blacklisted('conn', $nexus);
@@ -2106,7 +2086,6 @@ sub check_enclosure_fans {
     return if $#controllers == -1;
     return if blacklisted('encl_fan', 'all');
 
-    my $id        = undef;
     my $nexus     = undef;
     my $name      = undef;
     my $state     = undef;
@@ -2119,7 +2098,6 @@ sub check_enclosure_fans {
     if ($snmp) {
 	my %fan_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.7.1.1'  => 'fanNumber',
 	     '1.3.6.1.4.1.674.10893.1.20.130.7.1.2'  => 'fanName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.7.1.4'  => 'fanState',
 	     '1.3.6.1.4.1.674.10893.1.20.130.7.1.11' => 'fanProbeCurrValue',
@@ -2173,7 +2151,6 @@ sub check_enclosure_fans {
   FAN:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $id        = $out->{fanNumber} - 1;
 	    $name      = $out->{fanName};
 	    $state     = get_hashval($out->{fanState}, \%fan_state);
 	    $status    = $snmp_status{$out->{fanComponentStatus}};
@@ -2183,14 +2160,13 @@ sub check_enclosure_fans {
 	    $nexus     = convert_nexus($out->{fanNexusID});
 	}
 	else {
-	    $id        = $out->{'ID'};
 	    $name      = $out->{'Name'};
 	    $state     = $out->{'State'};
 	    $status    = $out->{'Status'};
 	    $speed     = $out->{'Speed'};
 	    $encl_id   = join q{:}, $out->{ctrl}, $out->{'encl_id'};
 	    $encl_name = $out->{encl_name};
-	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $id;
+	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $out->{'ID'};
 	}
 
 	next FAN if blacklisted('encl_fan', $nexus);
@@ -2219,7 +2195,6 @@ sub check_enclosure_pwr {
     return if $#controllers == -1;
     return if blacklisted('encl_ps', 'all');
 
-    my $id        = undef;
     my $nexus     = undef;
     my $name      = undef;
     my $state     = undef;
@@ -2231,7 +2206,6 @@ sub check_enclosure_pwr {
     if ($snmp) {
 	my %ps_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.9.1.1'  => 'powerSupplyNumber',
 	     '1.3.6.1.4.1.674.10893.1.20.130.9.1.2'  => 'powerSupplyName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.9.1.4'  => 'powerSupplyState',
 	     '1.3.6.1.4.1.674.10893.1.20.130.9.1.9'  => 'powerSupplyComponentStatus',
@@ -2284,7 +2258,6 @@ sub check_enclosure_pwr {
   PS:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $id        = $out->{powerSupplyNumber};
 	    $name      = $out->{powerSupplyName};
 	    $state     = get_hashval($out->{powerSupplyState}, \%ps_state);
 	    $status    = $snmp_status{$out->{powerSupplyComponentStatus}};
@@ -2293,13 +2266,12 @@ sub check_enclosure_pwr {
 	    $nexus     = convert_nexus($out->{powerSupplyNexusID});
 	}
 	else {
-	    $id        = $out->{'ID'};
 	    $name      = $out->{'Name'};
 	    $state     = $out->{'State'};
 	    $status    = $out->{'Status'};
 	    $encl_id   = join q{:}, $out->{ctrl}, $out->{'encl_id'};
 	    $encl_name = $out->{encl_name};
-	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $id;
+	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $out->{'ID'};
 	}
 
 	next PS if blacklisted('encl_ps', $nexus);
@@ -2328,7 +2300,6 @@ sub check_enclosure_temp {
     return if $#controllers == -1;
     return if blacklisted('encl_temp', 'all');
 
-    my $id        = undef;
     my $nexus     = undef;
     my $name      = undef;
     my $state     = undef;
@@ -2346,7 +2317,6 @@ sub check_enclosure_temp {
     if ($snmp) {
 	my %temp_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.1'  => 'temperatureProbeNumber',
 	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.2'  => 'temperatureProbeName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.4'  => 'temperatureProbeState',
 	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.6'  => 'temperatureProbeUnit',
@@ -2405,7 +2375,6 @@ sub check_enclosure_temp {
   TEMP:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $id        = $out->{temperatureProbeNumber} - 1;
 	    $name      = $out->{temperatureProbeName};
 	    $state     = get_hashval($out->{temperatureProbeState}, \%temp_state);
 	    $status    = $snmp_status{$out->{temperatureProbeComponentStatus}};
@@ -2425,7 +2394,6 @@ sub check_enclosure_temp {
 	    $nexus     = convert_nexus($out->{temperatureProbeNexusID});
 	}
 	else {
-	    $id        = $out->{'ID'};
 	    $name      = $out->{'Name'};
 	    $state     = $out->{'State'};
 	    $status    = $out->{'Status'};
@@ -2437,7 +2405,7 @@ sub check_enclosure_temp {
 	    $min_crit  = $out->{'Minimum Failure Threshold'};
 	    $encl_id   = join q{:}, $out->{ctrl}, $out->{'encl_id'};
 	    $encl_name = $out->{encl_name};
-	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $id;
+	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $out->{'ID'};
 	}
 
 	next TEMP if blacklisted('encl_temp', $nexus);
@@ -2546,7 +2514,6 @@ sub check_enclosure_emms {
     return if $#controllers == -1;
     return if blacklisted('encl_emm', 'all');
 
-    my $id        = undef;
     my $nexus     = undef;
     my $name      = undef;
     my $state     = undef;
@@ -2558,7 +2525,6 @@ sub check_enclosure_emms {
     if ($snmp) {
 	my %emms_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.13.1.1'  => 'enclosureManagementModuleNumber',
 	     '1.3.6.1.4.1.674.10893.1.20.130.13.1.2'  => 'enclosureManagementModuleName',
 	     '1.3.6.1.4.1.674.10893.1.20.130.13.1.4'  => 'enclosureManagementModuleState',
 	     '1.3.6.1.4.1.674.10893.1.20.130.13.1.11' => 'enclosureManagementModuleComponentStatus',
@@ -2612,7 +2578,6 @@ sub check_enclosure_emms {
   EMM:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $id        = $out->{enclosureManagementModuleNumber} - 1;
 	    $name      = $out->{enclosureManagementModuleName};
 	    $state     = get_hashval($out->{enclosureManagementModuleState}, \%emms_state);
 	    $status    = $snmp_status{$out->{enclosureManagementModuleComponentStatus}};
@@ -2621,13 +2586,12 @@ sub check_enclosure_emms {
 	    $nexus     = convert_nexus($out->{enclosureManagementModuleNexusID});
 	}
 	else {
-	    $id        = $out->{'ID'};
 	    $name      = $out->{'Name'};
 	    $state     = $out->{'State'};
 	    $status    = $out->{'Status'};
 	    $encl_id   = join q{:}, $out->{ctrl}, $out->{'encl_id'};
 	    $encl_name = $out->{encl_name};
-	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $id;
+	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $out->{'ID'};
 	}
 
 	next EMM if blacklisted('encl_emm', $nexus);
