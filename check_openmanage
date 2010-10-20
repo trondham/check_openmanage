@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.1-beta3';
+$VERSION = '3.6.1-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -233,6 +233,7 @@ $omreport = undef;
 	   'batteries'   => 1,   # check battery probes
 	   'amperage'    => 1,   # check power consumption
 	   'intrusion'   => 1,   # check intrusion detection
+	   'sdcard'      => 1,   # check removable flash media (SD cards)
 	   'alertlog'    => 0,   # check the alert log
 	   'esmlog'      => 0,   # check the ESM log (hardware log)
 	   'esmhealth'   => 1,   # check the ESM log overall health
@@ -830,10 +831,11 @@ sub run_omreport {
       = qr{
             Intrusion\sinformation\sis\snot\sfound\sfor\sthis\ssystem  # No intrusion probe
           | No\sinstrumented\spower\ssupplies\sfound\son\sthis\ssystem # No instrumented PS (blades/low-end)
-#          | No\scontrollers\sfound                                     # No RAID controller
           | No\sbattery\sprobes\sfound\son\sthis\ssystem               # No battery probes
           | Invalid\scommand:\spwrmonitoring                           # Old hardware
+          | Hardware\sor\sfeature\snot\spresent\.                      # SD cards
 #          | Current\sprobes\snot\sfound                                # OMSA + RHEL5.4 bug
+#          | No\scontrollers\sfound                                     # No RAID controller
         }xms;
 
     # Errors that are OK on blade servers
@@ -868,7 +870,7 @@ sub run_omreport {
 
 	next if !m/(.*?;){2}/xms;  # ignore lines with less than 3 fields
 	my @vals = split /;/xms;
-	if ($vals[0] =~ m/\A (Index|ID|Severity|Processor|Current\sSpeed) \z/xms) {
+	if ($vals[0] =~ m/\A (Index|ID|Severity|Processor|Current\sSpeed|Connector\sName) \z/xms) {
 	    @keys = @vals;
 	}
 	else {
@@ -881,7 +883,6 @@ sub run_omreport {
     # Finally, return the collected information
     return \@output;
 }
-
 
 #
 # Checks if a component is blacklisted. Returns 1 if the component is
@@ -3902,6 +3903,127 @@ sub check_intrusion {
 
 
 #-----------------------------------------
+# CHASSIS: Check SD Card Device
+#-----------------------------------------
+sub check_sdcard {
+    return if blacklisted('sdcard', 'all');
+
+    my $index    = undef;
+    my $status   = undef;
+    my $state    = undef;
+    my $location = undef;
+    my $capacity = undef;
+    my $setting  = undef;
+    my @output = ();
+
+    if ($snmp) {
+	my %sd_oid
+	  = (
+	     '1.3.6.1.4.1.674.10892.1.1100.112.1.2.1'  => 'sdCardDeviceIndex',
+	     '1.3.6.1.4.1.674.10892.1.1100.112.1.3.1'  => 'sdCardDeviceStatus',
+	     '1.3.6.1.4.1.674.10892.1.1100.112.1.4.1'  => 'sdCardDeviceType',
+	     '1.3.6.1.4.1.674.10892.1.1100.112.1.7.1'  => 'sdCardDeviceLocationName',
+	     '1.3.6.1.4.1.674.10892.1.1100.112.1.8.1'  => 'sdCardDeviceCardPresent',
+	     '1.3.6.1.4.1.674.10892.1.1100.112.1.9.1'  => 'sdCardDeviceCardState',
+	     '1.3.6.1.4.1.674.10892.1.1100.112.1.10.1' => 'sdCardDeviceCardStorageSize',
+	    );
+	my $result = undef;
+	if ($opt{use_get_table}) {
+	    my $sdCardDeviceTable = '1.3.6.1.4.1.674.10892.1.1100.112.1';
+	    $result = $snmp_session->get_table(-baseoid => $sdCardDeviceTable);
+	}
+	else {
+	    $result = $snmp_session->get_entries(-columns => [keys %sd_oid]);
+	}
+
+	# No SD cards is OK
+	return 0 if !defined $result;
+
+	@output = @{ get_snmp_output($result, \%sd_oid) };
+    }
+    else {
+	@output = @{ run_omreport("$omopt_chassis removableflashmedia") };
+    }
+
+    # Note: These values are bit fields, so combination values are possible.
+    my %sd_state
+      = (
+	 0   => 'None',            # state is none of the following:
+	 1   => 'Present',         # device is present
+	 2   => 'IPMI-ready',      # device is IPMI ready
+	 4   => 'Full-ready',      # device is full ready
+	 8   => 'Offline',         # device is offline
+	 16  => 'Failed',          # device is failed
+	 32  => 'Active',          # device is active
+	 64  => 'Bootable',        # device is bootable
+	 128 => 'Write-protected', # device is write-protected
+	 256 => 'Standby',         # device is in standby mode
+	);
+
+    my $c = 0;
+  SDCARD:
+    foreach my $out (@output) {
+	if ($snmp) {
+	    $index    = $out->{sdCardDeviceIndex} - 1;
+	    $status   = $snmp_status{$out->{sdCardDeviceStatus}};
+
+	    if (exists $out->{sdCardDeviceCardState}) {
+		my @states  = ();  # contains states SD card
+
+		# get the combined state from the Device Status OID
+		foreach my $mask (sort keys %sd_state) {
+		    if (($out->{sdCardDeviceCardState} & $mask) != 0) {
+			push @states, $sd_state{$mask};
+		    }
+		}
+
+		# Finally, create the state string
+		$state = join q{, }, @states;
+
+		# special case: absent
+		if ($out->{sdCardDeviceCardState} % 2 == 0) {
+		    $state = 'Absent';
+		}
+	    }
+
+	    $location = $out->{sdCardDeviceLocationName};
+	    $capacity = sprintf '%s MB', $out->{sdCardDeviceCardStorageSize};
+	}
+	else {
+	    $index    = $c++;
+	    $status   = defined $out->{'Status'} ? $out->{'Status'} : 'Ok';
+	    $state    = $out->{'State'};
+	    $location = $out->{'Connector Name'};
+	    $capacity = $out->{'Storage Size'} ne '[Not Available]'
+	      ? $out->{'Storage Size'} : 'Unknown Size';
+	}
+
+	next SDCARD if blacklisted('sd', $index);
+	$count{intr}++;
+
+	if ($status ne 'Ok') {
+	    my $msg = sprintf 'SD Card %d needs attention: %s',
+	      $index, $state;
+	    report('chassis', $msg, $E_WARNING, $index);
+	}
+	# Special case: Not Present
+	elsif ($status eq 'Ok' and $state eq 'Absent') {
+	    my $msg = sprintf 'SD Card %d [%s] is %s',
+	      $index, $location, $state;
+	    report('chassis', $msg, $E_OK, $index);
+	}
+	# Ok
+	else {
+	    my $msg = sprintf 'SD Card %d [%s, %s] is %s',
+	      $index, $location, $capacity, $state;
+	    report('chassis', $msg, $E_OK, $index);
+	}
+    }
+    return;
+}
+
+
+#-----------------------------------------
 # CHASSIS: Check alert log
 #-----------------------------------------
 sub check_alertlog {
@@ -4397,6 +4519,7 @@ if ($check{voltage})     { check_volts();         }
 if ($check{batteries})   { check_batteries();     }
 if ($check{amperage})    { check_pwrmonitoring(); }
 if ($check{intrusion})   { check_intrusion();     }
+if ($check{sdcard})      { check_sdcard();        }
 if ($check{alertlog})    { check_alertlog();      }
 if ($check{esmlog})      { check_esmlog();        }
 if ($check{esmhealth})   { check_esmlog_health(); }
@@ -4545,6 +4668,7 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
 	  'alertlog'    => $snmp ? 'OK - not supported via snmp' : "OK - Alert Log content: $count{alert}{Ok} ok, $count{alert}{'Non-Critical'} warning and $count{alert}{Critical} critical",
 	  'esmlog'      => "OK - ESM Log content: $count{esm}{Ok} ok, $count{esm}{'Non-Critical'} warning and $count{esm}{Critical} critical",
 	  'esmhealth'   => "ESM LOG OK - less than 80% used",
+          'sdcard'      => "SD CARD OK",
 	);
 
     print $okmsg{$opt{only}};
