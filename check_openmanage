@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.1-beta6';
+$VERSION = '3.6.1-beta7';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3756,7 +3756,7 @@ sub check_pwrmonitoring {
 	# disabled due to non-redundant and/or non-instrumented power
 	# supplies.
         # E.g. R410 with newer BMC firmware and 1 power supply
-	if ($opt{snmp} && $status eq 'Unknown' && $reading eq '[N/A]') {
+	if ($snmp && $status eq 'Unknown' && $reading eq '[N/A]') {
 	    next AMP;
 	}
 
