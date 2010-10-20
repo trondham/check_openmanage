@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.1-beta4';
+$VERSION = '3.6.1-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -286,6 +286,7 @@ if (!$snmp && -f $FW_LOCK) {
      'cpu'    => 0, # number of CPUs
      'bat'    => 0, # number of batteries
      'power'  => 0, # number of power supplies
+     'sd'     => 0, # number of SD cards
      'esm'    => {
 		  'Critical'     => 0, # critical entries in ESM log
 		  'Non-Critical' => 0, # warning entries in ESM log
@@ -3999,7 +4000,7 @@ sub check_sdcard {
 	}
 
 	next SDCARD if blacklisted('sd', $index);
-	$count{intr}++;
+	$count{sd}++ if $state ne 'Absent';
 
 	if ($status ne 'Ok') {
 	    my $msg = sprintf 'SD Card %d needs attention: %s',
@@ -4668,7 +4669,7 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
 	  'alertlog'    => $snmp ? 'OK - not supported via snmp' : "OK - Alert Log content: $count{alert}{Ok} ok, $count{alert}{'Non-Critical'} warning and $count{alert}{Critical} critical",
 	  'esmlog'      => "OK - ESM Log content: $count{esm}{Ok} ok, $count{esm}{'Non-Critical'} warning and $count{esm}{Critical} critical",
 	  'esmhealth'   => "ESM LOG OK - less than 80% used",
-          'sdcard'      => "SD CARD OK",
+          'sdcard'      => "SD CARDS OK - $count{sd} SD cards installed",
 	);
 
     print $okmsg{$opt{only}};
