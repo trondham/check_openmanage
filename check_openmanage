@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.1-beta5';
+$VERSION = '3.6.1-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3750,13 +3750,25 @@ sub check_pwrmonitoring {
 
 	next AMP if blacklisted('amp', $index);
 	next AMP if $index !~ m{\A \d+ \z}xms;
+
+	# Special case: Probe is present but unknown. This happens via
+	# SNMP on some systems where power monitoring capability is
+	# disabled due to non-redundant and/or non-instrumented power
+	# supplies.
+        # E.g. R410 with newer BMC firmware and 1 power supply
+	if ($opt{snmp} && $status eq 'Unknown' && $reading eq '[N/A]') {
+	    next AMP;
+	}
+
 	$count{amp}++;
 
+	# Special case: Discrete reading
 	if (defined $type and $type eq 'amperageProbeTypeIsDiscrete') {
 	    my $msg = sprintf 'Amperage probe %d [%s] is %s',
 	      $index, $location, $reading;
 	    report('chassis', $msg, $status2nagios{$status}, $index);
 	}
+	# Default
 	else {
 	    my $msg = sprintf 'Amperage probe %d [%s] reads %s %s',
 	      $index, $location, $reading, $unit;
@@ -3766,7 +3778,6 @@ sub check_pwrmonitoring {
 	# Collect performance data
 	if (defined $opt{perfdata}) {
 	    next AMP if $reading !~ m{\A \d+(\.\d+)? \z}xms; # discrete reading (not number)
-	    #next AMP if $type eq 'amperageProbeTypeIsDiscrete';
 	    my $label = join q{_}, 'pwr_mon', $index, lc $location;
 	    $label =~ s{\s}{_}gxms;
 	    push @perfdata, {
