@@ -492,6 +492,10 @@ Amperage probe (power consumption monitoring)
 
 Intrusion sensor
 
+=item B<sd>
+
+SD card
+
 =back
 
 =back
@@ -564,6 +568,10 @@ Only check power usage
 =item B<intrusion>
 
 Only check chassis intrusion
+
+=item B<sdcard>
+
+Only check SD cards
 
 =item B<esmhealth>
 
@@ -640,6 +648,10 @@ Check amperage probes. Default: ON
 =item B<intrusion>
 
 Check chassis intrusion. Default: ON
+
+=item B<sdcard>
+
+Check SD cards. Default: ON
 
 =item B<esmhealth>
 
