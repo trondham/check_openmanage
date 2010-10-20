@@ -835,6 +835,7 @@ sub run_omreport {
           | No\sbattery\sprobes\sfound\son\sthis\ssystem               # No battery probes
           | Invalid\scommand:\spwrmonitoring                           # Old hardware
           | Hardware\sor\sfeature\snot\spresent\.                      # SD cards
+          | Invalid command:\sremovableflashmedia                      # SD cards with old OMSA
 #          | Current\sprobes\snot\sfound                                # OMSA + RHEL5.4 bug
 #          | No\scontrollers\sfound                                     # No RAID controller
         }xms;
