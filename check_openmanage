@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.1-beta7';
+$VERSION = '3.6.1-beta8';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1479,6 +1479,11 @@ sub check_physical_disks {
 
         $vendor  =~ s{\s+\z}{}xms; # remove trailing whitespace
         $product =~ s{\s+\z}{}xms; # remove trailing whitespace
+
+	# If the disk is bad, the vendor field may be empty
+	if ($vendor eq q{}) {
+	    $vendor = 'Unknown Vendor';
+	}
 
 	# Hot spare stuff
 	if ($spare eq 'Global') { $spare = 'Global HS'; }
