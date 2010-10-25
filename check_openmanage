@@ -1479,7 +1479,6 @@ sub check_physical_disks {
 
         $vendor  =~ s{\s+\z}{}xms; # remove trailing whitespace
         $product =~ s{\s+\z}{}xms; # remove trailing whitespace
-        $state   =~ s{\s+\z}{}xms; # remove trailing whitespace
 
 	# If the disk is bad, the vendor and state fields may be empty
 	if ($vendor eq q{}) { $vendor = 'Unknown Vendor'; }
