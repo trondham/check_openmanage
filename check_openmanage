@@ -1483,7 +1483,7 @@ sub check_physical_disks {
 
 	# If the disk is bad, the vendor and state fields may be empty
 	if ($vendor eq q{}) { $vendor = 'Unknown Vendor'; }
-	if ($state eq q{}) { $state = 'Unknown'; }
+	if ($state eq q{}) { $state = 'Unknown State'; }
 
 	# Hot spare stuff
 	if ($spare eq 'Global') { $spare = 'Global HS'; }
