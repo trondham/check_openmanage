@@ -1,3 +1,20 @@
+3.6.1   2010-10-02
+------------------
+
+* Included new check for SD cards. Newer servers such as the R710 can
+  have SD cards installed, these should be monitored. The SD card
+  check is on by default. A new blacklisting keyword 'sd' has been
+  added. The SD card check can be turned off with '--check sdcard=0'.
+* Handle special cases where power monitoring capability is disabled
+  due to non-redundant and/or non-instrumented power supplies.
+* For physical disks probed via SNMP, check that values for vendor,
+  product ID and capacity is available before attempting to display
+  those values.
+* If a physical disk is in sufficiently bad condition, the vendor
+  field reported by OMSA may be empty. The plugin now handles this
+  situation without throwing an internal error.
+
+
 3.6.0   2010-08-30
 ------------------
 
