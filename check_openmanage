@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.2-beta1';
+$VERSION = '3.6.2-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -88,6 +88,8 @@ SNMP OPTIONS:
    -C, --community     SNMP community string [public]
    -P, --protocol      SNMP protocol version [2]
    --port              SNMP port number [161]
+   -6, --ipv6          Use IPv6 instead of IPv4 [no]
+   --tcp               Use TCP instead of UDP [no]
 
 OUTPUT OPTIONS:
 
@@ -148,6 +150,7 @@ END_LICENSE
 	 'community'         => 'public', # SMNP v1 or v2c
 	 'protocol'          => 2,        # default SNMP protocol 2c
 	 'ipv6'              => 0,        # default is IPv4
+	 'tcp'               => 0,        # default is UDP
 	 'username'          => undef,    # SMNP v3
 	 'authpassword'      => undef,    # SMNP v3
 	 'authkey'           => undef,    # SMNP v3
@@ -185,6 +188,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'C|community=s'      => \$opt{community},
 	   'P|protocol=i'       => \$opt{protocol},
 	   '6|ipv6'             => \$opt{ipv6},
+	   'tcp'                => \$opt{tcp},
 	   'U|username=s'       => \$opt{username},
 	   'authpassword=s'     => \$opt{authpassword},
 	   'authkey=s'          => \$opt{authkey},
@@ -490,10 +494,10 @@ sub snmp_initialize {
 	 '-version'  => $opt{protocol},
 	);
 
-    # IPv6
-    if ($opt{ipv6}) {
-	$param{'-domain'} = 'udp/ipv6';
-    }
+    # Setting the domain (IP version and transport protocol)
+    my $transport = $opt{tcp} ? 'tcp' : 'udp';
+    my $ipversion = $opt{ipv6} ? 'ipv6' : 'ipv4';
+    $param{'-domain'} = "$transport/$ipversion";
 
     # Parameters for SNMP v3
     if ($opt{protocol} == 3) {
@@ -4576,8 +4580,15 @@ if ($snmp) {
 
 # Print messages
 if ($opt{debug}) {
-    my $mode = !$snmp ? "local"
-      : $opt{ipv6} ? "SNMPv$opt{protocol} UDP/IPv6" : "SNMPv$opt{protocol} UDP/IPv4";
+    # finding the mode of operation
+    my $mode = 'local';
+    if ($snmp) {
+	# Setting the domain (IP version and transport protocol)
+	my $transport = $opt{tcp} ? 'TCP' : 'UDP';
+	my $ipversion = $opt{ipv6} ? 'IPv6' : 'IPv4';
+	$mode = "SNMPv$opt{protocol} $transport/$ipversion";
+    }
+
     print "   System:      $sysinfo{model}$sysinfo{rev}";
     print q{ } x (25 - length "$sysinfo{model}$sysinfo{rev}"), "OMSA version:    $sysinfo{om}\n";
     print "   ServiceTag:  $sysinfo{serial}";
