@@ -4583,7 +4583,7 @@ if ($opt{debug}) {
     print "   ServiceTag:  $sysinfo{serial}";
     print q{ } x (25 - length $sysinfo{serial}), "Plugin version:  $VERSION\n";
     print "   BIOS/date:   $sysinfo{bios} $sysinfo{biosdate}";
-    print q{ } x (25 - length "$sysinfo{bios} $sysinfo{biosdate}"), "Plugin mode:     $mode\n";
+    print q{ } x (25 - length "$sysinfo{bios} $sysinfo{biosdate}"), "Operation mode:  $mode\n";
     if ($#report_storage >= 0) {
 	print "-----------------------------------------------------------------------------\n";
 	print "   Storage Components                                                        \n";
