@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.1';
+$VERSION = '3.6.2-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -147,6 +147,7 @@ END_LICENSE
 	 'hostname'          => undef,    # hostname or IP
 	 'community'         => 'public', # SMNP v1 or v2c
 	 'protocol'          => 2,        # default SNMP protocol 2c
+	 'ipv6'              => 0,        # default is IPv4
 	 'username'          => undef,    # SMNP v3
 	 'authpassword'      => undef,    # SMNP v3
 	 'authkey'           => undef,    # SMNP v3
@@ -183,6 +184,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'H|hostname=s'       => \$opt{hostname},
 	   'C|community=s'      => \$opt{community},
 	   'P|protocol=i'       => \$opt{protocol},
+	   '6|ipv6'             => \$opt{ipv6},
 	   'U|username=s'       => \$opt{username},
 	   'authpassword=s'     => \$opt{authpassword},
 	   'authkey=s'          => \$opt{authkey},
@@ -487,6 +489,11 @@ sub snmp_initialize {
 	 '-hostname' => $opt{hostname},
 	 '-version'  => $opt{protocol},
 	);
+
+    # IPv6
+    if ($opt{ipv6}) {
+	$param{'-domain'} = 'udp/ipv6';
+    }
 
     # Parameters for SNMP v3
     if ($opt{protocol} == 3) {
@@ -4569,11 +4576,14 @@ if ($snmp) {
 
 # Print messages
 if ($opt{debug}) {
-    print "   System:      $sysinfo{model}$sysinfo{rev}\n";
+    my $mode = !$snmp ? "local"
+      : $opt{ipv6} ? "SNMPv$opt{protocol} UDP/IPv6" : "SNMPv$opt{protocol} UDP/IPv4";
+    print "   System:      $sysinfo{model}$sysinfo{rev}";
+    print q{ } x (25 - length "$sysinfo{model}$sysinfo{rev}"), "OMSA version:    $sysinfo{om}\n";
     print "   ServiceTag:  $sysinfo{serial}";
-    print q{ } x (25 - length $sysinfo{serial}), "OMSA version:    $sysinfo{om}\n";
+    print q{ } x (25 - length $sysinfo{serial}), "Plugin version:  $VERSION\n";
     print "   BIOS/date:   $sysinfo{bios} $sysinfo{biosdate}";
-    print q{ } x (25 - length "$sysinfo{bios} $sysinfo{biosdate}"), "Plugin version:  $VERSION\n";
+    print q{ } x (25 - length "$sysinfo{bios} $sysinfo{biosdate}"), "Plugin mode:     $mode\n";
     if ($#report_storage >= 0) {
 	print "-----------------------------------------------------------------------------\n";
 	print "   Storage Components                                                        \n";
