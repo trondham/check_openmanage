@@ -279,6 +279,16 @@ is set to C<public> if the option is not present.
 SNMP port of the remote (monitored) system. Defaults to the well-known
 SNMP port 161.
 
+=item -6, --ipv6
+
+This option will cause the plugin to use IPv6 instead of IPv4, which
+is the default.
+
+=item --tcp
+
+This option will cause the plugin to change the transport protocol
+from UDP (default) to TCP.
+
 =item -U, --username I<SECURITYNAME>
 
 [SNMPv3] The User-based Security Model (USM) used by SNMPv3 requires
