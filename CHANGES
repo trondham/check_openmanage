@@ -7,6 +7,9 @@
 * Added support for TCP when checking vis SNMP. The option '--tcp' can
   be used to turn on TCP. The default transport protocol is UDP if the
   option is not present.
+* The mode of operation (local or SNMP) is shown in the debug
+  output. If SNMP is used, the debug output will also show the SNMP
+  protocol version, IP version and transport protocol (UDP or TCP).
 
 
 3.6.1   2010-11-02
