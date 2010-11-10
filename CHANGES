@@ -1,3 +1,14 @@
+3.6.2
+------------------
+
+* Added support for IPv6 when checking via SNMP. IPv6 can be turned on
+  with the option '-6' or '--ipv6'. The default is IPv4 if the option
+  is not present.
+* Added support for TCP when checking vis SNMP. The option '--tcp' can
+  be used to turn on TCP. The default transport protocol is UDP if the
+  option is not present.
+
+
 3.6.1   2010-11-02
 ------------------
 
