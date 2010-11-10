@@ -281,13 +281,13 @@ SNMP port 161.
 
 =item -6, --ipv6
 
-This option will cause the plugin to use IPv6 instead of IPv4, which
-is the default.
+This option will cause the plugin to use IPv6. The default is IPv4 if
+the option is not present.
 
 =item --tcp
 
-This option will cause the plugin to change the transport protocol
-from UDP (default) to TCP.
+This option will cause the plugin to use TCP as transport
+protocol. The default is UDP if the option is not present.
 
 =item -U, --username I<SECURITYNAME>
 
