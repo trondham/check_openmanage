@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.2-beta2';
+$VERSION = '3.6.2-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1094,6 +1094,11 @@ sub get_hashval {
     return exists $hash->{$key} ? $hash->{$key} : "Undefined value $key";
 }
 
+# Find component status from hash
+sub get_snmp_status {
+    my $key  = shift || return 'Unknown';
+    return exists $snmp_status{$key} ? $snmp_status{$key} : 'Unknown';
+}
 
 
 #---------------------------------------------------------------------
@@ -1116,7 +1121,7 @@ sub check_global {
 	    printf "SNMP ERROR [global]: %s\n", $snmp_error;
 	    exit $E_UNKNOWN;
 	}
-	$health = $status2nagios{$snmp_status{$result->{$systemStateGlobalSystemStatus}}};
+	$health = $status2nagios{get_snmp_status($result->{$systemStateGlobalSystemStatus})};
     }
     else {
 	#
@@ -1203,7 +1208,7 @@ sub check_controllers {
 	if ($snmp) {
 	    $name     = $out->{controllerName};
 	    $state    = get_hashval($out->{controllerState}, \%ctrl_state);
-	    $status   = $snmp_status{$out->{controllerComponentStatus}};
+	    $status   = get_snmp_status($out->{controllerComponentStatus});
 	    $minfw    = exists $out->{controllerMinFWVersion}
 	      ? $out->{controllerMinFWVersion} : undef;
 	    $mindr    = exists $out->{controllerMinDriverVersion}
@@ -1433,7 +1438,7 @@ sub check_physical_disks {
 	if ($snmp) {
 	    $name   = $out->{arrayDiskName};
 	    $state    = get_hashval($out->{arrayDiskState}, \%pdisk_state);
-	    $status   = $snmp_status{$out->{arrayDiskComponentStatus}};
+	    $status   = get_snmp_status($out->{arrayDiskComponentStatus});
 	    $fpred    = exists $out->{arrayDiskSmartAlertIndication}
 	      && $out->{arrayDiskSmartAlertIndication} == 2 ? 1 : 0;
 	    $progr    = q{};
@@ -1647,7 +1652,7 @@ sub check_virtual_disks {
 	    $dev    = $out->{virtualDiskDeviceName};
 	    $state  = get_hashval($out->{virtualDiskState}, \%vdisk_state);
 	    $layout = get_hashval($out->{virtualDiskLayout}, \%vdisk_layout);
-	    $status = $snmp_status{$out->{virtualDiskComponentStatus}};
+	    $status = get_snmp_status($out->{virtualDiskComponentStatus});
 	    $size   = sprintf '%.2f GB', $out->{virtualDiskLengthInMB} / 1024;
 	    $progr  = q{};  # can't get this from SNMP(?)
 	    $nexus  = convert_nexus($out->{virtualDiskNexusID});
@@ -1784,7 +1789,7 @@ sub check_cache_battery {
   BATTERY:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $status = $snmp_status{$out->{batteryComponentStatus}};
+	    $status = get_snmp_status($out->{batteryComponentStatus});
 	    $state  = get_hashval($out->{batteryState}, \%bat_state);
 	    $learn  = get_hashval($out->{batteryLearnState}, \%bat_learn_state);
 	    $pred   = get_hashval($out->{batteryPredictedCapacity}, \%bat_pred_cap);
@@ -1938,7 +1943,7 @@ sub check_connectors {
     foreach my $out (@output) {
         if ($snmp) {
             $name   = $out->{channelName};
-            $status = $snmp_status{$out->{channelComponentStatus}};
+            $status = get_snmp_status($out->{channelComponentStatus});
             $state  = get_hashval($out->{channelState}, \%conn_state);
             $type   = get_hashval($out->{channelBusType}, \%conn_bustype);
 	    $nexus  = convert_nexus($out->{channelNexusID});
@@ -2033,7 +2038,7 @@ sub check_enclosures {
             $id       = $out->{enclosureNumber} - 1;
             $name     = $out->{enclosureName};
             $state    = get_hashval($out->{enclosureState}, \%encl_state);
-            $status   = $snmp_status{$out->{enclosureComponentStatus}};
+            $status   = get_snmp_status($out->{enclosureComponentStatus});
 	    $firmware = exists $out->{enclosureFirmwareVersion}
 	      ? $out->{enclosureFirmwareVersion} : 'N/A';
 	    $nexus    = convert_nexus($out->{enclosureNexusID});
@@ -2051,7 +2056,8 @@ sub check_enclosures {
             $id       = $out->{ID};
             $name     = $out->{Name};
             $state    = $out->{State};
-            $status   = $out->{Status};
+            $status   = defined $out->{Status} && $out->{Status} ne q{}
+	      ? $out->{Status} : 'Unknown';
 	    $firmware = $out->{'Firmware Version'} ne 'Not Applicable'
 	      ? $out->{'Firmware Version'} : 'N/A';
 	    $nexus    = join q{:}, $out->{ctrl}, $id;
@@ -2169,7 +2175,7 @@ sub check_enclosure_fans {
 	if ($snmp) {
 	    $name      = $out->{fanName};
 	    $state     = get_hashval($out->{fanState}, \%fan_state);
-	    $status    = $snmp_status{$out->{fanComponentStatus}};
+	    $status    = get_snmp_status($out->{fanComponentStatus});
 	    $speed     = $out->{fanProbeCurrValue};
 	    $encl_name = $out->{fanConnectionEnclosureName};
 	    $encl_id   = $snmp_enclosure{$out->{fanConnectionEnclosureNumber}}{nexus};
@@ -2276,7 +2282,7 @@ sub check_enclosure_pwr {
 	if ($snmp) {
 	    $name      = $out->{powerSupplyName};
 	    $state     = get_hashval($out->{powerSupplyState}, \%ps_state);
-	    $status    = $snmp_status{$out->{powerSupplyComponentStatus}};
+	    $status    = get_snmp_status($out->{powerSupplyComponentStatus});
 	    $encl_id   = $snmp_enclosure{$out->{powerSupplyConnectionEnclosureNumber}}{nexus};
 	    $encl_name = $out->{powerSupplyConnectionEnclosureName};
 	    $nexus     = convert_nexus($out->{powerSupplyNexusID});
@@ -2393,7 +2399,7 @@ sub check_enclosure_temp {
 	if ($snmp) {
 	    $name      = $out->{temperatureProbeName};
 	    $state     = get_hashval($out->{temperatureProbeState}, \%temp_state);
-	    $status    = $snmp_status{$out->{temperatureProbeComponentStatus}};
+	    $status    = get_snmp_status($out->{temperatureProbeComponentStatus});
 	    $unit      = $out->{temperatureProbeUnit};
 	    $reading   = exists $out->{temperatureProbeCurValue}
 	      ? $out->{temperatureProbeCurValue} : '[N/A]';
@@ -2596,7 +2602,7 @@ sub check_enclosure_emms {
 	if ($snmp) {
 	    $name      = $out->{enclosureManagementModuleName};
 	    $state     = get_hashval($out->{enclosureManagementModuleState}, \%emms_state);
-	    $status    = $snmp_status{$out->{enclosureManagementModuleComponentStatus}};
+	    $status    = get_snmp_status($out->{enclosureManagementModuleComponentStatus});
 	    $encl_id   = $snmp_enclosure{$out->{enclosureManagementModuleConnectionEnclosureNumber}}{nexus};
 	    $encl_name = $out->{enclosureManagementModuleConnectionEnclosureName};
 	    $nexus     = convert_nexus($out->{enclosureManagementModuleNexusID});
@@ -2695,7 +2701,7 @@ sub check_memory {
 	@failures = ();  # Initialize
 	if ($snmp) {
 	    $index    = $out->{memoryDeviceIndex};
-	    $status   = $snmp_status{$out->{memoryDeviceStatus}};
+	    $status   = get_snmp_status($out->{memoryDeviceStatus});
 	    $location = $out->{memoryDeviceLocationName};
 	    $size     = sprintf '%d MB', $out->{memoryDeviceSize}/1024;
 	    $modes    = $out->{memoryDeviceFailureModes};
@@ -2947,7 +2953,7 @@ sub check_powersupplies {
 	    @states = ();  # contains states for the PS
 
 	    $index    = $out->{powerSupplyIndex} - 1;
-	    $status   = $snmp_status{$out->{powerSupplyStatus}};
+	    $status   = get_snmp_status($out->{powerSupplyStatus});
 	    $type     = get_hashval($out->{powerSupplyType}, \%ps_type);
 	    $err_type = defined $out->{powerSupplyConfigurationErrorType}
 	      ? $ps_config_error_type{$out->{powerSupplyConfigurationErrorType}} : undef;
@@ -3405,8 +3411,8 @@ sub check_processors {
 	      ? $out->{processorDeviceStatusIndex} - 1
 		: $out->{processorDeviceIndex} - 1;
 	    $status = exists $out->{processorDeviceStatusStatus}
-	      ? $snmp_status{$out->{processorDeviceStatusStatus}}
-		: $snmp_status{$out->{processorDeviceStatus}};
+	      ? get_snmp_status($out->{processorDeviceStatusStatus})
+		: get_snmp_status($out->{processorDeviceStatus});
 	    if (exists $out->{processorDeviceStatusReading}) {
 		my @states  = ();  # contains states for the CPU
 
@@ -3607,7 +3613,7 @@ sub check_batteries {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index    = $out->{batteryIndex} - 1;
-	    $status   = $snmp_status{$out->{batteryStatus}};
+	    $status   = get_snmp_status($out->{batteryStatus});
 	    $reading  = get_hashval($out->{batteryReading}, \%bat_reading);
 	    $location = $out->{batteryLocationName};
 	}
@@ -3718,7 +3724,7 @@ sub check_pwrmonitoring {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index    = $out->{amperageProbeIndex} - 1;
-	    $status   = $snmp_status{$out->{amperageProbeStatus}};
+	    $status   = get_snmp_status($out->{amperageProbeStatus});
 	    $type     = get_hashval($out->{amperageProbeType}, \%amp_type);
 	    $reading  = $type eq 'amperageProbeTypeIsDiscrete'
 	      ? get_hashval($out->{amperageProbeDiscreteReading}, \%amp_discrete)
@@ -3901,7 +3907,7 @@ sub check_intrusion {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index    = $out->{intrusionIndex} - 1;
-	    $status   = $snmp_status{$out->{intrusionStatus}};
+	    $status   = get_snmp_status($out->{intrusionStatus});
 	    $reading  = get_hashval($out->{intrusionReading}, \%int_reading);
 	}
 	else {
@@ -3992,7 +3998,7 @@ sub check_sdcard {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index    = $out->{sdCardDeviceIndex} - 1;
-	    $status   = $snmp_status{$out->{sdCardDeviceStatus}};
+	    $status   = get_snmp_status($out->{sdCardDeviceStatus});
 
 	    if (exists $out->{sdCardDeviceCardState}) {
 		my @states  = ();  # contains states SD card
@@ -4087,7 +4093,7 @@ sub check_esmlog_health {
 	      $snmp_session->error;
 	    report('other', $msg, $E_UNKNOWN);
 	}
-	$health = $snmp_status{$result->{$systemStateEventLogStatus}};
+	$health = get_snmp_status($result->{$systemStateEventLogStatus});
     }
     else {
 	foreach (@{ run_command("$omreport $omopt_system esmlog -fmt ssv") }) {
