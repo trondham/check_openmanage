@@ -1102,7 +1102,7 @@ sub get_snmp_status {
 
 # Check that a hash entry is defined and not an empty string. Return a
 # chosen string (parameter) if these conditions are not met
-sub get_hash_string {
+sub get_nonempty_string {
     my $key  = shift;  # key to check
     my $hash = shift;  # hash where the key belongs
     my $alt  = shift;  # alternate return value
@@ -1239,7 +1239,7 @@ sub check_controllers {
 	    $nexus    = $out->{ID};
 	    $name     = $out->{Name};
 	    $state    = $out->{State};
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $minfw    = $out->{'Minimum Required Firmware Version'} ne 'Not Applicable'
 	      ? $out->{'Minimum Required Firmware Version'} : undef;
 	    $mindr    = $out->{'Minimum Required Driver Version'} ne 'Not Applicable'
@@ -1485,7 +1485,7 @@ sub check_physical_disks {
 	else {
 	    $name     = $out->{'Name'};
 	    $state    = $out->{'State'};
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $fpred    = lc($out->{'Failure Predicted'}) eq 'yes' ? 1 : 0;
 	    $progr    = ' [' . $out->{'Progress'} . ']';
 	    $ctrl     = $out->{'ctrl'};
@@ -1672,7 +1672,7 @@ sub check_virtual_disks {
 	else {
 	    $dev    = $out->{'Device Name'};
 	    $state  = $out->{State};
-	    $status = get_hash_string('Status', $out, 'Unknown');
+	    $status = get_nonempty_string('Status', $out, 'Unknown');
 	    $layout = $out->{Layout};
 	    $size   = $out->{Size};
 	    $progr  = ' [' . $out->{Progress} . ']';
@@ -1813,7 +1813,7 @@ sub check_cache_battery {
 	else {
 	    $id     = $out->{'ID'};
 	    $state  = $out->{'State'};
-	    $status = get_hash_string('Status', $out, 'Unknown');
+	    $status = get_nonempty_string('Status', $out, 'Unknown');
 	    $learn  = $out->{'Learn State'};
 	    $pred   = $out->{'Predicted Capacity Status'};
 	    $ctrl   = $out->{'ctrl'};
@@ -1967,7 +1967,7 @@ sub check_connectors {
         else {
             $name   = $out->{'Name'};
             $state  = $out->{'State'};
-	    $status = get_hash_string('Status', $out, 'Unknown');
+	    $status = get_nonempty_string('Status', $out, 'Unknown');
             $type   = $out->{'Connector Type'};
 	    $ctrl   = $out->{ctrl};
 	    $nexus  = join q{:}, $out->{ctrl}, $out->{'ID'};
@@ -2068,7 +2068,7 @@ sub check_enclosures {
             $id       = $out->{ID};
             $name     = $out->{Name};
             $state    = $out->{State};
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $firmware = $out->{'Firmware Version'} ne 'Not Applicable'
 	      ? $out->{'Firmware Version'} : 'N/A';
 	    $nexus    = join q{:}, $out->{ctrl}, $id;
@@ -2195,7 +2195,7 @@ sub check_enclosure_fans {
 	else {
 	    $name      = $out->{'Name'};
 	    $state     = $out->{'State'};
-	    $status    = get_hash_string('Status', $out, 'Unknown');
+	    $status    = get_nonempty_string('Status', $out, 'Unknown');
 	    $speed     = $out->{'Speed'};
 	    $encl_id   = join q{:}, $out->{ctrl}, $out->{'encl_id'};
 	    $encl_name = $out->{encl_name};
@@ -2301,7 +2301,7 @@ sub check_enclosure_pwr {
 	else {
 	    $name      = $out->{'Name'};
 	    $state     = $out->{'State'};
-	    $status    = get_hash_string('Status', $out, 'Unknown');
+	    $status    = get_nonempty_string('Status', $out, 'Unknown');
 	    $encl_id   = join q{:}, $out->{ctrl}, $out->{'encl_id'};
 	    $encl_name = $out->{encl_name};
 	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $out->{'ID'};
@@ -2429,7 +2429,7 @@ sub check_enclosure_temp {
 	else {
 	    $name      = $out->{'Name'};
 	    $state     = $out->{'State'};
-	    $status    = get_hash_string('Status', $out, 'Unknown');
+	    $status    = get_nonempty_string('Status', $out, 'Unknown');
 	    $unit      = 'FIXME';
 	    $reading   = $out->{'Reading'};
 	    $max_warn  = $out->{'Maximum Warning Threshold'};
@@ -2621,7 +2621,7 @@ sub check_enclosure_emms {
 	else {
 	    $name      = $out->{'Name'};
 	    $state     = $out->{'State'};
-	    $status    = get_hash_string('Status', $out, 'Unknown');
+	    $status    = get_nonempty_string('Status', $out, 'Unknown');
 	    $encl_id   = join q{:}, $out->{ctrl}, $out->{'encl_id'};
 	    $encl_name = $out->{encl_name};
 	    $nexus     = join q{:}, $out->{ctrl}, $out->{'encl_id'}, $out->{'ID'};
@@ -2724,7 +2724,7 @@ sub check_memory {
 	}
 	else {
 	    $index    = $out->{'Type'} eq '[Not Occupied]' ? undef : $out->{'Index'};
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $location = $out->{'Connector Name'};
 	    $size     = $out->{'Size'};
 	    if (defined $size) {
@@ -2839,7 +2839,7 @@ sub check_fans {
 	}
 	else {
 	    $index    = $out->{'Index'};
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $reading  = $out->{'Reading'};
 	    $location = $out->{'Probe Name'};
 	    $max_crit = $out->{'Maximum Failure Threshold'} ne '[N/A]'
@@ -2986,7 +2986,7 @@ sub check_powersupplies {
 	}
 	else {
 	    $index  = $out->{'Index'};
-	    $status = get_hash_string('Status', $out, 'Unknown');
+	    $status = get_nonempty_string('Status', $out, 'Unknown');
 	    $type   = $out->{'Type'};
 	    $state  = $out->{'Online Status'};
 	}
@@ -3098,7 +3098,7 @@ sub check_temperatures {
 	}
 	else {
 	    $index    = $out->{'Index'};
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $reading  = $out->{'Reading'}; $reading =~ s{\.0\s+C}{}xms;
 	    $location = $out->{'Probe Name'};
 	    $max_crit = $out->{'Maximum Failure Threshold'}; $max_crit =~ s{\.0\s+C}{}xms;
@@ -3449,7 +3449,7 @@ sub check_processors {
 	}
 	else {
 	    $index  = $out->{'Index'};
-	    $status = get_hash_string('Status', $out, 'Unknown');
+	    $status = get_nonempty_string('Status', $out, 'Unknown');
 	    $state  = $out->{'State'};
 	    $brand  = exists $out->{'Processor Brand'} ? $out->{'Processor Brand'} : undef;
 	    $family = exists $out->{'Processor Family'} ? $out->{'Processor Family'} : undef;
@@ -3558,7 +3558,7 @@ sub check_volts {
 	}
 	else {
 	    $index    = $out->{'Index'};
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $reading  = $out->{'Reading'};
 	    $location = $out->{'Probe Name'};
 	}
@@ -3630,7 +3630,7 @@ sub check_batteries {
 	}
 	else {
 	    $index    = $out->{'Index'};
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $reading  = $out->{'Reading'};
 	    $location = $out->{'Probe Name'};
 	}
@@ -3766,7 +3766,7 @@ sub check_pwrmonitoring {
 	else {
 	    $index    = $out->{'Index'};
 	    next AMP if (!defined $index || $index !~ m/^\d+$/x);
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $reading  = $out->{'Reading'};
 	    $location = $out->{'Probe Name'};
 	    $max_crit = $out->{'Failure Threshold'} ne '[N/A]'
@@ -3923,7 +3923,7 @@ sub check_intrusion {
 	}
 	else {
 	    $index    = $out->{'Index'};
-	    $status   = get_hash_string('Status', $out, 'Unknown');
+	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $reading  = $out->{'State'};
 	}
 
@@ -4035,7 +4035,7 @@ sub check_sdcard {
 	}
 	else {
 	    $index    = $c++;
-	    $status   = get_hash_string('Status', $out, 'Ok');
+	    $status   = get_nonempty_string('Status', $out, 'Ok');
 	    $state    = $out->{'State'};
 	    $location = $out->{'Connector Name'};
 	    $capacity = $out->{'Storage Size'} ne '[Not Available]'
