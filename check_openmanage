@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.2-beta5';
+$VERSION = '3.6.2-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1098,6 +1098,12 @@ sub get_hashval {
 sub get_snmp_status {
     my $key  = shift || return 'Unknown';
     return exists $snmp_status{$key} ? $snmp_status{$key} : 'Unknown';
+}
+
+# Find component status from hash
+sub get_snmp_probestatus {
+    my $key  = shift || return 'Unknown';
+    return exists $snmp_probestatus{$key} ? $snmp_probestatus{$key} : 'Unknown';
 }
 
 # Check that a hash entry is defined and not an empty string. Return a
@@ -2410,7 +2416,7 @@ sub check_enclosure_temp {
 	if ($snmp) {
 	    $name      = $out->{temperatureProbeName};
 	    $state     = get_hashval($out->{temperatureProbeState}, \%temp_state);
-	    $status    = get_snmp_status($out->{temperatureProbeComponentStatus});
+	    $status    = get_snmp_probestatus($out->{temperatureProbeComponentStatus});
 	    $unit      = $out->{temperatureProbeUnit};
 	    $reading   = exists $out->{temperatureProbeCurValue}
 	      ? $out->{temperatureProbeCurValue} : '[N/A]';
@@ -2829,7 +2835,7 @@ sub check_fans {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index    = $out->{coolingDeviceIndex};
-	    $status   = $snmp_probestatus{$out->{coolingDeviceStatus}};
+	    $status   = get_snmp_probestatus($out->{coolingDeviceStatus});
 	    $reading  = $out->{coolingDeviceReading};
 	    $location = $out->{coolingDeviceLocationName};
 	    $max_crit = exists $out->{coolingDeviceUpperCriticalThreshold}
@@ -3076,7 +3082,7 @@ sub check_temperatures {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index    = $out->{temperatureProbeIndex} - 1;
-	    $status   = $snmp_probestatus{$out->{temperatureProbeStatus}};
+	    $status   = get_snmp_probestatus($out->{temperatureProbeStatus});
 	    $location = $out->{temperatureProbeLocationName};
 	    $reading  = exists $out->{temperatureProbeReading}
 	      ? $out->{temperatureProbeReading} / 10 : '[N/A]';
@@ -3550,7 +3556,7 @@ sub check_volts {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index    = $out->{voltageProbeIndex} - 1;
-	    $status   = $snmp_probestatus{$out->{voltageProbeStatus}};
+	    $status   = get_snmp_probestatus($out->{voltageProbeStatus});
 	    $reading  = exists $out->{voltageProbeReading}
 	      ? sprintf('%.3f V', $out->{voltageProbeReading}/1000)
                 : get_hashval($out->{voltageProbeDiscreteReading}, \%volt_discrete_reading);
@@ -3735,7 +3741,7 @@ sub check_pwrmonitoring {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index    = $out->{amperageProbeIndex} - 1;
-	    $status   = get_snmp_status($out->{amperageProbeStatus});
+	    $status   = get_snmp_probestatus($out->{amperageProbeStatus});
 	    $type     = get_hashval($out->{amperageProbeType}, \%amp_type);
 	    $reading  = $type eq 'amperageProbeTypeIsDiscrete'
 	      ? get_hashval($out->{amperageProbeDiscreteReading}, \%amp_discrete)
