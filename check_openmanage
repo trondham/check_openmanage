@@ -1233,7 +1233,7 @@ sub check_controllers {
 	    $driver   = $out->{controllerDriverVersion} || 'N/A';
 	    $minstdr  = $out->{'controllerMinRequiredStorportVer'} || undef;
 	    $stdr     = $out->{controllerStorportDriverVersion} || undef;
-	    $nexus    = convert_nexus($out->{controllerNexusID});
+	    $nexus    = convert_nexus(($out->{controllerNexusID} || 9999));
 	}
 	else {
 	    $nexus    = get_nonempty_string('ID', $out, '9999');
