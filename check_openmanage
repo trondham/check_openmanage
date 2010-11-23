@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.2-beta4';
+$VERSION = '3.6.2-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -74,8 +74,8 @@ $HELP = <<'END_HELP';
 
 GENERAL OPTIONS:
 
-   -p, --perfdata      Output performance data [no]
-   -t, --timeout       Plugin timeout in seconds [30]
+   -p, --perfdata      Output performance data [default=no]
+   -t, --timeout       Plugin timeout in seconds [default=30]
    -c, --critical      Customise temperature critical limits
    -w, --warning       Customise temperature warning limits
    -d, --debug         Debug output, reports everything
@@ -85,11 +85,11 @@ GENERAL OPTIONS:
 SNMP OPTIONS:
 
    -H, --hostname      Hostname or IP (required for SNMP)
-   -C, --community     SNMP community string [public]
-   -P, --protocol      SNMP protocol version [2]
-   --port              SNMP port number [161]
-   -6, --ipv6          Use IPv6 instead of IPv4 [no]
-   --tcp               Use TCP instead of UDP [no]
+   -C, --community     SNMP community string [default=public]
+   -P, --protocol      SNMP protocol version [default=2]
+   --port              SNMP port number [default=161]
+   -6, --ipv6          Use IPv6 instead of IPv4 [default=no]
+   --tcp               Use TCP instead of UDP [default=no]
 
 OUTPUT OPTIONS:
 
