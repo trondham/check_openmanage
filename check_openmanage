@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.2-beta7';
+$VERSION = '3.6.2-beta8';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2701,22 +2701,26 @@ sub check_memory {
     foreach my $out (@output) {
 	@failures = ();  # Initialize
 	if ($snmp) {
-	    $index    = $out->{memoryDeviceIndex};
+	    $index    = ($out->{memoryDeviceIndex} || 10000) - 1;
 	    $status   = get_snmp_status($out->{memoryDeviceStatus});
-	    $location = $out->{memoryDeviceLocationName};
-	    $size     = sprintf '%d MB', $out->{memoryDeviceSize}/1024;
-	    $modes    = $out->{memoryDeviceFailureModes};
+	    $location = $out->{memoryDeviceLocationName} || 'Unknown location';
+	    $size     = sprintf '%d MB', ($out->{memoryDeviceSize} || 0)/1024;
+	    $modes    = $out->{memoryDeviceFailureModes} || -9999;
 	    if ($modes > 0) {
 		foreach my $mask (sort keys %failure_mode) {
 		    if (($modes & $mask) != 0) { push @failures, $failure_mode{$mask}; }
 		}
 	    }
+	    elsif ($modes == -9999) {
+		push @failures, q{ERROR: Failure modes not available via SNMP};
+	    }
 	}
 	else {
-	    $index    = $out->{'Type'} eq '[Not Occupied]' ? undef : $out->{'Index'};
+	    my $type  = get_nonempty_string('Type', $out, q{});
+	    $index    = $type eq '[Not Occupied]' ? undef : get_nonempty_string('Index', $out, 9999);
 	    $status   = get_nonempty_string('Status', $out, 'Unknown');
-	    $location = $out->{'Connector Name'};
-	    $size     = $out->{'Size'};
+	    $location = get_nonempty_string('Connector Name', $out, 'Unknown location');
+	    $size     = get_nonempty_string('Size', $out, 0);
 	    if (defined $size) {
 		$size =~ s{\s\s}{ }gxms;
 	    }
@@ -2818,24 +2822,22 @@ sub check_fans {
   FAN:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $index    = $out->{coolingDeviceIndex};
+	    $index    = ($out->{coolingDeviceIndex} || 10000) - 1;
 	    $status   = get_snmp_probestatus($out->{coolingDeviceStatus});
-	    $reading  = $out->{coolingDeviceReading};
-	    $location = $out->{coolingDeviceLocationName};
-	    $max_crit = exists $out->{coolingDeviceUpperCriticalThreshold}
-	      ? $out->{coolingDeviceUpperCriticalThreshold} : 0;
-	    $max_warn = exists $out->{coolingDeviceUpperNonCriticalThreshold}
-	      ? $out->{coolingDeviceUpperNonCriticalThreshold} : 0;
+	    $reading  = $out->{coolingDeviceReading} || 0;
+	    $location = $out->{coolingDeviceLocationName} || 'Unknown location';
+	    $max_crit = $out->{coolingDeviceUpperCriticalThreshold} || 0;
+	    $max_warn = $out->{coolingDeviceUpperNonCriticalThreshold} || 0;
 	}
 	else {
-	    $index    = $out->{'Index'};
+	    $index    = get_nonempty_string('Index', $out, 9999);
 	    $status   = get_nonempty_string('Status', $out, 'Unknown');
-	    $reading  = $out->{'Reading'};
-	    $location = $out->{'Probe Name'};
-	    $max_crit = $out->{'Maximum Failure Threshold'} ne '[N/A]'
-	      ? $out->{'Maximum Failure Threshold'} : 0;
-	    $max_warn = $out->{'Maximum Warning Threshold'} ne '[N/A]'
-	      ? $out->{'Maximum Warning Threshold'} : 0;
+	    $reading  = get_nonempty_string('Reading', $out, 0);
+	    $location = get_nonempty_string('Probe Name', $out, 'Unknown location');
+	    $max_crit = get_nonempty_string('Maximum Failure Threshold', $out, 0);
+	    $max_warn = get_nonempty_string('Maximum Warning Threshold', $out, 0);
+	    if ($max_crit eq '[N/A]') { $max_crit = 0; }
+	    if ($max_warn eq '[N/A]') { $max_warn = 0; }
 	    $reading  =~ s{\A (\d+).* \z}{$1}xms;
 	    $max_warn =~ s{\A (\d+).* \z}{$1}xms;
 	    $max_crit =~ s{\A (\d+).* \z}{$1}xms;
@@ -2953,15 +2955,16 @@ sub check_powersupplies {
 	if ($snmp) {
 	    @states = ();  # contains states for the PS
 
-	    $index    = $out->{powerSupplyIndex} - 1;
+	    $index    = ($out->{powerSupplyIndex} || 10000) - 1;
 	    $status   = get_snmp_status($out->{powerSupplyStatus});
 	    $type     = get_hashval($out->{powerSupplyType}, \%ps_type);
 	    $err_type = defined $out->{powerSupplyConfigurationErrorType}
-	      ? $ps_config_error_type{$out->{powerSupplyConfigurationErrorType}} : undef;
+	      ? get_hashval($out->{powerSupplyConfigurationErrorType}, \%ps_config_error_type) : undef;
 
 	    # get the combined state from the StatusReading OID
+	    my $raw_state = $out->{powerSupplySensorState} || 0;
 	    foreach my $mask (sort keys %ps_state) {
-		if (($out->{powerSupplySensorState} & $mask) != 0) {
+		if (($raw_state & $mask) != 0) {
 		    push @states, $ps_state{$mask};
 		}
 	    }
@@ -2975,10 +2978,10 @@ sub check_powersupplies {
 	    $state = join q{, }, @states;
 	}
 	else {
-	    $index  = $out->{'Index'};
+	    $index  = get_nonempty_string('Index', $out, 9999);
 	    $status = get_nonempty_string('Status', $out, 'Unknown');
-	    $type   = $out->{'Type'};
-	    $state  = $out->{'Online Status'};
+	    $type   = get_nonempty_string('Type', $out, 'Unknown type');
+	    $state  = get_nonempty_string('Online Status', $out, 'Unknown state');
 	}
 
 	next PS if blacklisted('ps', $index);
@@ -3065,36 +3068,46 @@ sub check_temperatures {
   TEMP:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $index    = $out->{temperatureProbeIndex} - 1;
+	    $index    = ($out->{temperatureProbeIndex} || 10000) - 1;
 	    $status   = get_snmp_probestatus($out->{temperatureProbeStatus});
-	    $location = $out->{temperatureProbeLocationName};
-	    $reading  = exists $out->{temperatureProbeReading}
-	      ? $out->{temperatureProbeReading} / 10 : '[N/A]';
-	    $max_crit = exists $out->{temperatureProbeUpperCriticalThreshold}
-	      ? $out->{temperatureProbeUpperCriticalThreshold} / 10 : '[N/A]';
-	    $max_warn = exists $out->{temperatureProbeUpperNonCriticalThreshold}
-	      ? $out->{temperatureProbeUpperNonCriticalThreshold} / 10 : '[N/A]';
-	    $min_crit = exists $out->{temperatureProbeLowerCriticalThreshold}
-	      ? $out->{temperatureProbeLowerCriticalThreshold} / 10 : '[N/A]';
-	    $min_warn = exists $out->{temperatureProbeLowerNonCriticalThreshold}
-	      ? $out->{temperatureProbeLowerNonCriticalThreshold} / 10 : '[N/A]';
+	    $location = $out->{temperatureProbeLocationName} || 'Unknown location';
 	    $type     = get_hashval($out->{temperatureProbeType}, \%probe_type);
-	    $discrete = exists $out->{temperatureProbeDiscreteReading}
-	      ? $out->{temperatureProbeDiscreteReading} : '[N/A]';
+	    $reading  = $out->{temperatureProbeReading} || '[N/A]';
+	    $max_crit = $out->{temperatureProbeUpperCriticalThreshold} || '[N/A]';
+	    $max_warn = $out->{temperatureProbeUpperNonCriticalThreshold} || '[N/A]';
+	    $min_crit = $out->{temperatureProbeLowerCriticalThreshold} || '[N/A]';
+	    $min_warn = $out->{temperatureProbeLowerNonCriticalThreshold} || '[N/A]';
+	    $discrete = $out->{temperatureProbeDiscreteReading} || '[N/A]';
+
+	    # If numeric values, i.e. not discrete
+	    $reading  /= 10 if $reading  =~ m{\A \d+ \z}xms;
+	    $max_crit /= 10 if $max_crit =~ m{\A \d+ \z}xms;
+	    $max_warn /= 10 if $max_warn =~ m{\A \d+ \z}xms;
+	    $min_crit /= 10 if $min_crit =~ m{\A \d+ \z}xms;
+	    $min_warn /= 10 if $min_warn =~ m{\A \d+ \z}xms;
+
 	    # workaround for bad temp probes
 	    if ($type eq 'AmbientESM' and $reading !~ m{\A \d+(\.\d+)? \z}xms) {
 		$type = 'Discrete';
 	    }
 	}
 	else {
-	    $index    = $out->{'Index'};
+	    $index    = get_nonempty_string('Index', $out, 9999);
 	    $status   = get_nonempty_string('Status', $out, 'Unknown');
-	    $reading  = $out->{'Reading'}; $reading =~ s{\.0\s+C}{}xms;
-	    $location = $out->{'Probe Name'};
-	    $max_crit = $out->{'Maximum Failure Threshold'}; $max_crit =~ s{\.0\s+C}{}xms;
-	    $max_warn = $out->{'Maximum Warning Threshold'}; $max_warn =~ s{\.0\s+C}{}xms;
-	    $min_crit = $out->{'Minimum Failure Threshold'}; $min_crit =~ s{\.0\s+C}{}xms;
-	    $min_warn = $out->{'Minimum Warning Threshold'}; $min_warn =~ s{\.0\s+C}{}xms;
+	    $location = get_nonempty_string('Probe Name', $out, 'Unknown location');
+	    $reading  = get_nonempty_string('Reading', $out, '[N/A]');
+	    $max_crit = get_nonempty_string('Maximum Failure Threshold', $out, '[N/A]');
+	    $max_warn = get_nonempty_string('Maximum Warning Threshold', $out, '[N/A]');
+	    $min_crit = get_nonempty_string('Minimum Failure Threshold', $out, '[N/A]');
+	    $min_warn = get_nonempty_string('Minimum Warning Threshold', $out, '[N/A]');
+
+	    # Cleaning the temp readings
+	    $reading =~ s{\.0\s+C}{}xms;
+	    $max_crit =~ s{\.0\s+C}{}xms;
+	    $max_warn =~ s{\.0\s+C}{}xms;
+	    $min_crit =~ s{\.0\s+C}{}xms;
+	    $min_warn =~ s{\.0\s+C}{}xms;
+
 	    $type     = $reading =~ m{\A\d+\z}xms ? 'AmbientESM' : 'Discrete';
 	    $discrete = $reading;
 	}
@@ -3409,12 +3422,12 @@ sub check_processors {
     foreach my $out (@output) {
 	if ($snmp) {
 	    $index  = exists $out->{processorDeviceStatusIndex}
-	      ? $out->{processorDeviceStatusIndex} - 1
-		: $out->{processorDeviceIndex} - 1;
+	      ? ($out->{processorDeviceStatusIndex} || 10000) - 1
+		: ($out->{processorDeviceIndex} || 10000) - 1;
 	    $status = exists $out->{processorDeviceStatusStatus}
 	      ? get_snmp_status($out->{processorDeviceStatusStatus})
 		: get_snmp_status($out->{processorDeviceStatus});
-	    if (exists $out->{processorDeviceStatusReading}) {
+	    if (defined $out->{processorDeviceStatusReading}) {
 		my @states  = ();  # contains states for the CPU
 
 		# get the combined state from the StatusReading OID
@@ -3430,21 +3443,21 @@ sub check_processors {
 	    else {
 		$state  = get_hashval($out->{processorDeviceStatusState}, \%cpu_state);
 	    }
-	    $man    = $out->{processorDeviceManufacturerName};
-	    $family = (exists $out->{processorDeviceFamily}
-		       and exists $cpu_family{$out->{processorDeviceFamily}})
+	    $man    = $out->{processorDeviceManufacturerName} || undef;
+	    $family = (defined $out->{processorDeviceFamily}
+		       and defined $cpu_family{$out->{processorDeviceFamily}})
 	      ? $cpu_family{$out->{processorDeviceFamily}} : undef;
-	    $speed  = $out->{processorDeviceCurrentSpeed};
-	    $brand  = $out->{processorDeviceBrandName};
+	    $speed  = $out->{processorDeviceCurrentSpeed} || undef;
+	    $brand  = $out->{processorDeviceBrandName} || undef;
 	}
 	else {
-	    $index  = $out->{'Index'};
+	    $index  = get_nonempty_string('Index', $out, 9999);
 	    $status = get_nonempty_string('Status', $out, 'Unknown');
-	    $state  = $out->{'State'};
-	    $brand  = exists $out->{'Processor Brand'} ? $out->{'Processor Brand'} : undef;
-	    $family = exists $out->{'Processor Family'} ? $out->{'Processor Family'} : undef;
-	    $man    = exists $out->{'Processor Manufacturer'} ? $out->{'Processor Manufacturer'} : undef;
-	    $speed  = exists $out->{'Current Speed'} ? $out->{'Current Speed'} : undef;
+	    $state  = get_nonempty_string('State', $out, 'Unknown state');
+	    $brand  = get_nonempty_string('Processor Brand', $out, undef);
+	    $family = get_nonempty_string('Processor Family',  $out, undef);
+	    $man    = get_nonempty_string('Processor Manufacturer', $out, undef);
+	    $speed  = get_nonempty_string('Current Speed', $out, undef);
 	}
 
 	next CPU if blacklisted('cpu', $index);
@@ -3455,7 +3468,7 @@ sub check_processors {
 	  or (defined $out->{'Processor Brand'} and $out->{'Processor Brand'} eq '[Not Occupied]');
 
 	# Ignore unoccupied CPU slots (snmp)
-	if ($snmp and exists $out->{processorDeviceStatusReading}
+	if ($snmp and defined $out->{processorDeviceStatusReading}
 	    and $out->{processorDeviceStatusReading} == 0) {
 	    next CPU;
 	}
@@ -3539,18 +3552,18 @@ sub check_volts {
   VOLT:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $index    = $out->{voltageProbeIndex} - 1;
+	    $index    = ($out->{voltageProbeIndex} || 10000) - 1;
 	    $status   = get_snmp_probestatus($out->{voltageProbeStatus});
-	    $reading  = exists $out->{voltageProbeReading}
+	    $reading  = defined $out->{voltageProbeReading}
 	      ? sprintf('%.3f V', $out->{voltageProbeReading}/1000)
                 : get_hashval($out->{voltageProbeDiscreteReading}, \%volt_discrete_reading);
-	    $location = $out->{voltageProbeLocationName};
+	    $location = $out->{voltageProbeLocationName} || 'Unknown location';
 	}
 	else {
-	    $index    = $out->{'Index'};
+	    $index    = get_nonempty_string('Index', $out, 9999);
 	    $status   = get_nonempty_string('Status', $out, 'Unknown');
-	    $reading  = $out->{'Reading'};
-	    $location = $out->{'Probe Name'};
+	    $reading  = get_nonempty_string('Reading', $out, 'Unknown reading');
+	    $location = get_nonempty_string('Probe Name', $out, 'Unknown location');
 	}
 
 	next VOLT if blacklisted('volt', $index);
@@ -3613,16 +3626,16 @@ sub check_batteries {
   BATTERY:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $index    = $out->{batteryIndex} - 1;
+	    $index    = ($out->{batteryIndex} || 10000) - 1;
 	    $status   = get_snmp_status($out->{batteryStatus});
 	    $reading  = get_hashval($out->{batteryReading}, \%bat_reading);
-	    $location = $out->{batteryLocationName};
+	    $location = $out->{batteryLocationName} || 'Unknown location';
 	}
 	else {
-	    $index    = $out->{'Index'};
+	    $index    = get_nonempty_string('Index', $out, 9999);
 	    $status   = get_nonempty_string('Status', $out, 'Unknown');
-	    $reading  = $out->{'Reading'};
-	    $location = $out->{'Probe Name'};
+	    $reading  = get_nonempty_string('Reading', $out, 'Unknown reading');
+	    $location = get_nonempty_string('Probe Name', $out, 'Unknown location');
 	}
 
 	next BATTERY if blacklisted('bp', $index);
@@ -3724,26 +3737,17 @@ sub check_pwrmonitoring {
   AMP:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $index    = $out->{amperageProbeIndex} - 1;
+	    $index    = ($out->{amperageProbeIndex} || 10000) - 1;
 	    $status   = get_snmp_probestatus($out->{amperageProbeStatus});
 	    $type     = get_hashval($out->{amperageProbeType}, \%amp_type);
 	    $reading  = $type eq 'amperageProbeTypeIsDiscrete'
 	      ? get_hashval($out->{amperageProbeDiscreteReading}, \%amp_discrete)
-		: $out->{amperageProbeReading};
-	    $location = $out->{amperageProbeLocationName};
-	    $max_crit = exists $out->{amperageProbeUpperCriticalThreshold}
-	      ? $out->{amperageProbeUpperCriticalThreshold} : 0;
-	    $max_warn = exists $out->{amperageProbeUpperNonCriticalThreshold}
-	      ? $out->{amperageProbeUpperNonCriticalThreshold} : 0;
+		: ($out->{amperageProbeReading} || 0);
+	    $location = $out->{amperageProbeLocationName} || 'Unknown location';
+	    $max_crit = $out->{amperageProbeUpperCriticalThreshold} || 0;
+	    $max_warn = $out->{amperageProbeUpperNonCriticalThreshold} || 0;
 	    $unit     = exists $amp_unit{$amp_type{$out->{amperageProbeType}}}
 	      ? $amp_unit{$amp_type{$out->{amperageProbeType}}} : 'mA';
-
-	    # workaround for broken probes
-	    if (!defined $reading) {
-		$type = 'amperageProbeTypeIsDiscrete';
-		$reading = '[N/A]';
-		$unit = q{};
-	    }
 
 	    # calculate proper values and set unit for ampere probes
 	    if ($unit eq 'hA' and $type ne 'amperageProbeTypeIsDiscrete') {
@@ -3754,17 +3758,18 @@ sub check_pwrmonitoring {
 	    }
 	}
 	else {
-	    $index    = $out->{'Index'};
-	    next AMP if (!defined $index || $index !~ m/^\d+$/x);
+	    $index    = get_nonempty_string('Index', $out, 9999);
 	    $status   = get_nonempty_string('Status', $out, 'Unknown');
-	    $reading  = $out->{'Reading'};
-	    $location = $out->{'Probe Name'};
-	    $max_crit = $out->{'Failure Threshold'} ne '[N/A]'
-	      ? $out->{'Failure Threshold'} : 0;
-	    $max_warn = $out->{'Warning Threshold'} ne '[N/A]'
-	      ? $out->{'Warning Threshold'} : 0;
+	    $reading  = get_nonempty_string('Reading', $out, 'Unknown reading');
+	    $location = get_nonempty_string('Probe Name', $out, 'Unknown location');
+	    $max_crit = get_nonempty_string('Failure Threshold', $out, 0);
+	    $max_warn = get_nonempty_string('Warning Threshold', $out, 0);
+
+	    $max_crit = 0 if $max_crit eq '[N/A]';
+	    $max_warn = 0 if $max_warn eq '[N/A]';
+
 	    $reading  =~ s{\A (\d+.*?)\s+([a-zA-Z]+) \s*\z}{$1}xms;
-	    $unit     = $2;
+	    $unit     = $2 || 'unknown';
 	    $max_warn =~ s{\A (\d+.*?)\s+[a-zA-Z]+ \s*\z}{$1}xms;
 	    $max_crit =~ s{\A (\d+.*?)\s+[a-zA-Z]+ \s*\z}{$1}xms;
 	}
@@ -3907,14 +3912,14 @@ sub check_intrusion {
   INTRUSION:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $index    = $out->{intrusionIndex} - 1;
+	    $index    = ($out->{intrusionIndex} || 10000) - 1;
 	    $status   = get_snmp_status($out->{intrusionStatus});
 	    $reading  = get_hashval($out->{intrusionReading}, \%int_reading);
 	}
 	else {
-	    $index    = $out->{'Index'};
+	    $index    = get_nonempty_string('Index', $out, 9999);
 	    $status   = get_nonempty_string('Status', $out, 'Unknown');
-	    $reading  = $out->{'State'};
+	    $reading  = get_nonempty_string('State', $out, 'Unknown state');
 	}
 
 	next INTRUSION if blacklisted('intr', $index);
@@ -3998,10 +4003,10 @@ sub check_sdcard {
   SDCARD:
     foreach my $out (@output) {
 	if ($snmp) {
-	    $index    = $out->{sdCardDeviceIndex} - 1;
+	    $index    = ($out->{sdCardDeviceIndex} || 10000) - 1;
 	    $status   = get_snmp_status($out->{sdCardDeviceStatus});
 
-	    if (exists $out->{sdCardDeviceCardState}) {
+	    if (defined $out->{sdCardDeviceCardState}) {
 		my @states  = ();  # contains states SD card
 
 		# get the combined state from the Device Status OID
@@ -4020,16 +4025,17 @@ sub check_sdcard {
 		}
 	    }
 
-	    $location = $out->{sdCardDeviceLocationName};
-	    $capacity = sprintf '%s MB', $out->{sdCardDeviceCardStorageSize};
+	    $location = $out->{sdCardDeviceLocationName} || 'Unknown location';
+	    $capacity = sprintf '%s MB', ($out->{sdCardDeviceCardStorageSize} || 'Unknown size');
 	}
 	else {
 	    $index    = $c++;
 	    $status   = get_nonempty_string('Status', $out, 'Ok');
-	    $state    = $out->{'State'};
-	    $location = $out->{'Connector Name'};
-	    $capacity = $out->{'Storage Size'} ne '[Not Available]'
-	      ? $out->{'Storage Size'} : 'Unknown Size';
+	    $state    = get_nonempty_string('State', $out, 'Unknown state');
+	    $location = get_nonempty_string('Connector Name', $out, 'Unknown location');
+	    $capacity = get_nonempty_string('Storage Size', $out, 'Unknown size');
+
+	    $capacity =~ s{\[Not Available\]}{Unknown Size};
 	}
 
 	next SDCARD if blacklisted('sd', $index);
