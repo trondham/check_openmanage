@@ -7,7 +7,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2010 Trond H. Amundsen
+# Copyright (C) 2008-2010 Trond H. Amundsen
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.2-beta8';
+$VERSION = '3.6.2-beta9';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -106,7 +106,7 @@ CHECK CONTROL AND BLACKLISTING:
    -b, --blacklist     Blacklist missing and/or failed components
    --only              Only check a certain component or alert type
    --check             Fine-tune which components are checked
-   --no-storage        Don't check storage (alias for "--check storage=0")
+   --no-storage        Don't check storage
 
 For more information and advanced options, see the manual page or URL:
   http://folk.uio.no/trondham/software/check_openmanage.html
@@ -115,7 +115,7 @@ END_HELP
 # Version and license text
 $LICENSE = <<"END_LICENSE";
 $NAME $VERSION
-Copyright (C) 2010 $AUTHOR
+Copyright (C) 2008-2010 $AUTHOR
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
