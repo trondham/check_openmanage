@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.2-beta9';
+$VERSION = '3.6.2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -76,8 +76,8 @@ GENERAL OPTIONS:
 
    -p, --perfdata      Output performance data [default=no]
    -t, --timeout       Plugin timeout in seconds [default=30]
-   -c, --critical      Customise temperature critical limits
-   -w, --warning       Customise temperature warning limits
+   -c, --critical      Custom temperature critical limits
+   -w, --warning       Custom temperature warning limits
    -d, --debug         Debug output, reports everything
    -h, --help          Display this help text
    -V, --version       Display version info
@@ -96,7 +96,7 @@ OUTPUT OPTIONS:
    -i, --info          Prefix any alerts with the service tag
    -e, --extinfo       Append system info to alerts
    -s, --state         Prefix alerts with alert state
-   -S, --short-state   Prefix alerts with alert state (abbreviated)
+   -S, --short-state   Prefix alerts with alert state abbreviated
    -o, --okinfo        Verbosity when check result is OK
    -I, --htmlinfo      HTML output with clickable links
 
