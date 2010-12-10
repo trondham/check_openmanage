@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.2';
+$VERSION = '3.6.3-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -846,7 +846,8 @@ sub run_omreport {
           | No\sbattery\sprobes\sfound\son\sthis\ssystem               # No battery probes
           | Invalid\scommand:\spwrmonitoring                           # Old hardware
           | Hardware\sor\sfeature\snot\spresent\.                      # SD cards
-          | Invalid\scommand:\sremovableflashmedia                      # SD cards with old OMSA
+          | Invalid\scommand:\sremovableflashmedia                     # SD cards with old OMSA
+          | Error\sCorrection;                                         # Memory stuff. Not really an error (new in OMSA 6.4)
 #          | Current\sprobes\snot\sfound                                # OMSA + RHEL5.4 bug
 #          | No\scontrollers\sfound                                     # No RAID controller
         }xms;
