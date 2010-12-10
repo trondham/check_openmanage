@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.3-beta1';
+$VERSION = '3.6.3-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1654,6 +1654,7 @@ sub check_virtual_disks {
 	 12 => 'RAID-50',
 	 19 => 'Concatenated RAID-1',
 	 24 => 'RAID-60',
+         25 => 'CacheCade',
 	);
 
     # Check virtual disks on each of the controllers
@@ -4500,7 +4501,9 @@ sub get_firmware_info {
 	 14 => 'secondaryBackPlane',                 # Secondary Backplane for ESM 2 systems
 	 15 => 'secondaryBackPlaneESM3And4',         # Secondary Backplane for ESM 3 and 4 systems
 	 16 => 'rac',                                # Remote Access Controller
-	 17 => 'imc'                                 # Integrated Management Controller
+	 17 => 'iDRAC',                              # Integrated Dell Remote Access Controller
+	 19 => 'unifiedServerConfigurator',          # Unified Server Configurator
+	 20 => 'lifecycleController',                # Lifecycle Controller
 	);
 
 
@@ -4510,7 +4513,7 @@ sub get_firmware_info {
 		$sysinfo{'bmc'} = 1;
 		$sysinfo{'bmc_fw'} = $out->{firmwareVersionName};
 	    }
-	    elsif ($fw_type{$out->{firmwareType}} =~ m{\A rac|imc \z}xms) {
+	    elsif ($fw_type{$out->{firmwareType}} =~ m{\A rac|iDRAC \z}xms) {
 		my $name = $out->{firmwareTypeName}; $name =~ s/\s//gxms;
 		$sysinfo{'rac'} = 1;
 		$sysinfo{'rac_name'} = $name;
