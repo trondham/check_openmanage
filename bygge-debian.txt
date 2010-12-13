@@ -8,7 +8,7 @@ tar cvfz check-openmanage_3.6.3.orig.tar.gz check-openmanage-3.6.3
 
 # synce inn debian-katalogen
 cd check-openmanage-3.6.3/
-rsync -av trondham@tux:svn/usit-unix-intern/trunk/usit-nagios-plugins/trondham/check_openmanage/debian .
+#rsync -av trondham@tux:svn/usit-unix-intern/trunk/usit-nagios-plugins/trondham/check_openmanage/debian .
 
 # bygge
 debuild -us -uc
