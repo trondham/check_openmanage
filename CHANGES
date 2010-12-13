@@ -1,4 +1,9 @@
-3.6.2
+3.6.3   2010-12-13
+------------------
+
+* A few compatibility fixes for OMSA 6.4.0 were added.
+
+3.6.2   2010-11-25
 ------------------
 
 * Added support for IPv6 when checking via SNMP. IPv6 can be turned on
@@ -10,7 +15,16 @@
 * The mode of operation (local or SNMP) is shown in the debug
   output. If SNMP is used, the debug output will also show the SNMP
   protocol version, IP version and transport protocol (UDP or TCP).
-
+* Amperage probe status via SNMP is of type "probe status", not
+  regular status. This has been fixed.
+* Massive overall robustness improvements to handle OMSA bugs where
+  some information from OMSA is missing.
+* Memory module enumeration via SNMP changed somewhat to reflect
+  enumeration provided by omreport. This ensures that the plugin's
+  output is identical in SNMP or local mode wrt. dimms IDs.
+* Fan enumeration via SNMP changed somewhat to reflect enumeration
+  provided by omreport. This ensures that the plugin's output is
+  identical in SNMP or local mode wrt. fan IDs.
 
 3.6.1   2010-11-02
 ------------------
