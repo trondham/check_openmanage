@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.4-beta1';
+$VERSION = '3.6.4-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -4608,7 +4608,7 @@ if ($opt{debug}) {
     print "   ServiceTag:  $sysinfo{serial}";
     print q{ } x (25 - length $sysinfo{serial}), "Plugin version:  $VERSION\n";
     print "   BIOS/date:   $sysinfo{bios} $sysinfo{biosdate}";
-    print q{ } x (25 - length "$sysinfo{bios} $sysinfo{biosdate}"), "Operation mode:  $mode\n";
+    print q{ } x (25 - length "$sysinfo{bios} $sysinfo{biosdate}"), "Checking mode:   $mode\n";
     if ($#report_storage >= 0) {
 	print "-----------------------------------------------------------------------------\n";
 	print "   Storage Components                                                        \n";
