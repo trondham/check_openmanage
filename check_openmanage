@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.4-beta2';
+$VERSION = '3.6.4-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1862,17 +1862,18 @@ sub check_cache_battery {
 	      $id, $ctrl, $state, $status;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
-	# Default
-	elsif ($status ne 'Ok') {
-	    my $msg = sprintf 'Cache Battery %d in controller %d needs attention: %s (%s)',
-	      $id, $ctrl, $state, $status;
+	# Special case: Failed
+	elsif ($state eq 'Failed' && $status eq 'Critical') {
+	    next BATTERY if blacklisted('bat_charge', $nexus);
+	    my $msg = sprintf 'Cache Battery %d in controller %d is %s [replace battery]',
+	      $id, $ctrl, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
-	# Ok
+	# Default
 	else {
 	    my $msg = sprintf 'Cache Battery %d in controller %d is %s',
 	      $id, $ctrl, $state;
-	    report('storage', $msg, $E_OK, $nexus);
+	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
     }
     return;
