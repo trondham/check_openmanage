@@ -1,3 +1,9 @@
+3.6.4   2011-01-04
+------------------
+
+* Added more robustness wrt. values from OMSA obtained via SNMP, to
+  avoid internal errors where non-important values are missing.
+
 3.6.3   2010-12-13
 ------------------
 
