@@ -1,22 +1,24 @@
+================================
 README file for check_openmanage
 ================================
 
 Files included in the tarball and zip archive:
 
-  check_openmanage       - The plugin
-  check_openmanage.3pm   - Man page
-  check_openmanage.pod   - Man page source
-  check_openmanage.php   - PNP4Nagios template
-  check_openmanage.spec  - RPM spec file
-  COPYING                - License information
-  INSTALL                - Install HOWTO
-  install.bat            - Windows install script
-  install.sh             - Linux/UNIX install script
-  README                 - This file
+  check_openmanage                      - The plugin
+  check_openmanage.exe                  - Win32 standalone executable
+  check_openmanage.8                    - Man page
+  check_openmanage.pod                  - Man page source
+  check_openmanage.php                  - PNP4Nagios template
+  nagios-plugins-check-openmanage.spec  - RPM spec file
+  COPYING                               - License information
+  INSTALL                               - Install HOWTO
+  install.bat                           - Windows install script
+  install.sh                            - Linux/UNIX install script
+  README                                - This file
 
 
 About this program
-------------------
+==================
 
 check_openmanage is a plugin for Nagios which checks the hardware
 health of Dell PowerEdge and some PowerVault servers. It uses the Dell
@@ -56,6 +58,7 @@ Chassis components checked:
 * Voltage probes
 * Power usage
 * Chassis intrusion
+* Removable flash media (SD cards)
 
 Other:
 
@@ -79,4 +82,3 @@ Nagios friendly way.
 More information avilable online:
 
   http://folk.uio.no/trondham/software/check_openmanage.html
-
