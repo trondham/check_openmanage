@@ -1,18 +1,25 @@
-Summary:   Nagios plugin to monitor hardware health on Dell servers
-Name:      check_openmanage
-Version:   3.6.0
-Release:   1%{?dist}
-License:   GPL
-Packager:  Trond Hasle Amundsen <t.h.amundsen@usit.uio.no>
-Group:     Applications/System
-BuildRoot: %{_tmppath}/%{name}-%{version}-root
-URL:       http://folk.uio.no/trondham/software/%{name}.html
-Source0:   http://folk.uio.no/trondham/software/files/%{name}-%{version}.tar.gz
+# Definitions used throughout the spec file
+%global plugin check_openmanage
+%global nagiospluginsdir %{_libdir}/nagios/plugins
+
+# No binaries here, do not build a debuginfo package
+%global debug_package %{nil}
+
+Name:          nagios-plugins-check-openmanage
+Version:       3.6.4
+Release:       1%{?dist}
+Summary:       Nagios plugin to monitor hardware health on Dell servers
+
+Group:         Applications/System
+License:       GPLv3+
+URL:           http://folk.uio.no/trondham/software/%{plugin}.html
+Source0:       http://folk.uio.no/trondham/software/files/%{plugin}-%{version}.tar.gz
+
+BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
 BuildRequires: perl
 
-Requires: perl >= 5.6.0
-Requires: perl(POSIX)
-Requires: perl(Getopt::Long)
+Obsoletes:     check_openmanage <= 3.6.3-1
 
 %description
 check_openmanage is a plugin for Nagios which checks the hardware
@@ -25,17 +32,18 @@ and gives an alert if any of the components are faulty or operate
 outside normal parameters.
 
 %prep
-%setup -q
+%setup -q -n %{plugin}-%{version}
 
 %build
-pod2man -s 8 -r "%{name} %{version}" -c "Nagios plugin" %{name}.pod %{name}.8
-gzip %{name}.8
+pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin}.8
+gzip %{plugin}.8
 
 %install
-mkdir -p %{buildroot}/%{_libdir}/nagios/plugins
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/%{nagiospluginsdir}
 mkdir -p %{buildroot}/%{_mandir}/man8
-install -p -m 0755 %{name} %{buildroot}/%{_libdir}/nagios/plugins
-install -m 0644 %{name}.8.gz %{buildroot}/%{_mandir}/man8
+install -m 0755 %{plugin} %{buildroot}/%{nagiospluginsdir}
+install -m 0644 %{plugin}.8.gz %{buildroot}/%{_mandir}/man8
 
 %clean
 rm -rf %{buildroot}
@@ -43,11 +51,25 @@ rm -rf %{buildroot}
 %files
 %defattr(-, root, root, -)
 %doc README COPYING CHANGES
-%{_libdir}/nagios/plugins/%{name}
-%attr(0755, root, root) %{_mandir}/man8/%{name}.8.gz
+%{nagiospluginsdir}/*
+%{_mandir}/man8/*.8*
 
 
 %changelog
+* Tue Jan  4 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.4-1
+- Version 3.6.4
+- Initial build with new spec file
+- Spec file adapted to Fedora/EPEL standards
+
+* Mon Dec 13 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.3-1
+- Version 3.6.3
+
+* Thu Nov 25 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.2-1
+- Version 3.6.2
+
+* Tue Nov  2 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.1-1
+- Version 3.6.1
+
 * Mon Aug 30 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.0-1
 - Version 3.6.0
 

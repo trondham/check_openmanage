@@ -10,11 +10,11 @@ Manual installation
 -------------------
 
 To install check_openmanage, copy the file check_openmanage to the
-Nagios plugin directory (usually /usr/lib/nagios/plugins/contrib):
+Nagios plugin directory (usually /usr/lib/nagios/plugins):
 
-  cp check_openmanage /usr/lib/nagios/plugins/contrib
+  cp check_openmanage /usr/lib/nagios/plugins
 
 To install the manual page:
 
-  cp check_openmanage.3pm /usr/share/man/man3
+  cp check_openmanage.8 /usr/share/man/man8
 

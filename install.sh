@@ -9,7 +9,7 @@ fi
 
 # Default install locations
 def_plugindir=${libdir}/nagios/plugins
-def_mandir=/usr/share/man/man3
+def_mandir=/usr/share/man/man8
 
 # Find install locations
 if [ "$1" = "-q" ]; then
@@ -48,7 +48,7 @@ fi
 
 # Install
 install -p -m 0755 check_openmanage $plugindir
-install -m 0644 check_openmanage.3pm $mandir
+install -m 0644 check_openmanage.8 $mandir
 
 # Done
 echo "done."
