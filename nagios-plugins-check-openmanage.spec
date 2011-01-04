@@ -7,7 +7,7 @@
 
 Name:          nagios-plugins-check-openmanage
 Version:       3.6.4
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
 
 Group:         Applications/System
@@ -36,14 +36,13 @@ outside normal parameters.
 
 %build
 pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin}.8
-gzip %{plugin}.8
 
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/%{nagiospluginsdir}
 mkdir -p %{buildroot}/%{_mandir}/man8
 install -m 0755 %{plugin} %{buildroot}/%{nagiospluginsdir}
-install -m 0644 %{plugin}.8.gz %{buildroot}/%{_mandir}/man8
+install -m 0644 %{plugin}.8 %{buildroot}/%{_mandir}/man8
 
 %clean
 rm -rf %{buildroot}
@@ -56,6 +55,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Jan  4 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.4-2
+- Don't compress the man page, rpmbuild takes care of that. Thanks to
+  Jose Pedro Oliveira for a patch that fixes this.
+
 * Tue Jan  4 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.4-1
 - Version 3.6.4
 - Initial build with new spec file
