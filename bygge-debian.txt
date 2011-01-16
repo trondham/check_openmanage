@@ -1,13 +1,13 @@
 På en debian- eller ubuntu-boks:
 
 # ymse
-wget http://folk.uio.no/trondham/software/files/check_openmanage-3.6.3.tar.gz
-tar xvfz check_openmanage-3.6.3.tar.gz 
-mv check_openmanage-3.6.3 check-openmanage-3.6.3
-tar cvfz check-openmanage_3.6.3.orig.tar.gz check-openmanage-3.6.3
+wget http://folk.uio.no/trondham/software/files/check_openmanage-3.6.4.tar.gz
+tar xvfz check_openmanage-3.6.4.tar.gz 
+mv check_openmanage-3.6.4 check-openmanage-3.6.4
+tar cvfz check-openmanage_3.6.4.orig.tar.gz check-openmanage-3.6.4
 
 # synce inn debian-katalogen
-cd check-openmanage-3.6.3/
+cd check-openmanage-3.6.4/
 #rsync -av trondham@tux:svn/usit-unix-intern/trunk/usit-nagios-plugins/trondham/check_openmanage/debian .
 
 # bygge
@@ -15,4 +15,4 @@ debuild -us -uc
 
 # synce ut deb-pakka
 cd ..
-scp check-openmanage_3.6.3-1_all.deb trondham@tux:www_docs/software/files/
+scp check-openmanage_3.6.4-1_all.deb trondham@tux:www_docs/software/files/
