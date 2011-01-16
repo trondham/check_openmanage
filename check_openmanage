@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.5-beta1';
+$VERSION = '3.6.5-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1649,11 +1649,24 @@ sub check_virtual_disks {
 	 1  => 'Concatenated',
 	 2  => 'RAID-0',
 	 3  => 'RAID-1',
+	 4  => 'UNSUPPORTED:raid-2',
+	 5  => 'UNSUPPORTED:raid-3',
+	 6  => 'UNSUPPORTED:raid-4',
 	 7  => 'RAID-5',
 	 8  => 'RAID-6',
+	 9  => 'UNSUPPORTED:raid-7',
 	 10 => 'RAID-10',
+	 11 => 'UNSUPPORTED:raid-30',
 	 12 => 'RAID-50',
+	 13 => 'UNSUPPORTED:addSpares',
+	 14 => 'UNSUPPORTED:deleteLogical',
+	 15 => 'UNSUPPORTED:transformLogical',
+	 18 => 'UNSUPPORTED:raid-0-plus-1',
 	 19 => 'Concatenated RAID-1',
+	 20 => 'UNSUPPORTED:concatRaid-5',
+	 21 => 'UNSUPPORTED:noRaid',
+	 22 => 'UNSUPPORTED:volume',
+	 23 => 'UNSUPPORTED:raidMorph',
 	 24 => 'RAID-60',
          25 => 'CacheCade',
 	);
