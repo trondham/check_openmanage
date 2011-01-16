@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.5-beta2';
+$VERSION = '3.6.5-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1168,8 +1168,6 @@ sub check_global {
 # STORAGE: Check controllers
 #-----------------------------------------
 sub check_controllers {
-    return if blacklisted('ctrl', 'all');
-
     my $nexus    = undef;
     my $name     = undef;
     my $state    = undef;
@@ -1321,7 +1319,6 @@ sub check_controllers {
 #-----------------------------------------
 sub check_physical_disks {
     return if $#controllers == -1;
-    return if blacklisted('pdisk', 'all');
 
     my $nexus    = undef;
     my $name     = undef;
@@ -1502,8 +1499,8 @@ sub check_physical_disks {
 	    }
 	}
 
-	next PDISK if blacklisted('pdisk', $nexus);
 	$count{pdisk}++;
+	next PDISK if blacklisted('pdisk', $nexus);
 
         $vendor  =~ s{\s+\z}{}xms; # remove trailing whitespace
         $product =~ s{\s+\z}{}xms; # remove trailing whitespace
@@ -1580,7 +1577,6 @@ sub check_physical_disks {
 #-----------------------------------------
 sub check_virtual_disks {
     return if $#controllers == -1;
-    return if blacklisted('vdisk', 'all');
 
     my $name   = undef;
     my $nexus  = undef;
@@ -1695,8 +1691,8 @@ sub check_virtual_disks {
 	    $nexus  = join q{:}, $ctrl, get_nonempty_string('ID', $out, '9999');
 	}
 
-	next VDISK if blacklisted('vdisk', $nexus);
 	$count{vdisk}++;
+	next VDISK if blacklisted('vdisk', $nexus);
 
 	# The device name is undefined sometimes
 	$dev = q{} if !defined $dev;
@@ -1729,7 +1725,6 @@ sub check_virtual_disks {
 #-----------------------------------------
 sub check_cache_battery {
     return if $#controllers == -1;
-    return if blacklisted('bat', 'all');
 
     my $id     = undef;
     my $nexus  = undef;
@@ -1894,7 +1889,6 @@ sub check_cache_battery {
 #-----------------------------------------
 sub check_connectors {
     return if $#controllers == -1;
-    return if blacklisted('conn', 'all');
 
     my $nexus  = undef;
     my $name   = undef;
@@ -1993,8 +1987,6 @@ sub check_connectors {
 # STORAGE: Check enclosures
 #-----------------------------------------
 sub check_enclosures {
-    return if blacklisted('encl', 'all');
-
     my $id       = undef;
     my $nexus    = undef;
     my $name     = undef;
@@ -2122,7 +2114,6 @@ sub check_enclosures {
 #-----------------------------------------
 sub check_enclosure_fans {
     return if $#controllers == -1;
-    return if blacklisted('encl_fan', 'all');
 
     my $nexus     = undef;
     my $name      = undef;
@@ -2231,7 +2222,6 @@ sub check_enclosure_fans {
 #-----------------------------------------
 sub check_enclosure_pwr {
     return if $#controllers == -1;
-    return if blacklisted('encl_ps', 'all');
 
     my $nexus     = undef;
     my $name      = undef;
@@ -2336,7 +2326,6 @@ sub check_enclosure_pwr {
 #-----------------------------------------
 sub check_enclosure_temp {
     return if $#controllers == -1;
-    return if blacklisted('encl_temp', 'all');
 
     my $nexus     = undef;
     my $name      = undef;
@@ -2545,7 +2534,6 @@ sub check_enclosure_temp {
 #-----------------------------------------
 sub check_enclosure_emms {
     return if $#controllers == -1;
-    return if blacklisted('encl_emm', 'all');
 
     my $nexus     = undef;
     my $name      = undef;
@@ -2656,8 +2644,6 @@ sub check_enclosure_emms {
 # CHASSIS: Check memory modules
 #-----------------------------------------
 sub check_memory {
-    return if blacklisted('dimm', 'all');
-
     my $index    = undef;
     my $status   = undef;
     my $location = undef;
@@ -2751,11 +2737,11 @@ sub check_memory {
 	$msize =~ s{\A (\d+) \s MB}{$1}xms;
 	$count{mem} += $msize;
 
-	next DIMM if blacklisted('dimm', $index);
-
 	# Ignore empty memory slots
 	next DIMM if !defined $index;
+
 	$count{dimm}++;
+	next DIMM if blacklisted('dimm', $index);
 
 	if ($status ne 'Ok') {
 	    my $msg = undef;
@@ -2785,8 +2771,6 @@ sub check_memory {
 # CHASSIS: Check fans
 #-----------------------------------------
 sub check_fans {
-    return if blacklisted('fan', 'all');
-
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -2853,8 +2837,8 @@ sub check_fans {
 	    $max_crit =~ s{\A (\d+).* \z}{$1}xms;
 	}
 
-	next FAN if blacklisted('fan', $index);
 	$count{fan}++;
+	next FAN if blacklisted('fan', $index);
 
 	if ($status ne 'Ok') {
 	    my $msg = sprintf 'Chassis fan %d [%s] needs attention: %s',
@@ -2890,8 +2874,6 @@ sub check_fans {
 # CHASSIS: Check power supplies
 #-----------------------------------------
 sub check_powersupplies {
-    return if blacklisted('ps', 'all');
-
     my $index    = undef;
     my $status   = undef;
     my $type     = undef;
@@ -2993,8 +2975,8 @@ sub check_powersupplies {
 	    $state  = get_nonempty_string('Online Status', $out, 'Unknown state');
 	}
 
-	next PS if blacklisted('ps', $index);
 	$count{power}++;
+	next PS if blacklisted('ps', $index);
 
 	if ($status ne 'Ok') {
 	    my $msg = sprintf 'Power Supply %d [%s] needs attention: %s',
@@ -3015,8 +2997,6 @@ sub check_powersupplies {
 # CHASSIS: Check temperatures
 #-----------------------------------------
 sub check_temperatures {
-    return if blacklisted('temp', 'all');
-
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -3121,8 +3101,8 @@ sub check_temperatures {
 	    $discrete = $reading;
 	}
 
-	next TEMP if blacklisted('temp', $index);
 	$count{temp}++;
+	next TEMP if blacklisted('temp', $index);
 
 	if ($type eq 'Discrete') {
 	    my $msg = sprintf 'Temperature probe %d [%s] is %s',
@@ -3219,8 +3199,6 @@ sub check_temperatures {
 # CHASSIS: Check processors
 #-----------------------------------------
 sub check_processors {
-    return if blacklisted('cpu', 'all');
-
     my $index   = undef;
     my $status  = undef;
     my $state   = undef;
@@ -3469,8 +3447,6 @@ sub check_processors {
 	    $speed  = get_nonempty_string('Current Speed', $out, undef);
 	}
 
-	next CPU if blacklisted('cpu', $index);
-
 	# Ignore unoccupied CPU slots (omreport)
 	next CPU if (defined $out->{'Processor Manufacturer'}
 		     and $out->{'Processor Manufacturer'} eq '[Not Occupied]')
@@ -3483,6 +3459,7 @@ sub check_processors {
 	}
 
 	$count{cpu}++;
+	next CPU if blacklisted('cpu', $index);
 
 	if (defined $brand) {
 	    $brand =~ s{\s\s+}{ }gxms;
@@ -3519,8 +3496,6 @@ sub check_processors {
 # CHASSIS: Check voltage probes
 #-----------------------------------------
 sub check_volts {
-    return if blacklisted('volt', 'all');
-
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -3575,8 +3550,8 @@ sub check_volts {
 	    $location = get_nonempty_string('Probe Name', $out, 'Unknown location');
 	}
 
-	next VOLT if blacklisted('volt', $index);
 	$count{volt}++;
+	next VOLT if blacklisted('volt', $index);
 
 	my $msg = sprintf 'Voltage sensor %d [%s] is %s',
 	  $index, $location, $reading;
@@ -3591,8 +3566,6 @@ sub check_volts {
 # CHASSIS: Check batteries
 #-----------------------------------------
 sub check_batteries {
-    return if blacklisted('bp', 'all');
-
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -3647,8 +3620,8 @@ sub check_batteries {
 	    $location = get_nonempty_string('Probe Name', $out, 'Unknown location');
 	}
 
-	next BATTERY if blacklisted('bp', $index);
 	$count{bat}++;
+	next BATTERY if blacklisted('bp', $index);
 
 	my $msg = sprintf 'Battery probe %d [%s] is %s',
 	  $index, $location, $reading;
@@ -3662,8 +3635,6 @@ sub check_batteries {
 # CHASSIS: Check amperage probes (power monitoring)
 #-----------------------------------------
 sub check_pwrmonitoring {
-    return if blacklisted('amp', 'all');
-
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -3783,7 +3754,6 @@ sub check_pwrmonitoring {
 	    $max_crit =~ s{\A (\d+.*?)\s+[a-zA-Z]+ \s*\z}{$1}xms;
 	}
 
-	next AMP if blacklisted('amp', $index);
 	next AMP if $index !~ m{\A \d+ \z}xms;
 
 	# Special case: Probe is present but unknown. This happens via
@@ -3796,6 +3766,7 @@ sub check_pwrmonitoring {
 	}
 
 	$count{amp}++;
+	next AMP if blacklisted('amp', $index);
 
 	# Special case: Discrete reading
 	if (defined $type and $type eq 'amperageProbeTypeIsDiscrete') {
@@ -3878,8 +3849,6 @@ sub check_pwrmonitoring {
 # CHASSIS: Check intrusion
 #-----------------------------------------
 sub check_intrusion {
-    return if blacklisted('intr', 'all');
-
     my $index    = undef;
     my $status   = undef;
     my $reading  = undef;
@@ -3931,8 +3900,8 @@ sub check_intrusion {
 	    $reading  = get_nonempty_string('State', $out, 'Unknown reading');
 	}
 
-	next INTRUSION if blacklisted('intr', $index);
 	$count{intr}++;
+	next INTRUSION if blacklisted('intr', $index);
 
 	if ($status ne 'Ok') {
 	    my $msg = sprintf 'Chassis intrusion %d detected: %s',
@@ -3954,8 +3923,6 @@ sub check_intrusion {
 # CHASSIS: Check SD Card Device
 #-----------------------------------------
 sub check_sdcard {
-    return if blacklisted('sdcard', 'all');
-
     my $index    = undef;
     my $status   = undef;
     my $state    = undef;
@@ -4047,8 +4014,8 @@ sub check_sdcard {
 	    $capacity =~ s{\[Not Available\]}{Unknown Size};
 	}
 
-	next SDCARD if blacklisted('sd', $index);
 	$count{sd}++ if $state ne 'Absent';
+	next SDCARD if blacklisted('sd', $index);
 
 	if ($status ne 'Ok') {
 	    my $msg = sprintf 'SD Card %d needs attention: %s',
@@ -4733,6 +4700,16 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
 	);
 
     print $okmsg{$opt{only}};
+
+    # show blacklisted components
+    if ($opt{show_blacklist} and %blacklist) {
+	my @blstr = ();
+	foreach (keys %blacklist) {
+	    push @blstr, "$_=" . join ',', @{ $blacklist{$_} };
+	}
+	print $linebreak;
+	print "----- BLACKLISTED: " . join '/', @blstr;
+    }
 }
 elsif ($exit_code == $E_OK && !$opt{debug}) {
     if (defined $opt{htmlinfo}) {
