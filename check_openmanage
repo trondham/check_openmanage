@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.4';
+$VERSION = '3.6.5-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -74,39 +74,40 @@ $HELP = <<'END_HELP';
 
 GENERAL OPTIONS:
 
-   -p, --perfdata      Output performance data [default=no]
-   -t, --timeout       Plugin timeout in seconds [default=30]
-   -c, --critical      Custom temperature critical limits
-   -w, --warning       Custom temperature warning limits
-   -d, --debug         Debug output, reports everything
-   -h, --help          Display this help text
-   -V, --version       Display version info
+   -p, --perfdata       Output performance data [default=no]
+   -t, --timeout        Plugin timeout in seconds [default=30]
+   -c, --critical       Custom temperature critical limits
+   -w, --warning        Custom temperature warning limits
+   -d, --debug          Debug output, reports everything
+   -h, --help           Display this help text
+   -V, --version        Display version info
 
 SNMP OPTIONS:
 
-   -H, --hostname      Hostname or IP (required for SNMP)
-   -C, --community     SNMP community string [default=public]
-   -P, --protocol      SNMP protocol version [default=2]
-   --port              SNMP port number [default=161]
-   -6, --ipv6          Use IPv6 instead of IPv4 [default=no]
-   --tcp               Use TCP instead of UDP [default=no]
+   -H, --hostname       Hostname or IP (required for SNMP)
+   -C, --community      SNMP community string [default=public]
+   -P, --protocol       SNMP protocol version [default=2]
+   --port               SNMP port number [default=161]
+   -6, --ipv6           Use IPv6 instead of IPv4 [default=no]
+   --tcp                Use TCP instead of UDP [default=no]
 
 OUTPUT OPTIONS:
 
-   -i, --info          Prefix any alerts with the service tag
-   -e, --extinfo       Append system info to alerts
-   -s, --state         Prefix alerts with alert state
-   -S, --short-state   Prefix alerts with alert state abbreviated
-   -o, --okinfo        Verbosity when check result is OK
-   -I, --htmlinfo      HTML output with clickable links
+   -i, --info           Prefix any alerts with the service tag
+   -e, --extinfo        Append system info to alerts
+   -s, --state          Prefix alerts with alert state
+   -S, --short-state    Prefix alerts with alert state abbreviated
+   -o, --okinfo         Verbosity when check result is OK
+   -B, --show-blacklist Show blacklistings in OK output
+   -I, --htmlinfo       HTML output with clickable links
 
 CHECK CONTROL AND BLACKLISTING:
 
-   -a, --all           Check everything, even log content
-   -b, --blacklist     Blacklist missing and/or failed components
-   --only              Only check a certain component or alert type
-   --check             Fine-tune which components are checked
-   --no-storage        Don't check storage
+   -a, --all            Check everything, even log content
+   -b, --blacklist      Blacklist missing and/or failed components
+   --only               Only check a certain component or alert type
+   --check              Fine-tune which components are checked
+   --no-storage         Don't check storage
 
 For more information and advanced options, see the manual page or URL:
   http://folk.uio.no/trondham/software/check_openmanage.html
@@ -139,6 +140,7 @@ END_LICENSE
 	 'state'             => 0,        # display alert type
 	 'short-state'       => 0,        # display alert type (short)
 	 'okinfo'            => 0,        # default "ok" output level
+	 'show_blacklist'    => 0,        # show blacklisted components
 	 'linebreak'         => undef,    # specify linebreak
 	 'version'           => 0,        # plugin version info
          'all'               => 0,        # check everything
@@ -178,6 +180,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   's|state'            => \$opt{state},
 	   'S|short-state'      => \$opt{shortstate},
 	   'o|ok-info=i'        => \$opt{okinfo},
+	   'B|show-blacklist'   => \$opt{show_blacklist},
 	   'linebreak=s'        => \$opt{linebreak},
 	   'a|all'              => \$opt{all},
 	   'only=s'             => \$opt{only},
@@ -4747,6 +4750,16 @@ elsif ($exit_code == $E_OK && !$opt{debug}) {
     }
     else {
 	print ', not checking storage';
+    }
+
+    # show blacklisted components
+    if ($opt{show_blacklist} and %blacklist) {
+	my @blstr = ();
+	foreach (keys %blacklist) {
+	    push @blstr, "$_=" . join ',', @{ $blacklist{$_} };
+	}
+	print $linebreak;
+	print "----- BLACKLISTED: " . join '/', @blstr;
     }
 
     if ($opt{okinfo} >= 1) {
