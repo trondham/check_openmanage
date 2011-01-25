@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.5-beta3';
+$VERSION = '3.6.5-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3540,7 +3540,7 @@ sub check_volts {
 	    $status   = get_snmp_probestatus($out->{voltageProbeStatus});
 	    $reading  = defined $out->{voltageProbeReading}
 	      ? sprintf('%.3f V', $out->{voltageProbeReading}/1000)
-                : get_hashval($out->{voltageProbeDiscreteReading}, \%volt_discrete_reading);
+                : (get_hashval($out->{voltageProbeDiscreteReading}, \%volt_discrete_reading) || 'Unknown reading');
 	    $location = $out->{voltageProbeLocationName} || 'Unknown location';
 	}
 	else {
