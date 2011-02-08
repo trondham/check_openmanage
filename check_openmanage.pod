@@ -109,6 +109,16 @@ The reason that OMSA version is separated from the rest is that
 finding it requires running a really slow omreport command, when the
 plugin is run locally via NRPE.
 
+=item -B, --show-blacklist
+
+If used together with blacklisting, this option will make the plugin
+output all blacklistings that are being used. The output will have the
+correct blacklisting syntax, and will make it easy to maintain control
+over which blacklistings that are used for each server, as any
+blacklistings can be viewed from Nagios.
+
+When blacklisting is not used, this option has no effect.
+
 =item --omreport I<OMREPORT PATH>
 
 Specify full path to omreport, if it is not installed in any of the
