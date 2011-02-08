@@ -1,3 +1,15 @@
+3.6.5   2011-02-08
+------------------
+
+* Fix counting of components when blacklisting is used. Components
+  should be counted even if blacklisted
+* Added some unsupported vdisk types to the list. The OMSA MIB
+  identifies these, but lists them as unsupported.
+* Added option '-B' or '--show-blacklist' to show any blacklistings in
+  the OK output
+* Fixed a bug for checking voltage probes, if the reading is missing
+  via SNMP.
+
 3.6.4   2011-01-04
 ------------------
 
