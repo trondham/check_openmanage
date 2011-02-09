@@ -97,7 +97,7 @@ OUTPUT OPTIONS:
    -e, --extinfo        Append system info to alerts
    -s, --state          Prefix alerts with alert state
    -S, --short-state    Prefix alerts with alert state abbreviated
-   -o, --okinfo         Verbosity when check result is OK
+   -o, --ok-info        Verbosity when check result is OK
    -B, --show-blacklist Show blacklistings in OK output
    -I, --htmlinfo       HTML output with clickable links
 
