@@ -3761,7 +3761,7 @@ sub check_pwrmonitoring {
 	# disabled due to non-redundant and/or non-instrumented power
 	# supplies.
         # E.g. R410 with newer BMC firmware and 1 power supply
-	if ($snmp && $status eq 'Unknown' && $reading eq '[N/A]') {
+	if ($snmp && $status eq 'Unknown' && $reading == 0) {
 	    next AMP;
 	}
 
@@ -3772,13 +3772,13 @@ sub check_pwrmonitoring {
 	if (defined $type and $type eq 'amperageProbeTypeIsDiscrete') {
 	    my $msg = sprintf 'Amperage probe %d [%s] is %s',
 	      $index, $location, $reading;
-	    report('chassis', $msg, $status2nagios{$status}, $index);
+	    report('chassis', $msg, $probestatus2nagios{$status}, $index);
 	}
 	# Default
 	else {
 	    my $msg = sprintf 'Amperage probe %d [%s] reads %s %s',
 	      $index, $location, $reading, $unit;
-	    report('chassis', $msg, $status2nagios{$status}, $index);
+	    report('chassis', $msg, $probestatus2nagios{$status}, $index);
 	}
 
 	# Collect performance data
