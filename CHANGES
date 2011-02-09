@@ -1,4 +1,4 @@
-3.6.5   2011-02-08
+3.6.5   2011-02-09
 ------------------
 
 * Fix counting of components when blacklisting is used. Components
