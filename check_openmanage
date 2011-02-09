@@ -232,20 +232,20 @@ $snmp_error   = undef;
 $omreport = undef;
 
 # Check flags, override available with the --check option
-%check = ( 'storage'     => 1,   # check storage subsystem
-	   'memory'      => 1,   # check memory (dimms)
-	   'fans'        => 1,   # check fan status
-	   'power'       => 1,   # check power supplies
-	   'temp'        => 1,   # check temperature
-	   'cpu'         => 1,   # check processors
-	   'voltage'     => 1,   # check voltage
-	   'batteries'   => 1,   # check battery probes
-	   'amperage'    => 1,   # check power consumption
-	   'intrusion'   => 1,   # check intrusion detection
-	   'sdcard'      => 1,   # check removable flash media (SD cards)
-	   'alertlog'    => 0,   # check the alert log
-	   'esmlog'      => 0,   # check the ESM log (hardware log)
-	   'esmhealth'   => 1,   # check the ESM log overall health
+%check = ( 'storage'   => 1,   # check storage subsystem
+	   'memory'    => 1,   # check memory (dimms)
+	   'fans'      => 1,   # check fan status
+	   'power'     => 1,   # check power supplies
+	   'temp'      => 1,   # check temperature
+	   'cpu'       => 1,   # check processors
+	   'voltage'   => 1,   # check voltage
+	   'batteries' => 1,   # check battery probes
+	   'amperage'  => 1,   # check power consumption
+	   'intrusion' => 1,   # check intrusion detection
+	   'sdcard'    => 1,   # check removable flash media (SD cards)
+	   'alertlog'  => 0,   # check the alert log
+	   'esmlog'    => 0,   # check the ESM log (hardware log)
+	   'esmhealth' => 1,   # check the ESM log overall health
 	 );
 
 # Default line break
