@@ -271,9 +271,9 @@ if (!$snmp && -f $FW_LOCK) {
 }
 
 # List of controllers and enclosures
-@controllers = ();  # controllers
-@enclosures  = ();  # enclosures
-%snmp_enclosure   = ();  # enclosures
+@controllers    = ();  # controllers
+@enclosures     = ();  # enclosures
+%snmp_enclosure = ();  # enclosures
 
 # Messages
 @report_storage = ();  # messages with associated nagios level (storage)
