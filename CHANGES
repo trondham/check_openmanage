@@ -9,6 +9,7 @@
   the OK output
 * Fixed a bug for checking voltage probes, if the reading is missing
   via SNMP.
+* Fixed a regression bug for a power monitoring corner case.
 
 3.6.4   2011-01-04
 ------------------
