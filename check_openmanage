@@ -283,37 +283,37 @@ if (!$snmp && -f $FW_LOCK) {
 # Counters for everything
 %count
   = (
-     'pdisk'  => 0, # number of physical disks
-     'vdisk'  => 0, # number of logical drives (virtual disks)
-     'temp'   => 0, # number of temperature probes
-     'volt'   => 0, # number of voltage probes
-     'amp'    => 0, # number of amperage probes
-     'intr'   => 0, # number of intrusion probes
-     'dimm'   => 0, # number of memory modules
-     'mem'    => 0, # total memory
-     'fan'    => 0, # number of fan probes
-     'cpu'    => 0, # number of CPUs
-     'bat'    => 0, # number of batteries
-     'power'  => 0, # number of power supplies
-     'sd'     => 0, # number of SD cards
-     'esm'    => {
-		  'Critical'     => 0, # critical entries in ESM log
-		  'Non-Critical' => 0, # warning entries in ESM log
-		  'Ok'           => 0, # ok entries in ESM log
-		 },
-     'alert'  => {
-		  'Critical'     => 0, # critical entries in alert log
-		  'Non-Critical' => 0, # warning entries in alert log
-		  'Ok'           => 0, # ok entries in alert log
-		 },
+     'pdisk' => 0, # number of physical disks
+     'vdisk' => 0, # number of logical drives (virtual disks)
+     'temp'  => 0, # number of temperature probes
+     'volt'  => 0, # number of voltage probes
+     'amp'   => 0, # number of amperage probes
+     'intr'  => 0, # number of intrusion probes
+     'dimm'  => 0, # number of memory modules
+     'mem'   => 0, # total memory
+     'fan'   => 0, # number of fan probes
+     'cpu'   => 0, # number of CPUs
+     'bat'   => 0, # number of batteries
+     'power' => 0, # number of power supplies
+     'sd'    => 0, # number of SD cards
+     'esm'   => {
+		 'Critical'     => 0, # critical entries in ESM log
+		 'Non-Critical' => 0, # warning entries in ESM log
+		 'Ok'           => 0, # ok entries in ESM log
+		},
+     'alert' => {
+		 'Critical'     => 0, # critical entries in alert log
+		 'Non-Critical' => 0, # warning entries in alert log
+		 'Ok'           => 0, # ok entries in alert log
+		},
     );
 
 # Performance data
 @perfdata = ();
 
 # Global health status
-$global         = 1;      # default is to check global status
-$globalstatus   = $E_OK;  # default global health status is "OK"
+$global       = 1;      # default is to check global status
+$globalstatus = $E_OK;  # default global health status is "OK"
 
 # Nagios error levels reversed
 %reverse_exitcode
