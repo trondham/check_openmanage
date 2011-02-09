@@ -3772,13 +3772,15 @@ sub check_pwrmonitoring {
 	if (defined $type and $type eq 'amperageProbeTypeIsDiscrete') {
 	    my $msg = sprintf 'Amperage probe %d [%s] is %s',
 	      $index, $location, $reading;
-	    report('chassis', $msg, $probestatus2nagios{$status}, $index);
+	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
+	    report('chassis', $msg, $err, $index);
 	}
 	# Default
 	else {
 	    my $msg = sprintf 'Amperage probe %d [%s] reads %s %s',
 	      $index, $location, $reading, $unit;
-	    report('chassis', $msg, $probestatus2nagios{$status}, $index);
+	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
+	    report('chassis', $msg, $err, $index);
 	}
 
 	# Collect performance data
