@@ -2528,13 +2528,13 @@ sub check_enclosure_temp {
 
 	# Collect performance data
 	if (defined $opt{perfdata} && $reading ne '[N/A]') {
-	    $name =~ s{\A Temperature\sProbe\s(\d+) \z}{temp_$1}gxms;
-	    my $label = "${name}";
+	    my $index = $name;
+	    $index =~ s{\A Temperature\sProbe\s(\d+) \z}{$1}gxms;
 	    push @perfdata, {
 			     type  => 'E',
-			     id    => $encl_id,
+			     id    => $opt{perfdata} eq 'minimal' ? "${encl_id}_t${index}" : "${encl_id}_temp_${index}",
 			     unit  => 'C',
-			     label => $label,
+			     label => q{},
 			     value => $reading,
 			     warn  => $max_warn,
 			     crit  => $max_crit,
