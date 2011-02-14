@@ -8,9 +8,9 @@
   - Voltage data was not included
 * The PNP template check_openmanage.php has been redone to work with
   the changes in perfdata output from the plugin
+* SD card check is now included if '--only chassis' is specified
 
 * TODO: Uncerfified physical drives makes non-critical status
-* TODO: SD card in '--only chassis'
 
 
 3.6.5   2011-02-09
