@@ -3872,7 +3872,7 @@ sub check_pwrmonitoring {
 		next AMP2;
 	    }
 	    if ($found and $line =~ m/\A ([^;]+?) ; (\d*\.\d+) \s ([AW]) \z/xms) {
-		my $aname = lc $1;
+		my $aname = $1;
 		my $aval  = $2;
 		my $aunit = $3;
 		$aname =~ s{\s}{_}gxms;
