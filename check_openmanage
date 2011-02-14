@@ -2530,14 +2530,11 @@ sub check_enclosure_temp {
 	if (defined $opt{perfdata} && $reading ne '[N/A]') {
 	    $name =~ s{\A Temperature\sProbe\s(\d+) \z}{temp_$1}gxms;
 	    my $label = "${name}";
-	    my $mini = $label;
-	    $mini =~ s{temp_}{t}xms;
 	    push @perfdata, {
 			     type  => 'E',
 			     id    => $encl_id,
 			     unit  => 'C',
 			     label => $label,
-			     mini  => $mini,
 			     value => $reading,
 			     warn  => $max_warn,
 			     crit  => $max_crit,
@@ -2882,7 +2879,6 @@ sub check_fans {
 			     id    => $index,
 			     unit  => 'rpm',
 			     label => $pname,
-			     mini  => 'f',
 			     value => $reading,
 			     warn  => $max_warn,
 			     crit  => $max_crit,
@@ -3209,7 +3205,6 @@ sub check_temperatures {
 				 id    => $index,
 				 unit  => 'C',
 				 label => $pname,
-				 mini  => 't',
 				 value => $reading,
 				 warn  => $max_warn,
 				 crit  => $max_crit,
@@ -3605,7 +3600,6 @@ sub check_volts {
 			     id    => $index,
 			     unit  => 'V',
 			     label => $label,
-			     mini  => 'v',
 			     value => $reading,
 			     warn  => 0,
 			     crit  => 0,
@@ -3845,7 +3839,6 @@ sub check_pwrmonitoring {
 			     id    => $index,
 			     unit  => $unit,
 			     label => $label,
-			     mini  => lc $unit,
 			     value => $reading,
 			     warn  => $max_warn,
 			     crit  => $max_crit,
@@ -4929,8 +4922,12 @@ if (defined $opt{perfdata} && !$opt{debug} && @perfdata) {
     }
 
     # Print performance data sorted
-    my $type = $opt{perfdata} eq 'minimal' ? 'mini' : 'label';
-    print join $lb, map { "$_->{type}$_->{id}_$_->{$type}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+    if ($opt{perfdata} eq 'minimal') {
+	print join $lb, map { "$_->{type}$_->{id}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+    }
+    else {
+	print join $lb, map { "$_->{type}$_->{id}_$_->{label}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+    }
 }
 
 # Print a linebreak at the end
