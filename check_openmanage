@@ -775,7 +775,7 @@ sub adjust_checks {
 
 	# adjust the check hash
 	if ($opt{only} eq 'chassis') {
-	    map { $check{$_} = 1 } qw(memory fans power temp cpu voltage
+	    map { $check{$_} = 1 } qw(memory fans power temp cpu voltage sdcard
 				      batteries amperage intrusion esmhealth);
 	}
 	else {
