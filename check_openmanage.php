@@ -28,7 +28,7 @@ $e = 0;      # enclosure counter
 $visited_fan  = 0;
 $visited_temp = 0;
 $visited_amp  = 0;
-$visited_volt  = 0;
+$visited_volt = 0;
 
 # Enclosure id
 $enclosure_id = '';
@@ -47,11 +47,11 @@ foreach ($DS as $i) {
 	}
 
 	# Long label
-	$NAME[$i] = preg_replace('/^T(\d+)_(.+)/', 'Temperature Probe $1 [$2]', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^T(\d+)_(.+)/', 'Probe $1 [$2]', $NAME[$i]);
 	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^T(\d+)$/', 'Temperature Probe $1', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^T(\d+)$/', 'Probe $1', $NAME[$i]);
 
 	$ds_name[$count] = "Chassis Temperatures";
 
@@ -82,11 +82,11 @@ foreach ($DS as $i) {
     if (preg_match('/^W/', $NAME[$i])) {
 
 	# Long label
-	$NAME[$i] = preg_replace('/^W(\d+)_(.+)/', 'Amerage Probe $1 [$2]', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^W(\d+)_(.+)/', 'Probe $1 [$2]', $NAME[$i]);
 	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^W(\d+)$/', 'Amperage Probe $1', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^W(\d+)$/', 'Probe $1', $NAME[$i]);
 
 	++$count;
 	$ds_name[$count] = "Power Consumption";
@@ -113,11 +113,11 @@ foreach ($DS as $i) {
     if (preg_match('/^A/', $NAME[$i])) {
 
 	# Long label
-	$NAME[$i] = preg_replace('/^A(\d+)_(.+)/', 'Amperage Probe $1 [$2]', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^A(\d+)_(.+)/', 'Probe $1 [$2]', $NAME[$i]);
 	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^A(\d+)$/', 'Amperage Probe $1', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^A(\d+)$/', 'Probe $1', $NAME[$i]);
 		
 	if ($visited_amp == 0) {
 	    ++$count;
@@ -147,11 +147,11 @@ foreach ($DS as $i) {
     if (preg_match('/^V/', $NAME[$i])) {
 
 	# Long label
-	$NAME[$i] = preg_replace('/^V(\d+)_(.+)/', 'Voltage Probe $1 [$2]', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^V(\d+)_(.+)/', 'Probe $1 [$2]', $NAME[$i]);
 	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^V(\d+)$/', 'Voltage Probe $1', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^V(\d+)$/', 'Probe $1', $NAME[$i]);
 		
 	if ($visited_volt == 0) {
 	    ++$count;
@@ -184,11 +184,11 @@ foreach ($DS as $i) {
 	}
 
 	# Long label
-	$NAME[$i] = preg_replace('/^F(\d+)_(.+)/', 'Fan Probe $1 [$2]', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^F(\d+)_(.+)/', 'Probe $1 [$2]', $NAME[$i]);
 	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^F(\d+)$/', 'Fan Probe $1', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^F(\d+)$/', 'Probe $1', $NAME[$i]);
 
 	$ds_name[$count] = "Fan Probes";
 
@@ -217,10 +217,10 @@ foreach ($DS as $i) {
 	}
 
 	# Long label
-	$NAME[$i] = preg_replace('/^enclosure_.+?_temp_(\d+)$/', 'Probe $1', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^E_.+?_temp_(\d+)$/', 'Probe $1', $NAME[$i]);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^e.+?t(\d+)$/', 'Probe $1', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^E.+?t(\d+)$/', 'Probe $1', $NAME[$i]);
 
 	$ds_name[$count] = "Enclosure $enclosure_id Temperatures";
 
