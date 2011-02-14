@@ -136,7 +136,6 @@ foreach ($DS as $i) {
 	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
 	}
 	$def[$count] .= "LINE:var$i#".$colors[$a].":\"$NAME[$i]\" " ;
-	$def[$count] .= "AREA:var$i#".$colors[$a++]."20: " ;
 	$def[$count] .= "GPRINT:var$i:LAST:\"%4.2lf A last \" ";
 	$def[$count] .= "GPRINT:var$i:MAX:\"%4.2lf A max \" ";
 	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%4.4lf A avg \\n\" ";
@@ -170,7 +169,6 @@ foreach ($DS as $i) {
 	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
 	}
 	$def[$count] .= "LINE:var$i#".$colors[$v].":\"$NAME[$i]\" " ;
-	$def[$count] .= "AREA:var$i#".$colors[$v++]."20: " ;
 	$def[$count] .= "GPRINT:var$i:LAST:\"%4.2lf A last \" ";
 	$def[$count] .= "GPRINT:var$i:MAX:\"%4.2lf A max \" ";
 	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%4.4lf A avg \\n\" ";
