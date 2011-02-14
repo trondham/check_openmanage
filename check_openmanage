@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.6.5';
+$VERSION = '3.7.0-alpha';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -97,7 +97,7 @@ OUTPUT OPTIONS:
    -e, --extinfo        Append system info to alerts
    -s, --state          Prefix alerts with alert state
    -S, --short-state    Prefix alerts with alert state abbreviated
-   -o, --ok-info        Verbosity when check result is OK
+   -o, --okinfo         Verbosity when check result is OK
    -B, --show-blacklist Show blacklistings in OK output
    -I, --htmlinfo       HTML output with clickable links
 
@@ -232,20 +232,20 @@ $snmp_error   = undef;
 $omreport = undef;
 
 # Check flags, override available with the --check option
-%check = ( 'storage'   => 1,   # check storage subsystem
-	   'memory'    => 1,   # check memory (dimms)
-	   'fans'      => 1,   # check fan status
-	   'power'     => 1,   # check power supplies
-	   'temp'      => 1,   # check temperature
-	   'cpu'       => 1,   # check processors
-	   'voltage'   => 1,   # check voltage
-	   'batteries' => 1,   # check battery probes
-	   'amperage'  => 1,   # check power consumption
-	   'intrusion' => 1,   # check intrusion detection
-	   'sdcard'    => 1,   # check removable flash media (SD cards)
-	   'alertlog'  => 0,   # check the alert log
-	   'esmlog'    => 0,   # check the ESM log (hardware log)
-	   'esmhealth' => 1,   # check the ESM log overall health
+%check = ( 'storage'     => 1,   # check storage subsystem
+	   'memory'      => 1,   # check memory (dimms)
+	   'fans'        => 1,   # check fan status
+	   'power'       => 1,   # check power supplies
+	   'temp'        => 1,   # check temperature
+	   'cpu'         => 1,   # check processors
+	   'voltage'     => 1,   # check voltage
+	   'batteries'   => 1,   # check battery probes
+	   'amperage'    => 1,   # check power consumption
+	   'intrusion'   => 1,   # check intrusion detection
+	   'sdcard'      => 1,   # check removable flash media (SD cards)
+	   'alertlog'    => 0,   # check the alert log
+	   'esmlog'      => 0,   # check the ESM log (hardware log)
+	   'esmhealth'   => 1,   # check the ESM log overall health
 	 );
 
 # Default line break
@@ -271,9 +271,9 @@ if (!$snmp && -f $FW_LOCK) {
 }
 
 # List of controllers and enclosures
-@controllers    = ();  # controllers
-@enclosures     = ();  # enclosures
-%snmp_enclosure = ();  # enclosures
+@controllers = ();  # controllers
+@enclosures  = ();  # enclosures
+%snmp_enclosure   = ();  # enclosures
 
 # Messages
 @report_storage = ();  # messages with associated nagios level (storage)
@@ -283,37 +283,37 @@ if (!$snmp && -f $FW_LOCK) {
 # Counters for everything
 %count
   = (
-     'pdisk' => 0, # number of physical disks
-     'vdisk' => 0, # number of logical drives (virtual disks)
-     'temp'  => 0, # number of temperature probes
-     'volt'  => 0, # number of voltage probes
-     'amp'   => 0, # number of amperage probes
-     'intr'  => 0, # number of intrusion probes
-     'dimm'  => 0, # number of memory modules
-     'mem'   => 0, # total memory
-     'fan'   => 0, # number of fan probes
-     'cpu'   => 0, # number of CPUs
-     'bat'   => 0, # number of batteries
-     'power' => 0, # number of power supplies
-     'sd'    => 0, # number of SD cards
-     'esm'   => {
-		 'Critical'     => 0, # critical entries in ESM log
-		 'Non-Critical' => 0, # warning entries in ESM log
-		 'Ok'           => 0, # ok entries in ESM log
-		},
-     'alert' => {
-		 'Critical'     => 0, # critical entries in alert log
-		 'Non-Critical' => 0, # warning entries in alert log
-		 'Ok'           => 0, # ok entries in alert log
-		},
+     'pdisk'  => 0, # number of physical disks
+     'vdisk'  => 0, # number of logical drives (virtual disks)
+     'temp'   => 0, # number of temperature probes
+     'volt'   => 0, # number of voltage probes
+     'amp'    => 0, # number of amperage probes
+     'intr'   => 0, # number of intrusion probes
+     'dimm'   => 0, # number of memory modules
+     'mem'    => 0, # total memory
+     'fan'    => 0, # number of fan probes
+     'cpu'    => 0, # number of CPUs
+     'bat'    => 0, # number of batteries
+     'power'  => 0, # number of power supplies
+     'sd'     => 0, # number of SD cards
+     'esm'    => {
+		  'Critical'     => 0, # critical entries in ESM log
+		  'Non-Critical' => 0, # warning entries in ESM log
+		  'Ok'           => 0, # ok entries in ESM log
+		 },
+     'alert'  => {
+		  'Critical'     => 0, # critical entries in alert log
+		  'Non-Critical' => 0, # warning entries in alert log
+		  'Ok'           => 0, # ok entries in alert log
+		 },
     );
 
 # Performance data
 @perfdata = ();
 
 # Global health status
-$global       = 1;      # default is to check global status
-$globalstatus = $E_OK;  # default global health status is "OK"
+$global         = 1;      # default is to check global status
+$globalstatus   = $E_OK;  # default global health status is "OK"
 
 # Nagios error levels reversed
 %reverse_exitcode
@@ -2513,10 +2513,13 @@ sub check_enclosure_temp {
 	# Collect performance data
 	if (defined $opt{perfdata} && $reading ne '[N/A]') {
 	    $name =~ s{\A Temperature\sProbe\s(\d+) \z}{temp_$1}gxms;
-	    my $label = "enclosure_${encl_id}_${name}";
+	    my $label = "${name}";
 	    my $mini = $label;
-	    $mini =~ s{enclosure_(.+?)_temp_(.+?)}{e$1t$2}xms;
+	    $mini =~ s{temp_}{t}xms;
 	    push @perfdata, {
+			     type  => 'E',
+			     id    => $encl_id,
+			     unit  => 'C',
 			     label => $label,
 			     mini  => $mini,
 			     value => $reading,
@@ -2854,12 +2857,16 @@ sub check_fans {
 
 	# Collect performance data
 	if (defined $opt{perfdata}) {
-	    my $pname = lc $location;
+	    my $pname = $location;
 	    $pname =~ s{\s}{_}gxms;
 	    $pname =~ s{proc_}{cpu#}xms;
+	    $pname =~ s{_rpm\z}{}ixms;
 	    push @perfdata, {
-			     label => "fan_${index}_${pname}",
-			     mini  => "f$index",
+			     type  => 'F',
+			     id    => $index,
+			     unit  => 'rpm',
+			     label => $pname,
+			     mini  => 'f',
 			     value => $reading,
 			     warn  => $max_warn,
 			     crit  => $max_crit,
@@ -3177,13 +3184,16 @@ sub check_temperatures {
 
 	    # Collect performance data
 	    if (defined $opt{perfdata}) {
-		my $pname = lc $location;
+		my $pname = $location;
 		$pname =~ s{\s}{_}gxms;
 		$pname =~ s{_temp\z}{}xms;
 		$pname =~ s{proc_}{cpu#}xms;
 		push @perfdata, {
-				 label => "temp_${index}_${pname}",
-				 mini  => "t$index",
+				 type  => 'T',
+				 id    => $index,
+				 unit  => 'C',
+				 label => $pname,
+				 mini  => 't',
 				 value => $reading,
 				 warn  => $max_warn,
 				 crit  => $max_crit,
@@ -3500,6 +3510,8 @@ sub check_volts {
     my $status   = undef;
     my $reading  = undef;
     my $location = undef;
+    my $max_crit = undef;
+    my $max_warn = undef;
     my @output = ();
 
     if ($snmp) {
@@ -3542,12 +3554,19 @@ sub check_volts {
 	      ? sprintf('%.3f V', $out->{voltageProbeReading}/1000)
                 : (get_hashval($out->{voltageProbeDiscreteReading}, \%volt_discrete_reading) || 'Unknown reading');
 	    $location = $out->{voltageProbeLocationName} || 'Unknown location';
+	    $max_crit = $out->{voltageProbeUpperCriticalThreshold} || 0;
+	    $max_warn = $out->{voltageProbeUpperNonCriticalThreshold} || 0;
 	}
 	else {
 	    $index    = get_nonempty_string('Index', $out, 9999);
 	    $status   = get_nonempty_string('Status', $out, 'Unknown');
 	    $reading  = get_nonempty_string('Reading', $out, 'Unknown reading');
 	    $location = get_nonempty_string('Probe Name', $out, 'Unknown location');
+	    $max_crit = get_nonempty_string('Maximum Failure Threshold', $out, 0);
+	    $max_warn = get_nonempty_string('Maximum Warning Threshold', $out, 0);
+
+	    $max_crit = 0 if $max_crit eq '[N/A]';
+	    $max_warn = 0 if $max_warn eq '[N/A]';
 	}
 
 	$count{volt}++;
@@ -3557,6 +3576,25 @@ sub check_volts {
 	  $index, $location, $reading;
 	my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	report('chassis', $msg, $err, $index);
+
+	# Collect performance data
+	if (defined $opt{perfdata}) {
+	    $reading =~ s{\s+V\z}{}xms;  # remove unit
+	    $reading =~ s{\.000\z}{}xms; # if integer
+	    next VOLT if $reading !~ m{\A \d+(\.\d+)? \z}xms; # discrete reading (not number)
+	    my $label = join q{_}, $location;
+	    $label =~ s{\s}{_}gxms;
+	    push @perfdata, {
+			     type  => 'V',
+			     id    => $index,
+			     unit  => 'V',
+			     label => $label,
+			     mini  => 'v',
+			     value => $reading,
+			     warn  => 0,
+			     crit  => 0,
+			    };
+	}
     }
     return;
 }
@@ -3772,25 +3810,26 @@ sub check_pwrmonitoring {
 	if (defined $type and $type eq 'amperageProbeTypeIsDiscrete') {
 	    my $msg = sprintf 'Amperage probe %d [%s] is %s',
 	      $index, $location, $reading;
-	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
-	    report('chassis', $msg, $err, $index);
+	    report('chassis', $msg, $status2nagios{$status}, $index);
 	}
 	# Default
 	else {
 	    my $msg = sprintf 'Amperage probe %d [%s] reads %s %s',
 	      $index, $location, $reading, $unit;
-	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
-	    report('chassis', $msg, $err, $index);
+	    report('chassis', $msg, $status2nagios{$status}, $index);
 	}
 
 	# Collect performance data
 	if (defined $opt{perfdata}) {
 	    next AMP if $reading !~ m{\A \d+(\.\d+)? \z}xms; # discrete reading (not number)
-	    my $label = join q{_}, 'pwr_mon', $index, lc $location;
+	    my $label = join q{_},  $location;
 	    $label =~ s{\s}{_}gxms;
 	    push @perfdata, {
+			     type  => $unit,
+			     id    => $index,
+			     unit  => $unit,
 			     label => $label,
-			     mini  => "p${index}" . lc $unit,
+			     mini  => lc $unit,
 			     value => $reading,
 			     warn  => $max_warn,
 			     crit  => $max_crit,
@@ -3807,7 +3846,7 @@ sub check_pwrmonitoring {
 
 	# find used indexes
 	foreach (@perfdata) {
-	    if ($_->{label} =~ m/\A pwr_mon_(\d+)/xms) {
+	    if ($_->{label} =~ m/\A [WA](\d+)/xms) {
 		$used{$1} = 1;
 	    }
 	}
@@ -4860,14 +4899,22 @@ if (defined $opt{perfdata} && !$opt{debug} && @perfdata) {
 
     # Sort routine for performance data
     sub perfsort {
-	my %order = ( fan => 0, pwr => 1, tem => 2, enc => 3, );
-	return ($order{(substr $a->{label}, 0, 3)} cmp $order{(substr $b->{label}, 0, 3)}) ||
-	  $a->{label} cmp $b->{label};
+	my %order = ( 'T' => 0, 'W' => 1, 'A' => 2, 'V' => 3, 'F' => 4, 'E' => 5, );
+
+	# sort in this order:
+	#  1. the type according to the hash "order" above
+	#  2. the id (index) numerically
+	#  3. the id (index) alphabetically
+	#  4. the label
+	return $order{$a->{type}} cmp $order{$b->{type}} ||
+	  ($a->{id} =~ m{\A\d+\z}xms and $a->{id} <=> $b->{id}) ||
+	    ($a->{id} !~ m{\A\d+\z}xms and $a->{id} cmp $b->{id}) ||
+	      $a->{label} cmp $b->{label};
     }
 
     # Print performance data sorted
     my $type = $opt{perfdata} eq 'minimal' ? 'mini' : 'label';
-    print join $lb, map { "$_->{$type}=$_->{value};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+    print join $lb, map { "$_->{type}$_->{id}_$_->{$type}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
 }
 
 # Print a linebreak at the end
