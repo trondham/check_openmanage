@@ -3871,17 +3871,20 @@ sub check_pwrmonitoring {
 		$found = 0;
 		next AMP2;
 	    }
-	    if ($found and $line =~ m/\A ([^;]+?) ; (\d*\.\d+) \s [AW] \z/xms) {
+	    if ($found and $line =~ m/\A ([^;]+?) ; (\d*\.\d+) \s ([AW]) \z/xms) {
 		my $aname = lc $1;
-		my $aval = $2;
+		my $aval  = $2;
+		my $aunit = $3;
 		$aname =~ s{\s}{_}gxms;
 
 		# don't use an existing index
 		while (exists $used{$index}) { ++$index; }
 
 		push @perfdata, {
-				 label => "pwr_mon_${index}_${aname}",
-				 mini  => "p${index}a",
+				 type  => $aunit,
+				 id    => $index,
+				 unit  => $aunit,
+				 label => $aname,
 				 value => $aval,
 				 warn  => 0,
 				 crit  => 0,
