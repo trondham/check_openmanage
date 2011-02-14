@@ -1,3 +1,11 @@
+3.7.0
+------------------
+
+* TODO: Uncerfified physical drives makes non-critical status
+* TODO: SD card in '--only chassis'
+* TODO: New check_openmanage.php
+
+
 3.6.5   2011-02-09
 ------------------
 
