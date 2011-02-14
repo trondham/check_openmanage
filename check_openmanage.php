@@ -217,7 +217,7 @@ foreach ($DS as $i) {
 	}
 
 	# Long label
-	$NAME[$i] = preg_replace('/^E_.+?_temp_(\d+)$/', 'Probe $1', $NAME[$i]);
+	$NAME[$i] = preg_replace('/^E.+?_temp_(\d+)$/', 'Probe $1', $NAME[$i]);
 
 	# Short label
 	$NAME[$i] = preg_replace('/^E.+?t(\d+)$/', 'Probe $1', $NAME[$i]);
