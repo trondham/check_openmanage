@@ -1333,6 +1333,7 @@ sub check_physical_disks {
     my $media    = undef;  # media type (e.g. HDD, SSD)
     my $bus      = undef;  # bus protocol (e.g. SAS, SATA)
     my $spare    = undef;  # spare state (e.g. global hotspare)
+    my $cert     = undef;  # if drive is certified or not
     my @output  = ();
 
     if ($snmp) {
@@ -1352,6 +1353,7 @@ sub check_physical_disks {
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.26' => 'arrayDiskNexusID',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.31' => 'arrayDiskSmartAlertIndication',
 	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.35' => 'arrayDiskMediaType',
+	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.36' => 'arrayDiskDellCertified',
 	     '1.3.6.1.4.1.674.10893.1.20.130.5.1.7'  => 'arrayDiskEnclosureConnectionControllerNumber',
 	     '1.3.6.1.4.1.674.10893.1.20.130.6.1.7'  => 'arrayDiskChannelConnectionControllerNumber',
 	    );
@@ -1461,6 +1463,7 @@ sub check_physical_disks {
 	    $spare    = get_hashval($out->{arrayDiskSpareState}, \%spare_state) || q{};
 	    $bus      = get_hashval($out->{arrayDiskBusType}, \%bus_type);
 	    $media    = get_hashval($out->{arrayDiskMediaType}, \%media_type);
+	    $cert     = $out->{arrayDiskDellCertified} || 1;
 	    $capacity = exists $out->{arrayDiskLengthInMB}
 	      ? $out->{arrayDiskLengthInMB} * 1024**2 : -1;
 
@@ -1491,11 +1494,18 @@ sub check_physical_disks {
 	    $media    = get_nonempty_string('Media', $out, undef);
 	    $bus      = get_nonempty_string('Bus Protocol', $out, undef);
 	    $spare    = get_nonempty_string('Hot Spare', $out, q{});
+            $cert     = get_nonempty_string('Certified', $out, 1);
 	    $ctrl     = $out->{ctrl};
 	    $capacity = get_nonempty_string('Capacity', $out, q{});
 	    $capacity =~ s{\A .*? \((\d+) \s bytes\) \z}{$1}xms;
 	    if ($capacity eq 'Unavailable') {
 		$capacity = -1;
+	    }
+	    if ($cert eq 'Yes' or $cert eq 'Not Applicable') {
+		$cert = 1;
+	    }
+	    else {
+		$cert = 0;
 	    }
 	}
 
@@ -1552,6 +1562,12 @@ sub check_physical_disks {
 	elsif ($state =~ m{\A Rebuilding|Replacing \z}xms) {
 	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d is %s%s',
 	      $name, $vendor, $product, $capacity, $ctrl, $state, $progr;
+	    report('storage', $msg, $E_WARNING, $nexus);
+	}
+	# Special case: Uncertified disk
+	elsif ($status eq 'Non-Critical' and !$cert) {
+	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d is Not Certified',
+	      $name, $vendor, $product, $capacity, $ctrl;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
