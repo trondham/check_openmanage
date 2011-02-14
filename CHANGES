@@ -1,6 +1,7 @@
 3.7.0
 ------------------
 
+* Fixed typo in help output
 * TODO: Uncerfified physical drives makes non-critical status
 * TODO: SD card in '--only chassis'
 * TODO: New check_openmanage.php
