@@ -1093,7 +1093,7 @@ sub warranty_url {
 # This helper function returns the corresponding value of a hash key,
 # but takes into account that the key may not exist
 sub get_hashval {
-    my $key  = shift || return undef;
+    my $key  = shift || return;
     my $hash = shift;
     return defined $hash->{$key} ? $hash->{$key} : "Undefined value $key";
 }
