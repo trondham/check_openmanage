@@ -4927,10 +4927,7 @@ if (defined $opt{perfdata} && !$opt{debug} && @perfdata) {
     }
 }
 
-# Print a linebreak at the end
-print "\n" if !$opt{debug};
-
-# Wrapping up
+# Wrapping up and finishing
 if ($opt{debug}) {
    # Exit with value 3 (unknown) if debug
     exit $E_UNKNOWN;
