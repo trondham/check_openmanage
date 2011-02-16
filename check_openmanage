@@ -2857,7 +2857,7 @@ sub check_fans {
 	next FAN if blacklisted('fan', $index);
 
 	# Default
-	my $msg = sprintf 'Chassis fan %d [%s] reading: %s rpm',
+	my $msg = sprintf 'Chassis fan %d [%s] reading: %s RPM',
 	  $index, $location, $reading;
 	my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	report('chassis', $msg, $err, $index);
