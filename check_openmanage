@@ -2856,17 +2856,10 @@ sub check_fans {
 	$count{fan}++;
 	next FAN if blacklisted('fan', $index);
 
-	if ($status ne 'Ok') {
-	    my $msg = sprintf 'Chassis fan %d [%s] needs attention: %s',
-	      $index, $location, $status;
-	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
-	    report('chassis', $msg, $err, $index);
-	}
-	else {
-	    my $msg = sprintf 'Chassis fan %d [%s]: %s',
-	      $index, $location, $reading;
-	    report('chassis', $msg, $E_OK, $index);
-	}
+	# Default
+	my $msg = sprintf 'Chassis fan %d [%s] reads %s rpm',
+	  $index, $location, $reading;
+	report('chassis', $msg, $E_OK, $index);
 
 	# Collect performance data
 	if (defined $opt{perfdata}) {
