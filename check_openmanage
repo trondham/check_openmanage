@@ -2859,7 +2859,8 @@ sub check_fans {
 	# Default
 	my $msg = sprintf 'Chassis fan %d [%s] reads %s rpm',
 	  $index, $location, $reading;
-	report('chassis', $msg, $E_OK, $index);
+	my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
+	report('chassis', $msg, $err, $index);
 
 	# Collect performance data
 	if (defined $opt{perfdata}) {
