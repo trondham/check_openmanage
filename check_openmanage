@@ -4930,5 +4930,15 @@ if (defined $opt{perfdata} && !$opt{debug} && @perfdata) {
 # Print a linebreak at the end
 print "\n" if !$opt{debug};
 
-# Exit with proper exit code
-exit $exit_code;
+# Wrapping up
+if ($opt{debug}) {
+   # Exit with value 3 (unknown) if debug
+    exit $E_UNKNOWN;
+}
+else {
+    # Print a linebreak at the end if we have a TTY
+    isatty(*STDOUT) && print "\n";
+
+    # Exit with proper exit code
+    exit $exit_code;
+}
