@@ -10,6 +10,7 @@
   the changes in perfdata output from the plugin
 * SD card check is now included if '--only chassis' is specified
 * The plugin will give a warning if a physical drive is uncertified
+* Slightly improved reporting of fan status
 
 
 3.6.5   2011-02-09
