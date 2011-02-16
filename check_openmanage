@@ -205,13 +205,13 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 # If user requested help
 if ($opt{help}) {
     print $USAGE, $HELP;
-    exit $E_OK;
+    exit $E_UNKNOWN;
 }
 
 # If user requested version info
 if ($opt{version}) {
     print $LICENSE;
-    exit $E_OK;
+    exit $E_UNKNOWN;
 }
 
 # Setting timeout
