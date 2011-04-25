@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-alpha';
+$VERSION = '3.7.0-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -74,6 +74,7 @@ $HELP = <<'END_HELP';
 
 GENERAL OPTIONS:
 
+   -f, --configfile     Configuration file
    -p, --perfdata       Output performance data [default=no]
    -t, --timeout        Plugin timeout in seconds [default=30]
    -c, --critical       Custom temperature critical limits
@@ -129,6 +130,7 @@ END_LICENSE
 	 'check'             => [],       # check control
 	 'critical'          => [],       # temperature critical limits
 	 'warning'           => [],       # temperature warning limits
+         'configfile'        => undef,    # configuration file
 	 'timeout'           => 30,       # default timeout is 30 seconds
 	 'debug'             => 0,        # debugging / verbose output
 	 'help'              => 0,        # display help output
@@ -168,6 +170,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'check=s'            => \@{ $opt{check} },
 	   'c|critical=s'       => \@{ $opt{critical} },
 	   'w|warning=s'        => \@{ $opt{warning} },
+           'f|configfile=s'     => \$opt{configfile},
 	   't|timeout=i'        => \$opt{timeout},
 	   'd|debug'            => \$opt{debug},
 	   'h|help'             => \$opt{help},
@@ -394,11 +397,17 @@ $globalstatus   = $E_OK;  # default global health status is "OK"
      'rac_fw'   => 'N/A',  # RAC firmware
     );
 
+# Initialize blacklist
+%blacklist = ();
+
+# Read config file
+parse_configfile() if defined $opt{configfile};
+
 # Adjust which checks to perform
 adjust_checks() if defined $opt{check};
 
 # Blacklisted components
-%blacklist = defined $opt{blacklist} ? %{ get_blacklist() } : ();
+set_blacklist($opt{blacklist}) if defined $opt{blacklist};
 
 # If blacklisting is in effect, don't check global health status
 if (scalar keys %blacklist > 0) {
@@ -428,6 +437,94 @@ else {
 #---------------------------------------------------------------------
 # Helper functions
 #---------------------------------------------------------------------
+
+# Make a regex from a glob pattern. Shamelessly stolen from Perl
+# Cookbook chapter 6.9
+sub glob2regex {
+    my $globstr = shift;
+    my %patmap
+      = ( '*' => '.*',
+          '?' => '.',
+          '[' => '[',
+          ']' => ']',
+        );
+    $globstr =~ s{(.)} { $patmap{$1} || "\Q$1" }ge;
+    return '\A' . $globstr . '\z';
+}
+
+#
+# Read config file
+#
+sub parse_configfile {
+    my $tiny = undef;
+
+    # Load the perl module
+    if ( eval { require Config::Tiny; 1 } ) {
+	$tiny = Config::Tiny->new();
+    }
+    else {
+	print "ERROR: Perl module 'Config::Tiny' not found\n";
+	exit $E_UNKNOWN;
+    }
+
+    # Read the config file
+    $tiny = Config::Tiny->read($opt{configfile})
+      or do { report('other', "Couldn't read configuration file '$opt{configfile}': $!", $E_UNKNOWN);
+	      return; };
+
+    # Adjust checks according to statements in the configuration file
+    sub configfile_adjust_checks {
+	my ($obj, $keyword) = @_;
+	my $off = qr{\A (0|off|false) \s* \z}xms;
+	my $on  = qr{\A (1|on|true) \s* \z}xms;
+      CHECK_CONFIG:
+	foreach my $key (keys %check) {
+	    my $copt = join '_', 'check', $key;
+	    next CHECK_CONFIG if !defined $obj->{$keyword}->{$copt} or $obj->{$keyword}->{$copt} eq q{};
+	    if ($obj->{$keyword}->{$copt} =~ m{$on}xms) {
+		$check{$key} = 1;
+	    }
+	    elsif ($obj->{$keyword}->{$copt} =~ m{$off}xms) {
+		$check{$key} = 0;
+	    }
+	}
+	return;
+    }
+
+    # Set blacklist according to statements in the configuration file
+    sub configfile_set_blacklist {
+	my ($obj, $keyword) = @_;
+	if (defined $obj->{$keyword}->{blacklist} and $obj->{$keyword}->{blacklist} ne q{}) {
+	    # set_blacklist() takes an array ref
+	    set_blacklist([$obj->{$keyword}->{blacklist}]);
+	}
+	return;
+    }
+
+    # Get global configuration options
+    configfile_adjust_checks($tiny, '_');
+    configfile_set_blacklist($tiny, '_');
+
+    # Get host options (exact or regexp)
+    if (defined $tiny->{$opt{hostname}}) {
+	configfile_adjust_checks($tiny, $opt{hostname});
+	configfile_set_blacklist($tiny, $opt{hostname});
+    }
+    else {
+      SECTION:
+	foreach my $section (keys %{ $tiny }) {
+	    next SECTION if $section eq '_';   # global section
+	    my $regex = glob2regex($section);  # make regexp
+	    if ($opt{hostname} =~ m{$regex}) {
+		configfile_adjust_checks($tiny, $section);
+		configfile_set_blacklist($tiny, $section);
+		last SECTION;
+	    }
+	}
+    }
+
+    return;
+}
 
 #
 # Store a message in one of the message arrays
@@ -691,12 +788,12 @@ sub check_omreport_options {
 # Read the blacklist option and return a hash containing the
 # blacklisted components
 #
-sub get_blacklist {
+sub set_blacklist {
+    my $foo = shift;
     my @bl = ();
-    my %blacklist = ();
 
-    if (scalar @{ $opt{blacklist} } >= 0) {
-	foreach my $black (@{ $opt{blacklist} }) {
+    if (scalar @{ $foo } >= 0) {
+	foreach my $black (@{ $foo }) {
 	    my $tmp = q{};
 	    if (-f $black) {
 		open my $BL, '<', $black
@@ -721,11 +818,11 @@ sub get_blacklist {
 	    next if $c !~ m/=/xms;
 	    my ($key, $val) = split /=/xms, $c;
 	    my @vals = split /,/xms, $val;
-	    $blacklist{$key} = \@vals;
+	    push @{ $blacklist{$key} }, @vals;
 	}
     }
 
-    return \%blacklist;
+    return;
 }
 
 #
@@ -867,6 +964,13 @@ sub run_omreport {
 
     # Workaround for Openmanage BUG introduced in OMSA 5.5.0
     $rawtext =~ s{\n;}{;}gxms if $command eq 'storage controller';
+
+    # Workaround for logical connectors where there are extra
+    # information that isn't possible to parse consistently. Remove
+    # everything after and including "Path Health"
+    if ($command =~ m{\A storage\sconnector}xms) {
+	$rawtext =~ s{Path\sHealth.*}{}xms;
+    }
 
     # Report if no controllers found
     if ($command eq 'storage controller' and $rawtext =~ m{No\scontrollers\sfound}xms) {
