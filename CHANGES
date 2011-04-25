@@ -13,7 +13,9 @@
 * Slightly improved reporting of fan status
 * Exit with value 3 (unknown) if printing debug, help or version
   info. This is best practice for Nagios plugins.
-
+* Workaround added for logical SAS connectors to external storage
+  enclosures, where omreport contains unparseable output
+* Added support for a configuration file
 
 3.6.5   2011-02-09
 ------------------
