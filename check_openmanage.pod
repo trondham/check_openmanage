@@ -751,6 +751,7 @@ along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
 =head1 SEE ALSO
 
+L<check_openmanage.conf(5)>
 L<http://folk.uio.no/trondham/software/check_openmanage.html>
 
 =cut
