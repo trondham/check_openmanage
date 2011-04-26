@@ -120,7 +120,7 @@ blacklists from the config file and parameter are added together.
 
 =head1 SEE ALSO
 
-L<check_openmanage(8)> 
+L<check_openmanage(8)>
 L<http://folk.uio.no/trondham/software/check_openmanage.html>
 
 =cut
