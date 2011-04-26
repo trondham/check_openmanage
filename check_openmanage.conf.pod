@@ -1,0 +1,126 @@
+# Man page created with:
+#
+#  pod2man -s 5 -r "`./check_openmanage -V | head -n 1`" -c 'Nagios plugin' check_openmanage.conf.pod check_openmanage.conf.5
+#
+# $Id: check_openmanage.pod 20039 2011-04-26 09:56:56Z trondham $
+
+=head1 NAME
+
+check_openmanage.conf - Configuration file for check_openmanage
+
+=head1 FILE FORMAT
+
+The file has an ini-style syntax and consists of sections and
+parameters. A section begins with the name of the section in square
+brackets and continues until the next section begins. An example of
+section with two keywords and parameters:
+
+    [section]
+        key = boolean
+        key2 = string
+
+The data types used are string (no quotes needed) and bool (with
+values of C<TRUE/FALSE>). For boolean values, C<1>, C<on> and C<true>
+are equivalent, likewise for C<0>, C<off> and C<false>. They are also
+case insensitive.
+
+The root section or global section has no section name in brackets,
+example:
+
+    key = false
+    key2 = foo
+
+    [section]
+        key = true
+        key2 = bar
+
+The values set in a bracket section will override those set in the
+root section, in case of conflicts.
+
+Lines starting with C<#> or C<;> are considered comments and ignored, as
+are blank lines.
+
+The configuration file must be a regular file. Owner and group does
+not matter, but the Nagios user must have read access.
+
+=head1 SECTIONS AND ORDERING
+
+The section name should correspond to the hostname, i.e. the value
+passed to the C<-H> or C<--hostname> parameter. The section name
+itself can be either an exact match to the hostname, or a glob
+pattern, as this example shows:
+
+    key = true
+    key2 = foo
+
+    [192.168.1.2]
+        key = true
+
+    [192.168.*]
+        key = false
+        key2 = bar
+
+The sections are read in order of significance. The root section is
+read first. Then any sections with glob patterns that match the
+hostname are read (alphabetically). Any section whose name is an exact
+match to the hostname is read last.
+
+For boolean values, any conflicts are resolved by letting the section
+with the most significance (closest match to the hostname) override
+any previous definitions. For string values, they are simply added
+together.
+
+In the example above, for the host C<192.168.1.2> the value of C<key>
+will be C<true> and C<key2> will be C<bar>. Any other host that
+matches C<192.168.*> will have C<key = false> and C<key2 = bar>. All
+other hosts will have C<key = true> and C<key2 = foo>.
+
+=head1 CONFIGURATION
+
+=over4
+
+=item CHECK CONTROL
+
+Any keyword to the C<--check> parameter are accepted in the
+configuration file, as C<check_KEYWORD>. These options take boolean
+values (C<true> or C<false>). The following keywords are accepted for
+check control, listed here with their default values:
+
+    check_storage = true
+    check_memory = true
+    check_fans = true
+    check_power = true
+    check_temp = true
+    check_cpu = true
+    check_voltage = true
+    check_batteries = true
+    check_amperage = true
+    check_intrusion = true
+    check_sdcard = true
+    check_esmhealth = true
+    check_esmlog = false
+    check_alertlog = false
+
+If used together with the C<--check> parameter to the plugin, the
+plugin parameter will override the configuration file, if there is a
+conflict.
+
+=item BLACKLISTING
+
+For blacklisting the keyword C<blacklist> is used, and the value is a
+string that uses the same syntax as the C<-b> or C<--blacklist>
+parameter. Example:
+
+    blacklist = ctrl_fw=all/pdisk=0:0:1
+
+If used together with the C<-b> or C<--blacklist> parameter, the two
+blacklists from the config file and parameter are added together.
+
+=back
+
+=head1 SEE ALSO
+
+L<check_openmanage(8)> 
+L<http://folk.uio.no/trondham/software/check_openmanage.html>
+
+=cut
