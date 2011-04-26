@@ -475,16 +475,16 @@ sub parse_configfile {
     # Adjust checks according to statements in the configuration file
     sub configfile_adjust_checks {
 	my ($obj, $keyword) = @_;
-	my $off = qr{\A (0|off|false) \s* \z}xms;
-	my $on  = qr{\A (1|on|true) \s* \z}xms;
+	my $off = qr{\A (0|off|false) \s* \z}ixms;
+	my $on  = qr{\A (1|on|true) \s* \z}ixms;
       CHECK_CONFIG:
 	foreach my $key (keys %check) {
 	    my $copt = join '_', 'check', $key;
 	    next CHECK_CONFIG if !defined $obj->{$keyword}->{$copt} or $obj->{$keyword}->{$copt} eq q{};
-	    if ($obj->{$keyword}->{$copt} =~ m{$on}xms) {
+	    if ($obj->{$keyword}->{$copt} =~ m{$on}ixms) {
 		$check{$key} = 1;
 	    }
-	    elsif ($obj->{$keyword}->{$copt} =~ m{$off}xms) {
+	    elsif ($obj->{$keyword}->{$copt} =~ m{$off}ixms) {
 		$check{$key} = 0;
 	    }
 	}
