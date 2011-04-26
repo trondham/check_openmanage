@@ -33,6 +33,11 @@ in SNMP mode.
 
 =over 4
 
+=item -f, --configfile I<FILE>
+
+Specify a configuration file. For reference on the config file syntax
+and options, consult the L<check_openmanage.conf(5)> manual page.
+
 =item -t, --timeout I<SECONDS>
 
 The number of seconds after which the plugin will abort. Default
