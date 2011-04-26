@@ -77,9 +77,9 @@ other hosts will have C<key = true> and C<key2 = foo>.
 
 =head1 CONFIGURATION
 
-=over4
+=over 4
 
-=item CHECK CONTROL
+=item Check control
 
 Any keyword to the C<--check> parameter are accepted in the
 configuration file, as C<check_KEYWORD>. These options take boolean
@@ -105,7 +105,7 @@ If used together with the C<--check> parameter to the plugin, the
 plugin parameter will override the configuration file, if there is a
 conflict.
 
-=item BLACKLISTING
+=item Blacklisting
 
 For blacklisting the keyword C<blacklist> is used, and the value is a
 string that uses the same syntax as the C<-b> or C<--blacklist>
