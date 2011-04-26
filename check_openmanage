@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta1';
+$VERSION = '3.7.0-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -501,27 +501,29 @@ sub parse_configfile {
 	return;
     }
 
-    # Get global configuration options
+    # First: Get global configuration options
     configfile_adjust_checks($tiny, '_');
     configfile_set_blacklist($tiny, '_');
 
-    # Get host options (exact or regexp)
+    # Second: Get options from glob pattern (but NOT exact match)
+  PATTERN:
+    foreach my $section (sort keys %{ $tiny }) {
+	next PATTERN if $section eq '_';            # global section
+        next PATTERN if $section eq $opt{hostname}; # exact match
+	my $regex = glob2regex($section);           # make regexp
+	if ($opt{hostname} =~ m{$regex}) {
+            print "DEBUG: pattern = $section\n";
+	    configfile_adjust_checks($tiny, $section);
+	    configfile_set_blacklist($tiny, $section);
+	}
+    }
+
+    # Third: Get host options (exact match to hostname)
     if (defined $tiny->{$opt{hostname}}) {
 	configfile_adjust_checks($tiny, $opt{hostname});
 	configfile_set_blacklist($tiny, $opt{hostname});
     }
-    else {
-      SECTION:
-	foreach my $section (keys %{ $tiny }) {
-	    next SECTION if $section eq '_';   # global section
-	    my $regex = glob2regex($section);  # make regexp
-	    if ($opt{hostname} =~ m{$regex}) {
-		configfile_adjust_checks($tiny, $section);
-		configfile_set_blacklist($tiny, $section);
-		last SECTION;
-	    }
-	}
-    }
+
 
     return;
 }
