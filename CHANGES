@@ -1,21 +1,32 @@
 3.7.0
 ------------------
 
-* Fixed typo in help output
 * Major overhaul of the perfdata code. This includes API breakage and
   fixes the following:
   - Probes were not sorted correctly
   - Voltage data was not included
 * The PNP template check_openmanage.php has been redone to work with
   the changes in perfdata output from the plugin
-* SD card check is now included if '--only chassis' is specified
-* The plugin will give a warning if a physical drive is uncertified
+* Added support for a configuration file
+
+3.6.6   2011-04-28
+------------------
+
+* Fixed typo in help output
+* SD card check is now included if the parameter '--only chassis' is
+  specified
+* The plugin will issue a proper warning if a physical drive is
+  uncertified, instead of an unspecified warning. One or more
+  uncertified drives will make the controller go into a non-critical
+  (warning) state.
 * Slightly improved reporting of fan status
 * Exit with value 3 (unknown) if printing debug, help or version
-  info. This is best practice for Nagios plugins.
+  info. This is considered best practice for Nagios plugins.
 * Workaround added for logical SAS connectors to external storage
-  enclosures, where omreport contains unparseable output
-* Added support for a configuration file
+  enclosures, when using check_openmanage in local mode with OMSA
+  6.4.0 or later versions. The output from omreport could contain
+  lines that the plugin was unable to parse, which would lead to
+  internal errors.
 
 3.6.5   2011-02-09
 ------------------
