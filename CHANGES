@@ -9,6 +9,12 @@
   the changes in perfdata output from the plugin
 * Added support for a configuration file
 
+3.6.7   2011-05-10
+------------------
+
+* A regression wrt. non-certified drives were fixed. The plugin failed
+  to identify non-certified physical drives via SNMP.
+
 3.6.6   2011-04-28
 ------------------
 
