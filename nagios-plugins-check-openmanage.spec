@@ -55,7 +55,7 @@ pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin
 
 
 %changelog
-* Tue May 10 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.7-1
+* Thu May 12 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.7-1
 - Version 3.6.7
 
 * Thu Apr 28 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.6-1
