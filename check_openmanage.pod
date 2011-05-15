@@ -442,6 +442,10 @@ only available in local mode, i.e. not with SNMP.
 
 Physical disk.
 
+=item B<pdisk_cert>
+
+Suppress warning message about non-certified physical disk.
+
 =item B<vdisk>
 
 Logical drive (virtual disk)
