@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta2';
+$VERSION = '3.7.0-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -217,22 +217,8 @@ if ($opt{version}) {
     exit $E_UNKNOWN;
 }
 
-# Setting timeout
-$SIG{ALRM} = sub {
-    print "PLUGIN TIMEOUT: $NAME timed out after $opt{timeout} seconds\n";
-    exit $E_UNKNOWN;
-};
-alarm $opt{timeout};
-
-# If we're using SNMP
-$snmp = defined $opt{hostname} ? 1 : 0;
-
-# SNMP session variables
-$snmp_session = undef;
-$snmp_error   = undef;
-
-# The omreport command
-$omreport = undef;
+# Initialize blacklist
+%blacklist = ();
 
 # Check flags, override available with the --check option
 %check = ( 'storage'     => 1,   # check storage subsystem
@@ -250,6 +236,31 @@ $omreport = undef;
 	   'esmlog'      => 0,   # check the ESM log (hardware log)
 	   'esmhealth'   => 1,   # check the ESM log overall health
 	 );
+
+# Messages
+@report_storage = ();  # messages with associated nagios level (storage)
+@report_chassis = ();  # messages with associated nagios level (chassis)
+@report_other   = ();  # messages with associated nagios level (other)
+
+# Read config file
+parse_configfile() if defined $opt{configfile};
+
+# Setting timeout
+$SIG{ALRM} = sub {
+    print "PLUGIN TIMEOUT: $NAME timed out after $opt{timeout} seconds\n";
+    exit $E_UNKNOWN;
+};
+alarm $opt{timeout};
+
+# If we're using SNMP
+$snmp = defined $opt{hostname} ? 1 : 0;
+
+# SNMP session variables
+$snmp_session = undef;
+$snmp_error   = undef;
+
+# The omreport command
+$omreport = undef;
 
 # Default line break
 $linebreak = isatty(*STDOUT) ? "\n" : '<br/>';
@@ -277,11 +288,6 @@ if (!$snmp && -f $FW_LOCK) {
 @controllers = ();  # controllers
 @enclosures  = ();  # enclosures
 %snmp_enclosure   = ();  # enclosures
-
-# Messages
-@report_storage = ();  # messages with associated nagios level (storage)
-@report_chassis = ();  # messages with associated nagios level (chassis)
-@report_other   = ();  # messages with associated nagios level (other)
 
 # Counters for everything
 %count
@@ -397,12 +403,6 @@ $globalstatus   = $E_OK;  # default global health status is "OK"
      'rac_fw'   => 'N/A',  # RAC firmware
     );
 
-# Initialize blacklist
-%blacklist = ();
-
-# Read config file
-parse_configfile() if defined $opt{configfile};
-
 # Adjust which checks to perform
 adjust_checks() if defined $opt{check};
 
@@ -456,7 +456,27 @@ sub glob2regex {
 # Read config file
 #
 sub parse_configfile {
-    my $tiny = undef;
+    our $tiny = undef;
+
+    # Regexp for boolean values
+    our $off = qr{\A (0|off|false) \s* \z}ixms;
+    our $on  = qr{\A (1|on|true) \s* \z}ixms;
+
+    # Mapping between command line options and the corresponding
+    # config file options
+    our %opt2config
+      = ( 'info'           => 'output_servicetag',
+	  'extinfo'        => 'output_sysinfo',
+	  'state'          => 'output_servicestate',
+	  'shortstate'     => 'output_servicestate_abbr',
+	  'show_blacklist' => 'output_blacklist',
+	  'htmlinfo'       => 'output_html',
+	  'protocol'       => 'snmp_version',
+	  'community'      => 'snmp_community',
+	  'port'           => 'snmp_port',
+#	  'ipv6'           => 'snmp_ipv6',
+#	  'tcp'            => 'smnp_tcp',
+	);
 
     # Load the perl module
     if ( eval { require Config::Tiny; 1 } ) {
@@ -474,18 +494,19 @@ sub parse_configfile {
 
     # Adjust checks according to statements in the configuration file
     sub configfile_adjust_checks {
-	my ($obj, $keyword) = @_;
-	my $off = qr{\A (0|off|false) \s* \z}ixms;
-	my $on  = qr{\A (1|on|true) \s* \z}ixms;
+	my $keyword = shift;
       CHECK_CONFIG:
 	foreach my $key (keys %check) {
 	    my $copt = join '_', 'check', $key;
-	    next CHECK_CONFIG if !defined $obj->{$keyword}->{$copt} or $obj->{$keyword}->{$copt} eq q{};
-	    if ($obj->{$keyword}->{$copt} =~ m{$on}ixms) {
+	    next CHECK_CONFIG if !defined $tiny->{$keyword}->{$copt} or $tiny->{$keyword}->{$copt} eq q{};
+	    if ($tiny->{$keyword}->{$copt} =~ m{$on}ixms) {
 		$check{$key} = 1;
 	    }
-	    elsif ($obj->{$keyword}->{$copt} =~ m{$off}ixms) {
+	    elsif ($tiny->{$keyword}->{$copt} =~ m{$off}ixms) {
 		$check{$key} = 0;
+	    }
+	    else {
+		report('other', "CONFIG ERROR: Rvalue for '$copt' must be boolean", $E_UNKNOWN);
 	    }
 	}
 	return;
@@ -493,37 +514,142 @@ sub parse_configfile {
 
     # Set blacklist according to statements in the configuration file
     sub configfile_set_blacklist {
-	my ($obj, $keyword) = @_;
-	if (defined $obj->{$keyword}->{blacklist} and $obj->{$keyword}->{blacklist} ne q{}) {
+	my $keyword = shift;
+	if (defined $tiny->{$keyword}->{blacklist} and $tiny->{$keyword}->{blacklist} ne q{}) {
 	    # set_blacklist() takes an array ref
-	    set_blacklist([$obj->{$keyword}->{blacklist}]);
+	    set_blacklist([$tiny->{$keyword}->{blacklist}]);
 	}
 	return;
     }
 
-    # First: Get global configuration options
-    configfile_adjust_checks($tiny, '_');
-    configfile_set_blacklist($tiny, '_');
+    # Set timeout according to statements in the configuration file
+    sub configfile_set_timeout {
+	my $keyword = shift;
+	if (defined $tiny->{$keyword}->{timeout} and $tiny->{$keyword}->{timeout} ne q{}) {
+	    if ($tiny->{$keyword}->{timeout} =~ m{\A \d+ \z}xms) { # integer
+		$opt{timeout} = $tiny->{$keyword}->{timeout};
+	    }
+	    else {
+		report('other', "CONFIG ERROR: Rvalue for 'timeout' must be an integer", $E_UNKNOWN);
+	    }
+	}
+	return;
+    }
 
-    # Second: Get options from glob pattern (but NOT exact match)
+    # Set a boolean option
+    sub configfile_set_boolean {
+	my ($keyword, $bool) = @_;
+	my $cbool = $opt2config{$bool};
+	if (defined $tiny->{$keyword}->{$cbool} and $tiny->{$keyword}->{$cbool} ne q{}) {
+	    if ($tiny->{$keyword}->{$cbool} =~ m{$on}ixms) {
+		$opt{$bool} = 1;
+	    }
+	    elsif ($tiny->{$keyword}->{$cbool} =~ m{$off}ixms) {
+		$opt{$bool} = 0;
+	    }
+	    else {
+		report('other', "CONFIG ERROR: Rvalue for '$cbool' must be boolean", $E_UNKNOWN);
+	    }
+	}
+	return;
+    }
+
+    # Set htmlinfo option from config file
+    sub configfile_set_htmlinfo {
+	my $keyword = shift;
+	my $conf = $opt2config{htmlinfo};
+	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
+	    if ($tiny->{$keyword}->{$conf} =~ m{$on}ixms) {
+		$opt{htmlinfo} = 1;
+	    }
+	    elsif ($tiny->{$keyword}->{$conf} =~ m{$off}ixms) {
+		$opt{htmlinfo} = undef;
+	    }
+	    else {
+		$opt{htmlinfo} = $tiny->{$keyword}->{$conf};
+	    }
+	}
+	return;
+    }
+
+    # Set SNMP protocol version from config file
+    sub configfile_set_snmp_version {
+	my $keyword = shift;
+	my $conf = $opt2config{protocol};
+	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
+	    if ($tiny->{$keyword}->{$conf} =~ m{\A 1|2|3 \z}xms) {
+		$opt{protocol} = $tiny->{$keyword}->{$conf};
+	    }
+	    else {
+		report('other', "CONFIG ERROR: Rvalue for '$conf' must be '1', '2' or '3'", $E_UNKNOWN);
+	    }
+	}
+	return;
+    }
+
+    # Set SNMP community name from config file
+    sub configfile_set_snmp_community {
+	my $keyword = shift;
+	my $conf = $opt2config{community};
+	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
+	    $opt{community} = $tiny->{$keyword}->{$conf};
+	}
+	return;
+    }
+
+    # Set SNMP port number from config file
+    sub configfile_set_snmp_port {
+	my $keyword = shift;
+	my $conf = $opt2config{port};
+	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
+	    if ($tiny->{$keyword}->{$conf} =~ m{\A \d+ \z}xms) { # integer
+		$opt{port} = $tiny->{$keyword}->{$conf};
+	    }
+	    else {
+		report('other', "CONFIG ERROR: Rvalue for '$conf' must be an integer", $E_UNKNOWN);
+	    }
+	}
+	return;
+    }
+
+    # Sections in the config file to check for statements
+    my @sections = ();
+
+    # First: Populate the sections array with the global section
+    @sections = ('_');
+
+    # Second: Populate the sections array with host glob pattern (but
+    # not exact match)
   PATTERN:
-    foreach my $section (sort keys %{ $tiny }) {
-	next PATTERN if $section eq '_';            # global section
-        next PATTERN if $section eq $opt{hostname}; # exact match
-	my $regex = glob2regex($section);           # make regexp
+    foreach my $glob (sort keys %{ $tiny }) {
+	next PATTERN if $glob eq '_';            # global section
+        next PATTERN if $glob eq $opt{hostname}; # exact match
+	my $regex = glob2regex($glob);           # make regexp
 	if ($opt{hostname} =~ m{$regex}) {
-            print "DEBUG: pattern = $section\n";
-	    configfile_adjust_checks($tiny, $section);
-	    configfile_set_blacklist($tiny, $section);
+	    push @sections, $glob;
 	}
     }
 
-    # Third: Get host options (exact match to hostname)
+    # Third: Populate the sections array with exact hostname
     if (defined $tiny->{$opt{hostname}}) {
-	configfile_adjust_checks($tiny, $opt{hostname});
-	configfile_set_blacklist($tiny, $opt{hostname});
+	push @sections, $opt{hostname};
     }
 
+    # Loop through the sections array and get options
+    foreach my $sect (@sections) {
+	configfile_adjust_checks($sect);
+	configfile_set_blacklist($sect);
+	configfile_set_timeout($sect);
+	configfile_set_htmlinfo($sect);
+	configfile_set_boolean($sect, 'info');
+	configfile_set_boolean($sect, 'extinfo');
+	configfile_set_boolean($sect, 'state');
+	configfile_set_boolean($sect, 'shortstate');
+	configfile_set_boolean($sect, 'show_blacklist');
+	configfile_set_snmp_version($sect);
+	configfile_set_snmp_community($sect);
+	configfile_set_snmp_port($sect);
+    }
 
     return;
 }
@@ -544,7 +670,6 @@ sub report {
 
     return push @{ $type2array{$type} }, [ $msg, $exval, $id ];
 }
-
 
 #
 # Run command, put resulting output lines in an array and return a
@@ -1569,7 +1694,7 @@ sub check_physical_disks {
 	    $spare    = get_hashval($out->{arrayDiskSpareState}, \%spare_state) || q{};
 	    $bus      = get_hashval($out->{arrayDiskBusType}, \%bus_type);
 	    $media    = get_hashval($out->{arrayDiskMediaType}, \%media_type);
-	    $cert     = $out->{arrayDiskDellCertified} || 1;
+	    $cert     = defined $out->{arrayDiskDellCertified} ? $out->{arrayDiskDellCertified} : 1;
 	    $capacity = exists $out->{arrayDiskLengthInMB}
 	      ? $out->{arrayDiskLengthInMB} * 1024**2 : -1;
 
@@ -1672,9 +1797,16 @@ sub check_physical_disks {
 	}
 	# Special case: Uncertified disk
 	elsif ($status eq 'Non-Critical' and !$cert) {
-	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d is Not Certified',
-	      $name, $vendor, $product, $capacity, $ctrl;
-	    report('storage', $msg, $E_WARNING, $nexus);
+	    if (blacklisted('pdisk_cert', $nexus)) {
+		my $msg = sprintf '%s [%s %s, %s] on ctrl %d is %s, Not Certified',
+		  $name, $vendor, $product, $capacity, $ctrl, $state;
+		report('storage', $msg, $E_OK, $nexus);
+	    }
+	    else {
+		my $msg = sprintf '%s [%s %s, %s] on ctrl %d is Not Certified',
+		  $name, $vendor, $product, $capacity, $ctrl;
+		report('storage', $msg, $E_WARNING, $nexus);
+	    }
 	}
 	# Default
 	elsif ($status ne 'Ok') {
