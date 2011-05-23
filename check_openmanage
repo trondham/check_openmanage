@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta3';
+$VERSION = '3.7.0-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -474,8 +474,8 @@ sub parse_configfile {
 	  'protocol'       => 'snmp_version',
 	  'community'      => 'snmp_community',
 	  'port'           => 'snmp_port',
-#	  'ipv6'           => 'snmp_ipv6',
-#	  'tcp'            => 'smnp_tcp',
+	  'ipv6'           => 'snmp_use_ipv6',
+	  'tcp'            => 'snmp_use_tcp',
 	);
 
     # Load the perl module
@@ -483,13 +483,13 @@ sub parse_configfile {
 	$tiny = Config::Tiny->new();
     }
     else {
-	print "ERROR: Perl module 'Config::Tiny' not found\n";
+	print "ERROR: Required perl module 'Config::Tiny' not found\n";
 	exit $E_UNKNOWN;
     }
 
     # Read the config file
     $tiny = Config::Tiny->read($opt{configfile})
-      or do { report('other', "Couldn't read configuration file '$opt{configfile}': $!", $E_UNKNOWN);
+      or do { report('other', (sprintf q{Couldn't read configuration file: %s}, Config::Tiny->errstr()), $E_UNKNOWN);
 	      return; };
 
     # Adjust checks according to statements in the configuration file
@@ -646,6 +646,8 @@ sub parse_configfile {
 	configfile_set_boolean($sect, 'state');
 	configfile_set_boolean($sect, 'shortstate');
 	configfile_set_boolean($sect, 'show_blacklist');
+	configfile_set_boolean($sect, 'ipv6');
+	configfile_set_boolean($sect, 'tcp');
 	configfile_set_snmp_version($sect);
 	configfile_set_snmp_community($sect);
 	configfile_set_snmp_port($sect);
