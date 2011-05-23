@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta4';
+$VERSION = '3.7.0-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -471,6 +471,7 @@ sub parse_configfile {
 	  'shortstate'     => 'output_servicestate_abbr',
 	  'show_blacklist' => 'output_blacklist',
 	  'htmlinfo'       => 'output_html',
+	  'okinfo'         => 'output_ok_verbosity',
 	  'protocol'       => 'snmp_version',
 	  'community'      => 'snmp_community',
 	  'port'           => 'snmp_port',
@@ -572,6 +573,21 @@ sub parse_configfile {
 	return;
     }
 
+    # Set OK output verbosity
+    sub configfile_set_ok_verbosity {
+	my $keyword = shift;
+	my $conf = $opt2config{okinfo};
+	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
+	    if ($tiny->{$keyword}->{$conf} =~ m{\A \d+ \z}xms) {
+		$opt{okinfo} = $tiny->{$keyword}->{$conf};
+	    }
+	    else {
+		report('other', "CONFIG ERROR: Rvalue for '$conf' must be a positive integer", $E_UNKNOWN);
+	    }
+	}
+	return;
+    }
+
     # Set SNMP protocol version from config file
     sub configfile_set_snmp_version {
 	my $keyword = shift;
@@ -606,7 +622,7 @@ sub parse_configfile {
 		$opt{port} = $tiny->{$keyword}->{$conf};
 	    }
 	    else {
-		report('other', "CONFIG ERROR: Rvalue for '$conf' must be an integer", $E_UNKNOWN);
+		report('other', "CONFIG ERROR: Rvalue for '$conf' must be a positive integer", $E_UNKNOWN);
 	    }
 	}
 	return;
@@ -641,6 +657,7 @@ sub parse_configfile {
 	configfile_set_blacklist($sect);
 	configfile_set_timeout($sect);
 	configfile_set_htmlinfo($sect);
+        configfile_set_ok_verbosity($sect);
 	configfile_set_boolean($sect, 'info');
 	configfile_set_boolean($sect, 'extinfo');
 	configfile_set_boolean($sect, 'state');
