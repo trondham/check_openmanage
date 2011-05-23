@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta5';
+$VERSION = '3.7.0-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -477,6 +477,9 @@ sub parse_configfile {
 	  'port'           => 'snmp_port',
 	  'ipv6'           => 'snmp_use_ipv6',
 	  'tcp'            => 'snmp_use_tcp',
+	  'warning'        => 'temp_threshold_warning',
+	  'critical'       => 'temp_threshold_critical',
+	  'all'            => 'check_everything',
 	);
 
     # Load the perl module
@@ -628,6 +631,17 @@ sub parse_configfile {
 	return;
     }
 
+    # Set temperature threshold from config file
+    sub configfile_set_temp_threshold {
+	my $keyword = shift;
+	my $level = shift;
+	my $conf = $opt2config{$level};
+	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
+	    $opt{$level} = [$tiny->{$keyword}->{$conf}]; # array ref
+	}
+	return;
+    }
+
     # Sections in the config file to check for statements
     my @sections = ();
 
@@ -658,6 +672,7 @@ sub parse_configfile {
 	configfile_set_timeout($sect);
 	configfile_set_htmlinfo($sect);
         configfile_set_ok_verbosity($sect);
+	configfile_set_boolean($sect, 'all');
 	configfile_set_boolean($sect, 'info');
 	configfile_set_boolean($sect, 'extinfo');
 	configfile_set_boolean($sect, 'state');
@@ -668,6 +683,8 @@ sub parse_configfile {
 	configfile_set_snmp_version($sect);
 	configfile_set_snmp_community($sect);
 	configfile_set_snmp_port($sect);
+	configfile_set_temp_threshold($sect, 'warning');
+	configfile_set_temp_threshold($sect, 'critical');
     }
 
     return;
