@@ -84,6 +84,16 @@ for more information.
 Override the machine-default temperature critical thresholds. Syntax
 and behaviour is the same as for warning thresholds described above.
 
+=item -F, --fahrenheit
+
+Set Fahrenheit as unit for all temperatures. This option will override
+the C<--tempunit> option, if used simultaneously.
+
+=item --tempunit I<CHAR>
+
+Set temperature unit. Legal values are C<F> for Fahrenheit, C<C> for
+Celsius, C<K> for Kelvin and C<R> for Rankine.
+
 =item -o, --ok-info I<NUMBER>
 
 This option lets you define how much output you want the plugin to
