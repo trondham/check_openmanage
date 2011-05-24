@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta6';
+$VERSION = '3.7.0-beta7';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -480,6 +480,7 @@ sub parse_configfile {
 	  'warning'        => 'temp_threshold_warning',
 	  'critical'       => 'temp_threshold_critical',
 	  'all'            => 'check_everything',
+	  'perfdata'       => 'performance_data',
 	);
 
     # Load the perl module
@@ -510,7 +511,7 @@ sub parse_configfile {
 		$check{$key} = 0;
 	    }
 	    else {
-		report('other', "CONFIG ERROR: Rvalue for '$copt' must be boolean", $E_UNKNOWN);
+		report('other', "CONFIG ERROR: Rvalue for '$copt' must be boolean (True/False)", $E_UNKNOWN);
 	    }
 	}
 	return;
@@ -534,7 +535,7 @@ sub parse_configfile {
 		$opt{timeout} = $tiny->{$keyword}->{timeout};
 	    }
 	    else {
-		report('other', "CONFIG ERROR: Rvalue for 'timeout' must be an integer", $E_UNKNOWN);
+		report('other', "CONFIG ERROR: Rvalue for 'timeout' must be a positive integer", $E_UNKNOWN);
 	    }
 	}
 	return;
@@ -552,7 +553,7 @@ sub parse_configfile {
 		$opt{$bool} = 0;
 	    }
 	    else {
-		report('other', "CONFIG ERROR: Rvalue for '$cbool' must be boolean", $E_UNKNOWN);
+		report('other', "CONFIG ERROR: Rvalue for '$cbool' must be boolean (True/False)", $E_UNKNOWN);
 	    }
 	}
 	return;
@@ -642,6 +643,27 @@ sub parse_configfile {
 	return;
     }
 
+    # Set perfdata from config file
+    sub configfile_set_perfdata {
+	my $keyword = shift;
+	my $conf = $opt2config{perfdata};
+	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
+	    if ($tiny->{$keyword}->{$conf} =~ m{$on}ixms) {
+		$opt{perfdata} = 1;
+	    }
+	    elsif ($tiny->{$keyword}->{$conf} =~ m{$off}ixms) {
+		$opt{perfdata} = undef;
+	    }
+	    elsif ($tiny->{$keyword}->{$conf} =~ m{\A minimal|multiline \z}xms) {
+		$opt{perfdata} = $tiny->{$keyword}->{$conf};
+	    }
+	    else {
+		report('other', "CONFIG ERROR: Rvalue for '$conf' must be either boolean, 'minimal' or 'multiline'", $E_UNKNOWN);
+	    }
+	}
+	return;
+    }
+
     # Sections in the config file to check for statements
     my @sections = ();
 
@@ -685,6 +707,7 @@ sub parse_configfile {
 	configfile_set_snmp_port($sect);
 	configfile_set_temp_threshold($sect, 'warning');
 	configfile_set_temp_threshold($sect, 'critical');
+	configfile_set_perfdata($sect);
     }
 
     return;
