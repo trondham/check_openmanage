@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta9';
+$VERSION = '3.7.0-beta10';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -74,7 +74,7 @@ $HELP = <<'END_HELP';
 
 GENERAL OPTIONS:
 
-   -f, --configfile     Configuration file
+   -f, --config         Specify configuration file
    -p, --perfdata       Output performance data [default=no]
    -t, --timeout        Plugin timeout in seconds [default=30]
    -c, --critical       Custom temperature critical limits
