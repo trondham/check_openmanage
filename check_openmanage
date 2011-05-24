@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta8';
+$VERSION = '3.7.0-beta9';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -496,6 +496,7 @@ sub parse_configfile {
 	  'critical'       => 'temp_threshold_critical',
 	  'all'            => 'check_everything',
 	  'perfdata'       => 'performance_data',
+	  'tempunit'       => 'temperature_unit',
 	);
 
     # Load the perl module
@@ -679,6 +680,21 @@ sub parse_configfile {
 	return;
     }
 
+    # Set temp unit from config file
+    sub configfile_set_tempunit {
+	my $keyword = shift;
+	my $conf = $opt2config{tempunit};
+	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
+	    if ($tiny->{$keyword}->{$conf} =~ m{\A C|F|K|R \z}ixms) {
+		$opt{tempunit} = $tiny->{$keyword}->{$conf};
+	    }
+	    else {
+		report('other', "CONFIG ERROR: Rvalue for '$conf' must one of C/F/K/R", $E_UNKNOWN);
+	    }
+	}
+	return;
+    }
+
     # Sections in the config file to check for statements
     my @sections = ();
 
@@ -723,6 +739,7 @@ sub parse_configfile {
 	configfile_set_temp_threshold($sect, 'warning');
 	configfile_set_temp_threshold($sect, 'critical');
 	configfile_set_perfdata($sect);
+	configfile_set_tempunit($sect);
     }
 
     return;
