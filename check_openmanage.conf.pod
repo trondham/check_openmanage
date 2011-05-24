@@ -161,6 +161,16 @@ integer. Example:
 If used together with the command line option C<-t> or C<--timeout>,
 the command line option takes precedence.
 
+=item Performance data
+
+Performance data can be turned on in the configuration file with
+C<performance_data>. Accepted values are boolean (TRUE/FALSE) or
+either of the keywords "minimal" and "multiline". Example:
+
+    performance_data = true
+
+The corresponding command line option is C<-p> or <--perfdata>.
+
 =back
 
 =head2 SNMP Options
