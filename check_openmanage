@@ -79,7 +79,7 @@ GENERAL OPTIONS:
    -t, --timeout        Plugin timeout in seconds [default=30]
    -c, --critical       Custom temperature critical limits
    -w, --warning        Custom temperature warning limits
-   -F, --fahrenheit     Use Fahrenheit for temperature [default=no]
+   -F, --fahrenheit     Use Fahrenheit as temperature unit
    -d, --debug          Debug output, reports everything
    -h, --help           Display this help text
    -V, --version        Display version info
