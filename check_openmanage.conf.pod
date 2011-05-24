@@ -96,7 +96,7 @@ match any single host. This may lead to unpredictable results.
 
 =head1 CONFIGURATION
 
-=head2 General
+=head2 GENERAL
 
 =over 4
 
@@ -171,9 +171,36 @@ either of the keywords "minimal" and "multiline". Example:
 
 The corresponding command line option is C<-p> or <--perfdata>.
 
+=item Temperature unit
+
+The temperature unit used for reporting, performance data etc. can be
+set with the C<temperature_unit> option. Allowed values are C<F> for
+Fahrenheit, C<C> for Celsius, C<K> for Kelvin and C<R> for
+Rankine. Example:
+
+    temperature_unit = F
+
+The corresponding command line option is C<--tempunit>, which will
+override the configuration option if used. The command line option
+C<-F> or C<--fahrenheit> will also override this option.
+
+=item Temperature limits
+
+Custom temperature limits may be configured with the options
+C<temp_threshold_warning> and C<temp_threshold_critical>. These
+options corresponds to the command line options C<-w> or C<--warning>
+and C<-c> or C<--critical>, respectively. They take the same arguments
+as the command line options. Example:
+
+    temp_threshold_warning = 0=30/10
+    temp_threshold_critical = 0=35/8
+
+The command line options take precedence over the configuration file
+options, if used simultaneously.
+
 =back
 
-=head2 SNMP Options
+=head2 SNMP OPTIONS
 
 Several SNMP related options may be set in the configuration file. For
 each of these, if used together with the corresponding command line
@@ -228,7 +255,7 @@ Corresponding command line option: C<--tcp>
 
 =back
 
-=head2 Output control
+=head2 OUTPUT CONTROL
 
 These options all corresponds to command line options. If the
 configuration file option and the corresponding command line option is
@@ -306,20 +333,6 @@ code. Example:
 Corresponding command line option: C<-I> or C<--htmlinfo>
 
 =back
-
-=head2 Temperature limits
-
-Custom temperature limits may be configured with the options
-C<temp_threshold_warning> and C<temp_threshold_critical>. These
-options corresponds to the command line options C<-w> or C<--warning>
-and C<-c> or C<--critical>, respectively. They take the same arguments
-as the command line options. Example:
-
-    temp_threshold_warning = 0=30/10
-    temp_threshold_critical = 0=35/8
-
-The command line options take precedence over the configuration file
-options, if used simultaneously.
 
 =head1 SEE ALSO
 
