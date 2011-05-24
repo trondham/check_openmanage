@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta7';
+$VERSION = '3.7.0-beta8';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -79,6 +79,7 @@ GENERAL OPTIONS:
    -t, --timeout        Plugin timeout in seconds [default=30]
    -c, --critical       Custom temperature critical limits
    -w, --warning        Custom temperature warning limits
+   -F, --fahrenheit     Use Fahrenheit for temperature [default=no]
    -d, --debug          Debug output, reports everything
    -h, --help           Display this help text
    -V, --version        Display version info
@@ -130,6 +131,8 @@ END_LICENSE
 	 'check'             => [],       # check control
 	 'critical'          => [],       # temperature critical limits
 	 'warning'           => [],       # temperature warning limits
+         'tempunit'          => 'C',      # temperature unit
+	 'fahrenheit'        => 0,        # Use fahrenheit
          'configfile'        => undef,    # configuration file
 	 'timeout'           => 30,       # default timeout is 30 seconds
 	 'debug'             => 0,        # debugging / verbose output
@@ -170,6 +173,8 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'check=s'            => \@{ $opt{check} },
 	   'c|critical=s'       => \@{ $opt{critical} },
 	   'w|warning=s'        => \@{ $opt{warning} },
+	   'tempunit=s'         => \$opt{tempunit},
+	   'F|fahrenheit'       => \$opt{fahrenheit},
            'f|configfile=s'     => \$opt{configfile},
 	   't|timeout=i'        => \$opt{timeout},
 	   'd|debug'            => \$opt{debug},
@@ -433,6 +438,16 @@ else {
     check_omreport_options();
 }
 
+# Temperature unit
+if ($opt{fahrenheit}) {
+    $opt{tempunit} = 'F';
+}
+
+# Check tempunit syntax
+if ($opt{tempunit} !~ m{\A C|F|K|R \z}xms) {
+    print "ERROR: Unknown temperature unit '$opt{tempunit}'\n";
+    exit $E_UNKNOWN;
+}
 
 #---------------------------------------------------------------------
 # Helper functions
@@ -1410,6 +1425,23 @@ sub get_nonempty_string {
 	return $hash->{$key};
     }
     return $alt;
+}
+
+# Converts from Celsius to something else
+sub temp_from_celsius {
+    my $x  = shift;
+    my $to = shift;
+
+    if ($to eq 'F') {
+       return ceil($x * 9/5 + 32);
+    }
+    elsif ($to eq 'K') {
+       return ceil($x + 273.15);
+    }
+    elsif ($to eq 'R') {
+       return ceil($x * 9/5 + 32 + 459.67);
+    }
+    return $x;
 }
 
 
@@ -2752,6 +2784,15 @@ sub check_enclosure_temp {
 	$min_warn =~ s{\A \s* (-?\d+) \s* C? \s* \z}{$1}xms or $min_warn = '[N/A]';
 	$min_crit =~ s{\A \s* (-?\d+) \s* C? \s* \z}{$1}xms or $min_crit = '[N/A]';
 
+	# Convert temp units
+	if ($opt{tempunit} ne 'C') {
+	    $reading  = temp_from_celsius($reading,  $opt{tempunit});
+	    $max_warn = temp_from_celsius($max_warn, $opt{tempunit});
+	    $max_crit = temp_from_celsius($max_crit, $opt{tempunit});
+	    $min_warn = temp_from_celsius($min_warn, $opt{tempunit});
+	    $min_crit = temp_from_celsius($min_crit, $opt{tempunit});
+	}
+
 	# Inactive temp probes
 	if ($status eq 'Unknown' and $state eq 'Inactive') {
 	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
@@ -2759,26 +2800,26 @@ sub check_enclosure_temp {
 	    report('storage', $msg, $E_OK, $nexus);
 	}
 	elsif ($status ne 'Ok' and $max_crit ne '[N/A]' and $reading > $max_crit) {
-	    my $msg = sprintf '%s in enclosure %s [%s] is critically high at %d C',
-	      $name, $encl_id, $encl_name, $reading;
+	    my $msg = sprintf '%s in enclosure %s [%s] is critically high at %d %s',
+	      $name, $encl_id, $encl_name, $reading, $opt{tempunit};
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	    report('chassis', $msg, $err, $nexus);
 	}
 	elsif ($status ne 'Ok' and $max_warn ne '[N/A]' and $reading > $max_warn) {
-	    my $msg = sprintf '%s in enclosure %s [%s] is too high at %d C',
-	      $name, $encl_id, $encl_name, $reading;
+	    my $msg = sprintf '%s in enclosure %s [%s] is too high at %d %s',
+	      $name, $encl_id, $encl_name, $reading, $opt{tempunit};
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	    report('chassis', $msg, $err, $nexus);
 	}
 	elsif ($status ne 'Ok' and $min_crit ne '[N/A]' and $reading < $min_crit) {
-	    my $msg = sprintf '%s in enclosure %s [%s] is critically low at %d C',
-	      $name, $encl_id, $encl_name, $reading;
+	    my $msg = sprintf '%s in enclosure %s [%s] is critically low at %d %s',
+	      $name, $encl_id, $encl_name, $reading, $opt{tempunit};
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	    report('chassis', $msg, $err, $nexus);
 	}
 	elsif ($status ne 'Ok' and $min_warn ne '[N/A]' and $reading < $min_warn) {
-	    my $msg = sprintf '%s in enclosure %s [%s] is too low at %d C',
-	      $name, $encl_id, $encl_name, $reading;
+	    my $msg = sprintf '%s in enclosure %s [%s] is too low at %d %s',
+	      $name, $encl_id, $encl_name, $reading, $opt{tempunit};
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	    report('chassis', $msg, $err, $nexus);
 	}
@@ -2789,7 +2830,7 @@ sub check_enclosure_temp {
 	    if (defined $reading && $reading =~ m{\A -?\d+ \z}xms) {
 		# take into account that with certain states the
 		# reading doesn't exist or is not an integer
-		$msg .= sprintf ' at %s C', $reading;
+		$msg .= sprintf ' at %s %s', $reading, $opt{tempunit};
 		if ($min_warn eq '[N/A]' or $min_crit eq '[N/A]') {
 		    $msg .= sprintf ' (max=%s/%s)', $max_warn, $max_crit;
 		}
@@ -2808,7 +2849,7 @@ sub check_enclosure_temp {
 	    if (defined $reading && $reading ne '[N/A]') {
 		# take into account that with certain states the
 		# reading doesn't exist or is not an integer
-		$msg .= sprintf ' reads %d C', $reading;
+		$msg .= sprintf ' reads %d %s', $reading, $opt{tempunit};
 		if ($min_warn eq '[N/A]' or $min_crit eq '[N/A]') {
 		    $msg .= sprintf ' (max=%s/%s)', $max_warn, $max_crit;
 		}
@@ -2830,7 +2871,7 @@ sub check_enclosure_temp {
 	    push @perfdata, {
 			     type  => 'E',
 			     id    => $opt{perfdata} eq 'minimal' ? "${encl_id}_t${index}" : "${encl_id}_temp_${index}",
-			     unit  => 'C',
+			     unit  => $opt{tempunit},
 			     label => q{},
 			     value => $reading,
 			     warn  => $max_warn,
@@ -3414,6 +3455,15 @@ sub check_temperatures {
 	$count{temp}++;
 	next TEMP if blacklisted('temp', $index);
 
+	# Convert temp units
+	if ($opt{tempunit} ne 'C') {
+	    $reading  = temp_from_celsius($reading,  $opt{tempunit});
+	    $max_warn = temp_from_celsius($max_warn, $opt{tempunit});
+	    $max_crit = temp_from_celsius($max_crit, $opt{tempunit});
+	    $min_warn = temp_from_celsius($min_warn, $opt{tempunit});
+	    $min_crit = temp_from_celsius($min_crit, $opt{tempunit});
+	}
+
 	if ($type eq 'Discrete') {
 	    my $msg = sprintf 'Temperature probe %d [%s] is %s',
 	      $index, $location, $discrete;
@@ -3424,56 +3474,56 @@ sub check_temperatures {
 	    # First check according to custom thresholds
 	    if (exists $crit_threshold{$index}{max} and $reading > $crit_threshold{$index}{max}) {
 		# Custom critical MAX
-		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (custom max=%d)',
-		  $index, $location, $reading, $crit_threshold{$index}{max};
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d %s (custom max=%d)',
+		  $index, $location, $reading, $opt{tempunit}, $crit_threshold{$index}{max};
 		report('chassis', $msg, $E_CRITICAL, $index);
 	    }
 	    elsif (exists $warn_threshold{$index}{max} and $reading > $warn_threshold{$index}{max}) {
 		# Custom warning MAX
-		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (custom max=%d)',
-		  $index, $location, $reading, $warn_threshold{$index}{max};
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d %s (custom max=%d)',
+		  $index, $location, $reading, $opt{tempunit}, $warn_threshold{$index}{max};
 		report('chassis', $msg, $E_WARNING, $index);
 	    }
 	    elsif (exists $crit_threshold{$index}{min} and $reading < $crit_threshold{$index}{min}) {
 		# Custom critical MIN
-		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (custom min=%d)',
-		  $index, $location, $reading, $crit_threshold{$index}{min};
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d %s (custom min=%d)',
+		  $index, $location, $reading, $opt{tempunit}, $crit_threshold{$index}{min};
 		report('chassis', $msg, $E_CRITICAL, $index);
 	    }
 	    elsif (exists $warn_threshold{$index}{min} and $reading < $warn_threshold{$index}{min}) {
 		# Custom warning MIN
-		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C (custom min=%d)',
-		  $index, $location, $reading, $warn_threshold{$index}{min};
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d %s (custom min=%d)',
+		  $index, $location, $reading, $opt{tempunit}, $warn_threshold{$index}{min};
 		report('chassis', $msg, $E_WARNING, $index);
 	    }
 	    elsif ($status ne 'Ok' and $max_crit ne '[N/A]' and $reading > $max_crit) {
-		my $msg = sprintf 'Temperature Probe %d [%s] is critically high at %d C',
-		  $index, $location, $reading;
+		my $msg = sprintf 'Temperature Probe %d [%s] is critically high at %d %s',
+		  $index, $location, $reading, $opt{tempunit};
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
 	    elsif ($status ne 'Ok' and $max_warn ne '[N/A]' and $reading > $max_warn) {
-		my $msg = sprintf 'Temperature Probe %d [%s] is too high at %d C',
-		  $index, $location, $reading;
+		my $msg = sprintf 'Temperature Probe %d [%s] is too high at %d %s',
+		  $index, $location, $reading, $opt{tempunit};
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
 	    elsif ($status ne 'Ok' and $min_crit ne '[N/A]' and $reading < $min_crit) {
-		my $msg = sprintf 'Temperature Probe %d [%s] is critically low at %d C',
-		  $index, $location, $reading;
+		my $msg = sprintf 'Temperature Probe %d [%s] is critically low at %d %s',
+		  $index, $location, $reading, $opt{tempunit};
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
 	    elsif ($status ne 'Ok' and $min_warn ne '[N/A]' and $reading < $min_warn) {
-		my $msg = sprintf 'Temperature Probe %d [%s] is too low at %d C',
-		  $index, $location, $reading;
+		my $msg = sprintf 'Temperature Probe %d [%s] is too low at %d %s',
+		  $index, $location, $reading, $opt{tempunit};
 		my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 		report('chassis', $msg, $err, $index);
 	    }
 	    # Ok
 	    else {
-		my $msg = sprintf 'Temperature Probe %d [%s] reads %d C',
-		  $index, $location, $reading;
+		my $msg = sprintf 'Temperature Probe %d [%s] reads %d %s',
+		  $index, $location, $reading, $opt{tempunit};
 		if ($min_warn eq '[N/A]' and $min_crit eq '[N/A]') {
 		    $msg .= sprintf ' (max=%s/%s)', $max_warn, $max_crit;
 		}
@@ -3494,7 +3544,7 @@ sub check_temperatures {
 		push @perfdata, {
 				 type  => 'T',
 				 id    => $index,
-				 unit  => 'C',
+				 unit  => $opt{tempunit},
 				 label => $pname,
 				 value => $reading,
 				 warn  => $max_warn,
