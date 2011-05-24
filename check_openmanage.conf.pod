@@ -94,6 +94,14 @@ limited to C<*>, C<?> and C<[]>. Some examples:
 CAUTION! Be careful not to have more than one glob pattern section
 match any single host. This may lead to unpredictable results.
 
+=head1 COMMAND LINE OPTIONS
+
+Unless otherwise  noted, options given in the configuration file will
+override any corresponding command line options.
+
+In general, avoid using the same options on command line and in the
+configuration file.
+
 =head1 CONFIGURATION
 
 =head2 GENERAL
@@ -144,7 +152,7 @@ parameter. Example:
     blacklist = ctrl_fw=all/pdisk=0:0:1
 
 If used together with the C<-b> or C<--blacklist> command line option,
-the two blacklists from the config file and command line are added
+the two blacklists from the config file and command line are merged
 together.
 
 For more information about blacklisting, including syntax, see
@@ -158,8 +166,7 @@ integer. Example:
 
     timeout = 60
 
-If used together with the command line option C<-t> or C<--timeout>,
-the command line option takes precedence.
+The corresponding command line option is C<-t> or C<--timeout>.
 
 =item Performance data
 
@@ -180,9 +187,9 @@ Rankine. Example:
 
     temperature_unit = F
 
-The corresponding command line option is C<--tempunit>, which will
-override the configuration option if used. The command line option
-C<-F> or C<--fahrenheit> will also override this option.
+The corresponding command line option is C<--tempunit>. Note that the
+command line option C<-F> or C<--fahrenheit> will override both the
+command line option and the configuration file option.
 
 =item Temperature limits
 
@@ -190,23 +197,17 @@ Custom temperature limits may be configured with the options
 C<temp_threshold_warning> and C<temp_threshold_critical>. These
 options corresponds to the command line options C<-w> or C<--warning>
 and C<-c> or C<--critical>, respectively. They take the same arguments
-as the command line options. Example:
+as the command line options. Examples:
 
     temp_threshold_warning = 0=30/10
     temp_threshold_critical = 0=35/8
-
-The command line options take precedence over the configuration file
-options, if used simultaneously.
 
 =back
 
 =head2 SNMP OPTIONS
 
-Several SNMP related options may be set in the configuration file. For
-each of these, if used together with the corresponding command line
-option, the latter takes presedence and overrules the option set in
-the configuration file. The configuration file may contain the
-following SNMP options:
+Several SNMP related options may be set in the configuration file. The
+configuration file may contain the following SNMP options:
 
 =over 4
 
@@ -257,9 +258,7 @@ Corresponding command line option: C<--tcp>
 
 =head2 OUTPUT CONTROL
 
-These options all corresponds to command line options. If the
-configuration file option and the corresponding command line option is
-used simultaneously, the command line option takes precedence.
+These options gives some control over the output given by the plugin.
 
 =over 4
 
