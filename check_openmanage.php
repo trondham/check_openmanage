@@ -56,11 +56,30 @@ $def_title = 'Dell OpenManage';
 # Loop through the performance data
 foreach ($DS as $i) {
 	
-    # TEMPERATURES (Celsius)
+    # TEMPERATURES
     if (preg_match('/^T/', $NAME[$i])) {
 	if ($visited_temp == 0) {
 	    ++$count;
 	    $visited_temp = 1;
+	}
+
+	# Temperature unit
+	switch ($VAL['UNIT']) {
+	    case "F":
+		$unit_long = "Fahrenheit";
+		$unit_short = "F";
+		break;
+	    case "K":
+		$unit_long = "Kelvin";
+		$unit_short = "K";
+		break;
+	    case "R":
+		$unit_long = "Rankine";
+		$unit_short = "R";
+		break;
+	    default:
+		$unit_long = "Celsius";
+		$unit_short = "°C";
 	}
 
 	# Long label
@@ -82,7 +101,7 @@ foreach ($DS as $i) {
 	    $critThresh = $CRIT[$i];
 	}
 
-	$opt[$count] = "--slope-mode --vertical-label \"Celsius\" --title \"$def_title: Chassis Temperatures\" ";
+	$opt[$count] = "--slope-mode --vertical-label \"$unit_long\" --title \"$def_title: Chassis Temperatures\" ";
 	if(isset($def[$count])){
 	    $def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
 	}
@@ -90,9 +109,9 @@ foreach ($DS as $i) {
 	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
 	}
 	$def[$count] .= "LINE:var$i#".$colors[$t++].":\"$NAME[$i]\" " ;
-	$def[$count] .= "GPRINT:var$i:LAST:\"%6.0lf °C last \" ";
-	$def[$count] .= "GPRINT:var$i:MAX:\"%6.0lf °C max \" ";
-	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf °C avg \\n\" ";
+	$def[$count] .= "GPRINT:var$i:LAST:\"%6.0lf $unit_short last \" ";
+	$def[$count] .= "GPRINT:var$i:MAX:\"%6.0lf $unit_short max \" ";
+	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf $unit_short avg \\n\" ";
     }
 
     # WATTAGE PROBE
