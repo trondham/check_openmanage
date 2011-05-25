@@ -54,10 +54,12 @@ $enclosure_id = '';
 $def_title = 'Dell OpenManage';
 
 # Loop through the performance data
-foreach ($DS as $i) {
+foreach ($this->DS as $KEY=>$VAL) {
 	
+    $label = $VAL['LABEL'];
+
     # TEMPERATURES
-    if (preg_match('/^T/', $NAME[$i])) {
+    if (preg_match('/^T/', $label)) {
 	if ($visited_temp == 0) {
 	    ++$count;
 	    $visited_temp = 1;
@@ -65,6 +67,9 @@ foreach ($DS as $i) {
 
 	# Temperature unit
 	switch ($VAL['UNIT']) {
+	    default:
+		$unit_long = "Celsius";
+		$unit_short = "°C";
 	    case "F":
 		$unit_long = "Fahrenheit";
 		$unit_short = "F";
@@ -77,52 +82,49 @@ foreach ($DS as $i) {
 		$unit_long = "Rankine";
 		$unit_short = "R";
 		break;
-	    default:
-		$unit_long = "Celsius";
-		$unit_short = "°C";
 	}
 
 	# Long label
-	$NAME[$i] = preg_replace('/^T(\d+)_(.+)/', '$2', $NAME[$i]);
-	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
+	$label = preg_replace('/^T(\d+)_(.+)/', '$2', $label);
+	$label = preg_replace('/_/', ' ', $label);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^T(\d+)$/', 'Probe $1', $NAME[$i]);
+	$label = preg_replace('/^T(\d+)$/', 'Probe $1', $label);
 
 	$ds_name[$count] = "Chassis Temperatures";
 
 	$warnThresh = "INF";
 	$critThresh = "INF";
 
-	if ($WARN[$i] != "") {
-	    $warnThresh = $WARN[$i];
+	if ($VAL['WARN'] != "") {
+	    $warnThresh = $VAL['WARN'];
 	}
-	if ($CRIT[$i] != "") {
-	    $critThresh = $CRIT[$i];
+	if ($VAL['CRIT'] != "") {
+	    $critThresh = $VAL['CRIT'];
 	}
 
 	$opt[$count] = "--slope-mode --vertical-label \"$unit_long\" --title \"$def_title: Chassis Temperatures\" ";
 	if(isset($def[$count])){
-	    $def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] .= "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
 	else {
-	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
-	$def[$count] .= "LINE:var$i#".$colors[$t++].":\"$NAME[$i]\" " ;
-	$def[$count] .= "GPRINT:var$i:LAST:\"%6.0lf $unit_short last \" ";
-	$def[$count] .= "GPRINT:var$i:MAX:\"%6.0lf $unit_short max \" ";
-	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf $unit_short avg \\n\" ";
+	$def[$count] .= "LINE:var$KEY#".$colors[$t++].":\"$label\" " ;
+	$def[$count] .= "GPRINT:var$KEY:LAST:\"%6.0lf $unit_short last \" ";
+	$def[$count] .= "GPRINT:var$KEY:MAX:\"%6.0lf $unit_short max \" ";
+	$def[$count] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf $unit_short avg \\n\" ";
     }
 
     # WATTAGE PROBE
-    if (preg_match('/^W/', $NAME[$i])) {
+    if (preg_match('/^W/', $label)) {
 
 	# Long label
-	$NAME[$i] = preg_replace('/^W(\d+)_(.+)/', '$2', $NAME[$i]);
-	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
+	$label = preg_replace('/^W(\d+)_(.+)/', '$2', $label);
+	$label = preg_replace('/_/', ' ', $label);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^W(\d+)$/', 'Probe $1', $NAME[$i]);
+	$label = preg_replace('/^W(\d+)$/', 'Probe $1', $label);
 
 	++$count;
 	$ds_name[$count] = "Power Consumption";
@@ -133,39 +135,39 @@ foreach ($DS as $i) {
 	$opt[$count] = "--slope-mode --vertical-label \"$vlabel\" --title \"$def_title: $title\" ";
 
 	if(isset($def[$count])){
-	    $def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] .= "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
 	else {
-	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
 
-	$def[$count] .= "VDEF:tot$i=var$i,TOTAL ";
-	$def[$count] .= "CDEF:kwh$i=var$i,POP,tot$i,1000,/,60,/,60,/ ";
-        $def[$count] .= "CDEF:btu$i=kwh$i,3412.3,* ";
+	$def[$count] .= "VDEF:tot$KEY=var$KEY,TOTAL ";
+	$def[$count] .= "CDEF:kwh$KEY=var$KEY,POP,tot$KEY,1000,/,60,/,60,/ ";
+        $def[$count] .= "CDEF:btu$KEY=kwh$KEY,3412.3,* ";
 
-	$def[$count] .= "AREA:var$i#$PWRcolor:\"$NAME[$i]\" " ;
-	$def[$count] .= "GPRINT:var$i:LAST:\"%6.0lf W last \" ";
-	$def[$count] .= "GPRINT:var$i:MAX:\"%6.0lf W max \" ";
-	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf W avg \l\" ";
+	$def[$count] .= "AREA:var$KEY#$PWRcolor:\"$label\" " ;
+	$def[$count] .= "GPRINT:var$KEY:LAST:\"%6.0lf W last \" ";
+	$def[$count] .= "GPRINT:var$KEY:MAX:\"%6.0lf W max \" ";
+	$def[$count] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf W avg \l\" ";
 
         $def[$count] .= "COMMENT:\" \l\" ";
 
         $def[$count] .= "COMMENT:\"    Total power used in time period\:\" ";
-	$def[$count] .= "GPRINT:kwh$i:AVERAGE:\"%10.2lf kWh\l\" ";
+	$def[$count] .= "GPRINT:kwh$KEY:AVERAGE:\"%10.2lf kWh\l\" ";
 
         $def[$count] .= "COMMENT:\"                                    \" ";
-	$def[$count] .= "GPRINT:btu$i:AVERAGE:\"%10.2lf BTU\l\" ";
+	$def[$count] .= "GPRINT:btu$KEY:AVERAGE:\"%10.2lf BTU\l\" ";
     }
 
     # AMPERAGE PROBE
-    if (preg_match('/^A/', $NAME[$i])) {
+    if (preg_match('/^A/', $label)) {
 
 	# Long label
-	$NAME[$i] = preg_replace('/^A(\d+)_(.+)/', '$2', $NAME[$i]);
-	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
+	$label = preg_replace('/^A(\d+)_(.+)/', '$2', $label);
+	$label = preg_replace('/_/', ' ', $label);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^A(\d+)$/', 'Probe $1', $NAME[$i]);
+	$label = preg_replace('/^A(\d+)$/', 'Probe $1', $label);
 		
 	if ($visited_amp == 0) {
 	    ++$count;
@@ -178,27 +180,27 @@ foreach ($DS as $i) {
 
 	$opt[$count] = "-X0 --lower-limit 0 --slope-mode --vertical-label \"$vlabel\" --title \"$def_title: $title\" ";
 	if(isset($def[$count])){
-	    $def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE ";
+	    $def[$count] .= "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE ";
 	}
 	else {
-	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE ";
+	    $def[$count] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE ";
 	}
-	$def[$count] .= "AREA:var$i#".$colors[$a++].":\"$NAME[$i]\":STACK ";
-	$def[$count] .= "GPRINT:var$i:LAST:\"%4.1lf A last \" ";
-	$def[$count] .= "GPRINT:var$i:MAX:\"%4.1lf A max \" ";
-	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%4.3lf A avg \\n\" ";
+	$def[$count] .= "AREA:var$KEY#".$colors[$a++].":\"$label\":STACK ";
+	$def[$count] .= "GPRINT:var$KEY:LAST:\"%4.1lf A last \" ";
+	$def[$count] .= "GPRINT:var$KEY:MAX:\"%4.1lf A max \" ";
+	$def[$count] .= "GPRINT:var$KEY:AVERAGE:\"%4.3lf A avg \\n\" ";
     }
     
 
     # VOLTAGE PROBE
-    if (preg_match('/^V/', $NAME[$i])) {
+    if (preg_match('/^V/', $label)) {
 
 	# Long label
-	$NAME[$i] = preg_replace('/^V(\d+)_(.+)/', '$2', $NAME[$i]);
-	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
+	$label = preg_replace('/^V(\d+)_(.+)/', '$2', $label);
+	$label = preg_replace('/_/', ' ', $label);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^V(\d+)$/', 'Probe $1', $NAME[$i]);
+	$label = preg_replace('/^V(\d+)$/', 'Probe $1', $label);
 		
 	if ($visited_volt == 0) {
 	    ++$count;
@@ -211,48 +213,48 @@ foreach ($DS as $i) {
 
 	$opt[$count] = "--slope-mode --vertical-label \"$vlabel\" --title \"$def_title: $title\" ";
 	if(isset($def[$count])){
-	    $def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] .= "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
 	else {
-	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
-	$def[$count] .= "LINE:var$i#".$colors[$v++].":\"$NAME[$i]\" " ;
-	$def[$count] .= "GPRINT:var$i:LAST:\"%4.2lf A last \" ";
-	$def[$count] .= "GPRINT:var$i:MAX:\"%4.2lf A max \" ";
-	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%4.4lf A avg \\n\" ";
+	$def[$count] .= "LINE:var$KEY#".$colors[$v++].":\"$label\" " ;
+	$def[$count] .= "GPRINT:var$KEY:LAST:\"%4.2lf A last \" ";
+	$def[$count] .= "GPRINT:var$KEY:MAX:\"%4.2lf A max \" ";
+	$def[$count] .= "GPRINT:var$KEY:AVERAGE:\"%4.4lf A avg \\n\" ";
     }
 
     # FANS (RPMs)
-    if (preg_match('/^F/', $NAME[$i])) {
+    if (preg_match('/^F/', $label)) {
 	if ($visited_fan == 0) {
 	    ++$count;
 	    $visited_fan = 1;
 	}
 
 	# Long label
-	$NAME[$i] = preg_replace('/^F(\d+)_(.+)/', '$2', $NAME[$i]);
-	$NAME[$i] = preg_replace('/_/', ' ', $NAME[$i]);
+	$label = preg_replace('/^F(\d+)_(.+)/', '$2', $label);
+	$label = preg_replace('/_/', ' ', $label);
 
 	# Short label
-	$NAME[$i] = preg_replace('/^F(\d+)$/', 'Probe $1', $NAME[$i]);
+	$label = preg_replace('/^F(\d+)$/', 'Probe $1', $label);
 
 	$ds_name[$count] = "Fan Probes";
 
 	$opt[$count] = "-X0 --slope-mode --vertical-label \"RPMs\" --title \"$def_title: Fan Speeds\" ";
 	if(isset($def[$count])){
-	    $def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] .= "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
 	else {
-	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
-	$def[$count] .= "LINE:var$i#".$colors[$f++].":\"$NAME[$i]\" " ;
-	$def[$count] .= "GPRINT:var$i:LAST:\"%6.0lf RPM last \" ";
-	$def[$count] .= "GPRINT:var$i:MAX:\"%6.0lf RPM max \" ";
-	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf RPM avg \\n\" ";
+	$def[$count] .= "LINE:var$KEY#".$colors[$f++].":\"$label\" " ;
+	$def[$count] .= "GPRINT:var$KEY:LAST:\"%6.0lf RPM last \" ";
+	$def[$count] .= "GPRINT:var$KEY:MAX:\"%6.0lf RPM max \" ";
+	$def[$count] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf RPM avg \\n\" ";
     }
 	
     # ENCLOSURE TEMPERATURES (Celsius)
-    if (preg_match('/^E(?P<encl>.+?)_t(emp_)?(?P<probe>\d+)/', $NAME[$i], $matches)) {
+    if (preg_match('/^E(?P<encl>.+?)_t(emp_)?(?P<probe>\d+)/', $label, $matches)) {
 
 	$this_id     = $matches['encl'];
 	$probe_index = $matches['probe'];
@@ -264,32 +266,32 @@ foreach ($DS as $i) {
 	}
 
 	# Label
-	$NAME[$i] = "Probe $probe_index";
+	$label = "Probe $probe_index";
 
 	$ds_name[$count] = "Enclosure $enclosure_id Temperatures";
 
 	$warnThresh = "INF";
 	$critThresh = "INF";
 
-	if ($WARN[$i] != "") {
-	    $warnThresh = $WARN[$i];
+	if ($VAL['WARN'] != "") {
+	    $warnThresh = $VAL['WARN'];
 	}
-	if ($CRIT[$i] != "") {
-	    $critThresh = $CRIT[$i];
+	if ($VAL['CRIT'] != "") {
+	    $critThresh = $VAL['CRIT'];
 	}
 
 	$opt[$count] = "--slope-mode --vertical-label \"Celsius\" --title \"$def_title: Enclosure $enclosure_id Temperatures\" ";
 
 	if(isset($def[$count])){
-	    $def[$count] .= "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] .= "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
 	else {
-	    $def[$count] = "DEF:var$i=$rrdfile:$DS[$i]:AVERAGE " ;
+	    $def[$count] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
-	$def[$count] .= "LINE:var$i#".$colors[$e++].":\"$NAME[$i]\" " ;
-	$def[$count] .= "GPRINT:var$i:LAST:\"%6.0lf °C last \" ";
-	$def[$count] .= "GPRINT:var$i:MAX:\"%6.0lf °C max \" ";
-	$def[$count] .= "GPRINT:var$i:AVERAGE:\"%6.2lf °C avg \\n\" ";
+	$def[$count] .= "LINE:var$KEY#".$colors[$e++].":\"$label\" " ;
+	$def[$count] .= "GPRINT:var$KEY:LAST:\"%6.0lf °C last \" ";
+	$def[$count] .= "GPRINT:var$KEY:MAX:\"%6.0lf °C max \" ";
+	$def[$count] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf °C avg \\n\" ";
     }
 }
 ?>
