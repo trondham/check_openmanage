@@ -68,19 +68,19 @@ foreach ($this->DS as $KEY=>$VAL) {
 	# Temperature unit
 	switch ($VAL['UNIT']) {
 	    default:
-		$unit_long = "Celsius";
-		$unit_short = "°C";
+		$vlabel = "Celsius";
+		$unit = "°C";
 	    case "F":
-		$unit_long = "Fahrenheit";
-		$unit_short = "F";
+		$vlabel = "Fahrenheit";
+		$unit = "F";
 		break;
 	    case "K":
-		$unit_long = "Kelvin";
-		$unit_short = "K";
+		$vlabel = "Kelvin";
+		$unit = "K";
 		break;
 	    case "R":
-		$unit_long = "Rankine";
-		$unit_short = "R";
+		$vlabel = "Rankine";
+		$unit = "R";
 		break;
 	}
 
@@ -103,7 +103,7 @@ foreach ($this->DS as $KEY=>$VAL) {
 	    $critThresh = $VAL['CRIT'];
 	}
 
-	$opt[$count] = "--slope-mode --vertical-label \"$unit_long\" --title \"$def_title: Chassis Temperatures\" ";
+	$opt[$count] = "--slope-mode --vertical-label \"$vlabel\" --title \"$def_title: Chassis Temperatures\" ";
 	if(isset($def[$count])){
 	    $def[$count] .= "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
@@ -111,9 +111,9 @@ foreach ($this->DS as $KEY=>$VAL) {
 	    $def[$count] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
 	$def[$count] .= "LINE:var$KEY#".$colors[$t++].":\"$label\" " ;
-	$def[$count] .= "GPRINT:var$KEY:LAST:\"%6.0lf $unit_short last \" ";
-	$def[$count] .= "GPRINT:var$KEY:MAX:\"%6.0lf $unit_short max \" ";
-	$def[$count] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf $unit_short avg \\n\" ";
+	$def[$count] .= "GPRINT:var$KEY:LAST:\"%6.0lf $unit last \" ";
+	$def[$count] .= "GPRINT:var$KEY:MAX:\"%6.0lf $unit max \" ";
+	$def[$count] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf $unit avg \\n\" ";
     }
 
     # WATTAGE PROBE
