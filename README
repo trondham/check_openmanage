@@ -7,7 +7,7 @@ Files included in the tarball and zip archive:
   check_openmanage                      - The plugin
   check_openmanage.exe                  - Win32 standalone executable
   check_openmanage.8                    - Program man page
-  check_openmanage.conf.8               - Config file man page
+  check_openmanage.conf.5               - Config file man page
   check_openmanage.pod                  - Program man page source
   check_openmanage.conf.pod             - Config file man page source
   check_openmanage.php                  - PNP4Nagios template
