@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta10';
+$VERSION = '3.7.0-beta11';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -923,14 +923,23 @@ sub snmp_check {
 # Detecting blade via SNMP
 #
 sub snmp_detect_blade {
-    my $DellBaseBoardType = '1.3.6.1.4.1.674.10892.1.300.80.1.7.1.1';
-    my $result = $snmp_session->get_request(-varbindlist => [$DellBaseBoardType]);
+    # In some setups, the IDs for the blade and interconnect
+    # board are mixed up, so we need to check both.
+    my $DellBaseBoardType1 = '1.3.6.1.4.1.674.10892.1.300.80.1.7.1.1';
+    my $DellBaseBoardType2 = '1.3.6.1.4.1.674.10892.1.300.80.1.7.1.2';
+    my $result1 = $snmp_session->get_request(-varbindlist => [$DellBaseBoardType1]);
+    my $result2 = $snmp_session->get_request(-varbindlist => [$DellBaseBoardType2]);
 
     # Identify blade. Older models (4th and 5th gen models) and/or old
     # OMSA (4.x) don't have this OID. If we get "noSuchInstance" or
     # similar, we assume that this isn't a blade
-    if (exists $result->{$DellBaseBoardType} && $result->{$DellBaseBoardType} eq '3') {
+    if (exists $result1->{$DellBaseBoardType1} && $result1->{$DellBaseBoardType1} eq '3') {
 	$blade = 1;
+	return;
+    }
+    if (exists $result2->{$DellBaseBoardType2} && $result2->{$DellBaseBoardType2} eq '3') {
+	$blade = 1;
+	return;
     }
     return;
 }
