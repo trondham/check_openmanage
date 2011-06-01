@@ -55,6 +55,33 @@ $enclosure_id = '';
 # Default title
 $def_title = 'Dell OpenManage';
 
+# Temperature unit
+function tempunit($arg) 
+{
+    $unit   = 'unknown';
+    $vlabel = 'unknown';
+    
+    switch ($arg) {
+    default:
+	$vlabel = "Celsius";
+	$unit = "°C";
+	break;
+    case "F":
+	$vlabel = "Fahrenheit";
+	$unit = "F";
+	break;
+    case "K":
+	$vlabel = "Kelvin";
+	$unit = "K";
+	break;
+    case "R":
+	$vlabel = "Rankine";
+	$unit = "R";
+	break;
+    }
+    return array($unit, $vlabel);
+}
+
 # Loop through the performance data
 foreach ($this->DS as $KEY=>$VAL) {
 	
@@ -63,25 +90,8 @@ foreach ($this->DS as $KEY=>$VAL) {
     # TEMPERATURES (AMBIENT)
     if (preg_match('/^T/', $label) && preg_match('/Ambient/', $label)) {
 
-	# Temperature unit
-	switch ($VAL['UNIT']) {
-	    default:
-		$vlabel = "Celsius";
-		$unit = "°C";
-		break;
-	    case "F":
-		$vlabel = "Fahrenheit";
-		$unit = "F";
-		break;
-	    case "K":
-		$vlabel = "Kelvin";
-		$unit = "K";
-		break;
-	    case "R":
-		$vlabel = "Rankine";
-		$unit = "R";
-		break;
-	}
+	# Temperature unit and vertical label
+	list ($unit, $vlabel) = tempunit($VAL['UNIT']);
 
 	# Long label
 	$label = preg_replace('/^T(\d+)_(.+)/', '$2', $label);
@@ -205,25 +215,8 @@ foreach ($this->DS as $KEY=>$VAL) {
     # TEMPERATURES
     if (preg_match('/^T/', $label) && !preg_match('/Ambient/', $label)) {
 
-	# Temperature unit
-	switch ($VAL['UNIT']) {
-	    default:
-		$vlabel = "Celsius";
-		$unit = "°C";
-		break;
-	    case "F":
-		$vlabel = "Fahrenheit";
-		$unit = "F";
-		break;
-	    case "K":
-		$vlabel = "Kelvin";
-		$unit = "K";
-		break;
-	    case "R":
-		$vlabel = "Rankine";
-		$unit = "R";
-		break;
-	}
+	# Temperature unit and vertical label
+	list ($unit, $vlabel) = tempunit($VAL['UNIT']);
 
 	# Long label
 	$label = preg_replace('/^T(\d+)_(.+)/', '$2', $label);
