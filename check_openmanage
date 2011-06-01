@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta11';
+$VERSION = '3.7.0-beta12';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -482,6 +482,7 @@ sub parse_configfile {
     our %opt2config
       = ( 'info'           => 'output_servicetag',
 	  'extinfo'        => 'output_sysinfo',
+	  'postmsg'        => 'output_post_message',
 	  'state'          => 'output_servicestate',
 	  'shortstate'     => 'output_servicestate_abbr',
 	  'show_blacklist' => 'output_blacklist',
@@ -695,6 +696,16 @@ sub parse_configfile {
 	return;
     }
 
+    # Set postmsg string from config file
+    sub configfile_set_postmsg {
+	my $keyword = shift;
+	my $conf = $opt2config{postmsg};
+	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
+	    $opt{postmsg} = $tiny->{$keyword}->{$conf}; # array ref
+	}
+	return;
+    }
+
     # Sections in the config file to check for statements
     my @sections = ();
 
@@ -740,6 +751,7 @@ sub parse_configfile {
 	configfile_set_temp_threshold($sect, 'critical');
 	configfile_set_perfdata($sect);
 	configfile_set_tempunit($sect);
+	configfile_set_postmsg($sect);
     }
 
     return;
