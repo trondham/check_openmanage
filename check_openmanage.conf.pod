@@ -331,6 +331,18 @@ code. Example:
 
 Corresponding command line option: C<-I> or C<--htmlinfo>
 
+=item Custom line after alerts
+
+The option C<output_post_message> lets you specify one line of
+information to be shown after any alerts. This option takes a string
+as parameter. Examples:
+
+    output_post_message = OS: %o %r
+    output_post_message = NOTE: Handled in ticket 123456
+
+For more information about codes and formatting, see the corresponding
+command line option C<--postmsg> in L<check_openmanage(8)>.
+
 =back
 
 =head1 SEE ALSO
