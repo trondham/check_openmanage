@@ -150,7 +150,7 @@ foreach ($this->DS as $KEY=>$VAL) {
         # warning threshold
 	if ($VAL['WARN'] != "") {
 	    $warnThresh = $VAL['WARN'];
-	    $def[$id_temp1] .= "CDEF:warn$KEY=var$KEY,$warnThresh,GT,var$KEY,0,IF ";
+	    $def[$id_temp1] .= "CDEF:warn$KEY=var$KEY,$warnThresh,GT,var$KEY,UNKN,IF ";
 	    $def[$id_temp1] .= "CDEF:wshade00_$KEY=warn$KEY,1,* ";
 	    $def[$id_temp1] .= "CDEF:wshade01_$KEY=warn$KEY,0.99,* ";
 	    $def[$id_temp1] .= "CDEF:wshade02_$KEY=warn$KEY,0.92,* ";
@@ -182,7 +182,7 @@ foreach ($this->DS as $KEY=>$VAL) {
         # critical threshold
 	if ($VAL['CRIT'] != "") {
 	    $critThresh = $VAL['CRIT'];
-	    $def[$id_temp1] .= "CDEF:crit$KEY=var$KEY,$critThresh,GT,var$KEY,0,IF ";
+	    $def[$id_temp1] .= "CDEF:crit$KEY=var$KEY,$critThresh,GT,var$KEY,UNKN,IF ";
 	    $def[$id_temp1] .= "CDEF:cshade00_$KEY=crit$KEY,1,* ";
 	    $def[$id_temp1] .= "CDEF:cshade01_$KEY=crit$KEY,0.99,* ";
 	    $def[$id_temp1] .= "CDEF:cshade02_$KEY=crit$KEY,0.92,* ";
