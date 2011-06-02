@@ -138,9 +138,9 @@ foreach ($this->DS as $KEY=>$VAL) {
         $def[$id_temp1] .= "AREA:shade27_$KEY#1144d9 ";
         $def[$id_temp1] .= "AREA:shade30_$KEY#1144dc:\"$label\": ";
 
-	$def[$id_temp1] .= "GPRINT:var$KEY:LAST:\"%6.0lf $unit last \" ";
-	$def[$id_temp1] .= "GPRINT:var$KEY:MAX:\"%6.0lf $unit max \" ";
-	$def[$id_temp1] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf $unit avg \\l\" ";
+	$def[$id_temp1] .= "GPRINT:var$KEY:LAST:\"%5.0lf $unit last\" ";
+	$def[$id_temp1] .= "GPRINT:var$KEY:MAX:\"%5.0lf $unit max\" ";
+	$def[$id_temp1] .= "GPRINT:var$KEY:AVERAGE:\"%8.2lf $unit avg\\l\" ";
 
 	# insert extra vertical space if we have thresholds
 	if ($VAL['WARN'] != "" || $VAL['CRIT'] != "") {
@@ -300,12 +300,12 @@ foreach ($this->DS as $KEY=>$VAL) {
         $def[$id_watt] .= "AREA:shade30_$KEY#dc0000:\"$label\": ";
 
 	# print avg, max and min
-	$def[$id_watt] .= "GPRINT:var$KEY:LAST:\"%6.0lf W last \" ";
-	$def[$id_watt] .= "GPRINT:var$KEY:MAX:\"%6.0lf W max \" ";
-	$def[$id_watt] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf W avg \l\" ";
+	$def[$id_watt] .= "GPRINT:var$KEY:LAST:\"%6.0lf W last\" ";
+	$def[$id_watt] .= "GPRINT:var$KEY:MAX:\"%6.0lf W max\" ";
+	$def[$id_watt] .= "GPRINT:var$KEY:AVERAGE:\"%8.2lf W avg\l\" ";
 
 	# print kWh and BTU for time period
-        $def[$id_watt] .= "COMMENT:\" \l\" ";
+        $def[$id_watt] .= "COMMENT:\\s ";
         $def[$id_watt] .= "COMMENT:\"    Total power used in time period\:\" ";
 	$def[$id_watt] .= "GPRINT:kwh$KEY:AVERAGE:\"%10.2lf kWh\l\" ";
         $def[$id_watt] .= "COMMENT:\"                                    \" ";
