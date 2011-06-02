@@ -140,11 +140,11 @@ foreach ($this->DS as $KEY=>$VAL) {
 
 	$def[$id_temp1] .= "GPRINT:var$KEY:LAST:\"%6.0lf $unit last \" ";
 	$def[$id_temp1] .= "GPRINT:var$KEY:MAX:\"%6.0lf $unit max \" ";
-	$def[$id_temp1] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf $unit avg \\n\" ";
+	$def[$id_temp1] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf $unit avg \\l\" ";
 
-	# add an extra linebreak if we have thresholds
+	# insert extra vertical space if we have thresholds
 	if ($VAL['WARN'] != "" || $VAL['CRIT'] != "") {
-	    $def[$id_temp1] .= "COMMENT:\" \l\" ";
+	    $def[$id_temp1] .= "COMMENT:\\s ";
 	}
 
         # warning threshold
@@ -176,7 +176,7 @@ foreach ($this->DS as $KEY=>$VAL) {
 	    $def[$id_temp1] .= "AREA:wshade21_$KEY#f8f800 ";
 	    $def[$id_temp1] .= "AREA:wshade24_$KEY#fbfb00 ";
 	    $def[$id_temp1] .= "AREA:wshade27_$KEY#fdfd00 ";
-	    $def[$id_temp1] .= "AREA:wshade30_$KEY#ffff00:\"Above Upper Warning Threshold\:  $warnThresh $unit\\n\": ";
+	    $def[$id_temp1] .= "AREA:wshade30_$KEY#ffff00:\"Above Upper Warning Threshold\:  $warnThresh $unit\\l\": ";
 	}
 	
         # critical threshold
@@ -208,7 +208,7 @@ foreach ($this->DS as $KEY=>$VAL) {
 	    $def[$id_temp1] .= "AREA:cshade21_$KEY#d20000 ";
 	    $def[$id_temp1] .= "AREA:cshade24_$KEY#d60000 ";
 	    $def[$id_temp1] .= "AREA:cshade27_$KEY#d90000 ";
-	    $def[$id_temp1] .= "AREA:cshade30_$KEY#dc0000:\"Above Upper Critical Threshold\: $critThresh $unit\\n\": ";
+	    $def[$id_temp1] .= "AREA:cshade30_$KEY#dc0000:\"Above Upper Critical Threshold\: $critThresh $unit\\l\": ";
 	}
     }
 
@@ -234,10 +234,11 @@ foreach ($this->DS as $KEY=>$VAL) {
 	else {
 	    $def[$id_temp2] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
-	$def[$id_temp2] .= "LINE:var$KEY#".$colors[$t++].":\"$label\" " ;
-	$def[$id_temp2] .= "GPRINT:var$KEY:LAST:\"%6.0lf $unit last \" ";
-	$def[$id_temp2] .= "GPRINT:var$KEY:MAX:\"%6.0lf $unit max \" ";
-	$def[$id_temp2] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf $unit avg \\n\" ";
+	$space = strlen($label) < 20 ? str_repeat(' ', 20 - strlen($label)) : ' ';
+	$def[$id_temp2] .= "LINE:var$KEY#".$colors[$t++].":\"$label$space\" " ;
+	$def[$id_temp2] .= "GPRINT:var$KEY:LAST:\"%4.0lf $unit last\" ";
+	$def[$id_temp2] .= "GPRINT:var$KEY:MAX:\"%6.0lf $unit max\" ";
+	$def[$id_temp2] .= "GPRINT:var$KEY:AVERAGE:\"%8.2lf $unit avg\\l\" ";
     }
 
     # WATTAGE PROBE
@@ -340,6 +341,8 @@ foreach ($this->DS as $KEY=>$VAL) {
 	    $def[$id_amp] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE ";
 	}
 
+	$space = strlen($label) < 16 ? str_repeat(' ', 16 - strlen($label)) : ' ';
+
         $def[$id_amp] .= "CDEF:tier$KEY=var$KEY,10,/ ";
         $def[$id_amp] .= "AREA:tier$KEY#".$colors[$a]."b7::STACK ";
         $def[$id_amp] .= "AREA:tier$KEY#".$colors[$a]."bf::STACK ";
@@ -350,7 +353,7 @@ foreach ($this->DS as $KEY=>$VAL) {
         $def[$id_amp] .= "AREA:tier$KEY#".$colors[$a]."e7::STACK ";
         $def[$id_amp] .= "AREA:tier$KEY#".$colors[$a]."ef::STACK ";
         $def[$id_amp] .= "AREA:tier$KEY#".$colors[$a]."f7::STACK ";
-        $def[$id_amp] .= "AREA:tier$KEY#".$colors[$a]."ff:\"$label\":STACK ";
+        $def[$id_amp] .= "AREA:tier$KEY#".$colors[$a]."ff:\"$label$space\":STACK ";
 	$a++;
 
 	if ($first) {
@@ -359,11 +362,10 @@ foreach ($this->DS as $KEY=>$VAL) {
 	else {
 	    $def[$id_amp] .= "CDEF:sum$KEY=sum".($KEY-1).",var$KEY,+ ";
 	}
-
 	$def[$id_amp] .= "LINE1:sum$KEY#555555 ";
-	$def[$id_amp] .= "GPRINT:var$KEY:LAST:\"%4.1lf A last \" ";
-	$def[$id_amp] .= "GPRINT:var$KEY:MAX:\"%4.1lf A max \" ";
-	$def[$id_amp] .= "GPRINT:var$KEY:AVERAGE:\"%4.3lf A avg \\n\" ";
+	$def[$id_amp] .= "GPRINT:var$KEY:LAST:\"%6.1lf A last\" ";
+	$def[$id_amp] .= "GPRINT:var$KEY:MAX:\"%6.1lf A max\" ";
+	$def[$id_amp] .= "GPRINT:var$KEY:AVERAGE:\"%8.3lf A avg\\l\" ";
     }
     
 
@@ -389,10 +391,11 @@ foreach ($this->DS as $KEY=>$VAL) {
 	else {
 	    $def[$id_volt] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
-	$def[$id_volt] .= "LINE:var$KEY#".$colors[$v++].":\"$label\" " ;
-	$def[$id_volt] .= "GPRINT:var$KEY:LAST:\"%4.2lf A last \" ";
-	$def[$id_volt] .= "GPRINT:var$KEY:MAX:\"%4.2lf A max \" ";
-	$def[$id_volt] .= "GPRINT:var$KEY:AVERAGE:\"%4.4lf A avg \\n\" ";
+	$space = strlen($label) < 18 ? str_repeat(' ', 18 - strlen($label)) : ' ';
+	$def[$id_volt] .= "LINE:var$KEY#".$colors[$v++].":\"$label$space\" " ;
+	$def[$id_volt] .= "GPRINT:var$KEY:LAST:\"%8.2lf A last\" ";
+	$def[$id_volt] .= "GPRINT:var$KEY:MAX:\"%8.2lf A max\" ";
+	$def[$id_volt] .= "GPRINT:var$KEY:AVERAGE:\"%10.4lf A avg\\l\" ";
     }
 
     # FANS (RPMs)
@@ -414,10 +417,11 @@ foreach ($this->DS as $KEY=>$VAL) {
 	else {
 	    $def[$id_fan] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
-	$def[$id_fan] .= "LINE:var$KEY#".$colors[$f++].":\"$label\" " ;
-	$def[$id_fan] .= "GPRINT:var$KEY:LAST:\"%6.0lf RPM last \" ";
-	$def[$id_fan] .= "GPRINT:var$KEY:MAX:\"%6.0lf RPM max \" ";
-	$def[$id_fan] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf RPM avg \\n\" ";
+	$space = strlen($label) < 16 ? str_repeat(' ', 16 - strlen($label)) : ' ';
+	$def[$id_fan] .= "LINE:var$KEY#".$colors[$f++].":\"$label$space\" " ;
+	$def[$id_fan] .= "GPRINT:var$KEY:LAST:\"%6.0lf RPM last\" ";
+	$def[$id_fan] .= "GPRINT:var$KEY:MAX:\"%6.0lf RPM max\" ";
+	$def[$id_fan] .= "GPRINT:var$KEY:AVERAGE:\"%9.2lf RPM avg\\l\" ";
     }
 	
     # ENCLOSURE TEMPERATURES (Celsius)
@@ -445,10 +449,11 @@ foreach ($this->DS as $KEY=>$VAL) {
 	else {
 	    $def[$id_enc] = "DEF:var$KEY=$rrdfile:$VAL[DS]:AVERAGE " ;
 	}
-	$def[$id_enc] .= "LINE:var$KEY#".$colors[$e++].":\"$label\" " ;
-	$def[$id_enc] .= "GPRINT:var$KEY:LAST:\"%6.0lf °C last \" ";
-	$def[$id_enc] .= "GPRINT:var$KEY:MAX:\"%6.0lf °C max \" ";
-	$def[$id_enc] .= "GPRINT:var$KEY:AVERAGE:\"%6.2lf °C avg \\n\" ";
+	$space = strlen($label) < 14 ? str_repeat(' ', 14 - strlen($label)) : ' ';
+	$def[$id_enc] .= "LINE:var$KEY#".$colors[$e++].":\"$label$space\" " ;
+	$def[$id_enc] .= "GPRINT:var$KEY:LAST:\"%6.0lf °C last\" ";
+	$def[$id_enc] .= "GPRINT:var$KEY:MAX:\"%6.0lf °C max\" ";
+	$def[$id_enc] .= "GPRINT:var$KEY:AVERAGE:\"%8.2lf °C avg\\l\" ";
     }
 }
 ?>
