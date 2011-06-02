@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta12';
+$VERSION = '3.7.0-beta13';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -498,6 +498,8 @@ sub parse_configfile {
 	  'all'            => 'check_everything',
 	  'perfdata'       => 'performance_data',
 	  'tempunit'       => 'temperature_unit',
+	  'timeout'        => 'timeout',
+	  'blacklist'      => 'blacklist',
 	);
 
     # Load the perl module
@@ -513,6 +515,32 @@ sub parse_configfile {
     $tiny = Config::Tiny->read($opt{configfile})
       or do { report('other', (sprintf q{Couldn't read configuration file: %s}, Config::Tiny->errstr()), $E_UNKNOWN);
 	      return; };
+
+    # Syntax check
+    foreach my $section (keys %{ $tiny }) {
+      KEYWORD:
+	foreach my $keyword (keys %{ $tiny->{$section} }) {
+	    next KEYWORD if $keyword eq 'check_everything';
+	    if ($keyword =~ m{\A check_(.+)}xms) {
+		my $c = $1;
+		foreach my $cl (keys %check) {
+		    next KEYWORD if $c eq $cl;
+		}
+	    }
+	    else {
+	      LEGAL:
+		foreach my $legal (keys %opt2config) {
+		    next KEYWORD if $keyword eq $opt2config{$legal};
+		}
+	    }
+	    if ($section eq '_') {
+		report('other', qq{CONFIG ERROR: In the global section: Unknown statement "$keyword"}, $E_UNKNOWN);
+	    }
+	    else {
+		report('other', qq{CONFIG ERROR: Unknown statement "$keyword" in section "$section"}, $E_UNKNOWN);
+	    }
+	}
+    }
 
     # Adjust checks according to statements in the configuration file
     sub configfile_adjust_checks {
