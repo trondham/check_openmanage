@@ -68,7 +68,7 @@ function tempunit($arg)
 	break;
     case "F":
 	$vlabel = "Fahrenheit";
-	$unit = "F";
+	$unit = "°F";
 	break;
     case "K":
 	$vlabel = "Kelvin";
@@ -76,7 +76,7 @@ function tempunit($arg)
 	break;
     case "R":
 	$vlabel = "Rankine";
-	$unit = "R";
+	$unit = "°R";
 	break;
     }
     return array($unit, $vlabel);
