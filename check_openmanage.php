@@ -138,8 +138,8 @@ foreach ($this->DS as $KEY=>$VAL) {
         $def[$id_temp1] .= "AREA:shade27_$KEY#1144d9 ";
         $def[$id_temp1] .= "AREA:shade30_$KEY#1144dc:\"$label\": ";
 
-	$def[$id_temp1] .= "GPRINT:var$KEY:LAST:\"%5.0lf $unit last\" ";
-	$def[$id_temp1] .= "GPRINT:var$KEY:MAX:\"%5.0lf $unit max\" ";
+	$def[$id_temp1] .= "GPRINT:var$KEY:LAST:\"%5.1lf $unit last\" ";
+	$def[$id_temp1] .= "GPRINT:var$KEY:MAX:\"%5.1lf $unit max\" ";
 	$def[$id_temp1] .= "GPRINT:var$KEY:AVERAGE:\"%8.2lf $unit avg\\l\" ";
 
 	# insert extra vertical space if we have thresholds
@@ -236,8 +236,8 @@ foreach ($this->DS as $KEY=>$VAL) {
 	}
 	$space = strlen($label) < 20 ? str_repeat(' ', 20 - strlen($label)) : ' ';
 	$def[$id_temp2] .= "LINE:var$KEY#".$colors[$t++].":\"$label$space\" " ;
-	$def[$id_temp2] .= "GPRINT:var$KEY:LAST:\"%4.0lf $unit last\" ";
-	$def[$id_temp2] .= "GPRINT:var$KEY:MAX:\"%6.0lf $unit max\" ";
+	$def[$id_temp2] .= "GPRINT:var$KEY:LAST:\"%4.1lf $unit last\" ";
+	$def[$id_temp2] .= "GPRINT:var$KEY:MAX:\"%6.1lf $unit max\" ";
 	$def[$id_temp2] .= "GPRINT:var$KEY:AVERAGE:\"%8.2lf $unit avg\\l\" ";
     }
 
@@ -451,8 +451,8 @@ foreach ($this->DS as $KEY=>$VAL) {
 	}
 	$space = strlen($label) < 14 ? str_repeat(' ', 14 - strlen($label)) : ' ';
 	$def[$id_enc] .= "LINE:var$KEY#".$colors[$e++].":\"$label$space\" " ;
-	$def[$id_enc] .= "GPRINT:var$KEY:LAST:\"%6.0lf °C last\" ";
-	$def[$id_enc] .= "GPRINT:var$KEY:MAX:\"%6.0lf °C max\" ";
+	$def[$id_enc] .= "GPRINT:var$KEY:LAST:\"%6.1lf °C last\" ";
+	$def[$id_enc] .= "GPRINT:var$KEY:MAX:\"%6.1lf °C max\" ";
 	$def[$id_enc] .= "GPRINT:var$KEY:AVERAGE:\"%8.2lf °C avg\\l\" ";
     }
 }
