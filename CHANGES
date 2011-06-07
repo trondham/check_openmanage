@@ -8,6 +8,10 @@
 * The PNP template check_openmanage.php has been redone to work with
   the changes in perfdata output from the plugin
 * Added support for a configuration file
+
+3.6.8   2011-06-07
+------------------
+
 * Added workaround for a rare condition in which blade detection fails
   because the chassis IDs for the blade and interconnect board have
   switched places in the BaseBoardType SNMP table.
