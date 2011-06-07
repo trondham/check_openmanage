@@ -6,7 +6,7 @@
 %global debug_package %{nil}
 
 Name:          nagios-plugins-check-openmanage
-Version:       3.6.7
+Version:       3.6.8
 Release:       1%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
 
@@ -55,6 +55,9 @@ pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin
 
 
 %changelog
+* Tue Jun 06 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.8-1
+- Version 3.6.8
+
 * Thu May 12 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.7-1
 - Version 3.6.7
 
