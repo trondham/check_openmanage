@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta14';
+$VERSION = '3.7.0-beta15';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -138,6 +138,7 @@ END_LICENSE
 	 'debug'             => 0,        # debugging / verbose output
 	 'help'              => 0,        # display help output
 	 'perfdata'          => undef,    # output performance data
+	 'legacy_perfdata'   => 0,        # legacy performance data output
 	 'info'              => 0,        # display servicetag
 	 'extinfo'           => 0,        # display extra info
 	 'htmlinfo'          => undef,    # html tags in output
@@ -181,6 +182,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'h|help'             => \$opt{help},
 	   'V|version'          => \$opt{version},
 	   'p|perfdata:s'       => \$opt{perfdata},
+	   'legacy-perfdata'    => \$opt{legacy_perfdata},
 	   'i|info'             => \$opt{info},
 	   'e|extinfo'          => \$opt{extinfo},
 	   'I|htmlinfo:s'       => \$opt{htmlinfo},
@@ -2934,14 +2936,21 @@ sub check_enclosure_temp {
 	if (defined $opt{perfdata} && $reading ne '[N/A]') {
 	    my $index = $name;
 	    $index =~ s{\A Temperature\sProbe\s(\d+) \z}{$1}gxms;
+	    my $legacy_name = $name;
+	    $legacy_name =~ s{\A Temperature\sProbe\s(\d+) \z}{temp_$1}gxms;
+	    my $legacy_label = lc "enclosure_${encl_id}_${legacy_name}";
+	    my $legacy_mini = $legacy_label;
+            $legacy_mini =~ s{enclosure_(.+?)_temp_(.+?)}{e$1t$2}xms;
 	    push @perfdata, {
-			     type  => 'E',
-			     id    => $opt{perfdata} eq 'minimal' ? "${encl_id}_t${index}" : "${encl_id}_temp_${index}",
-			     unit  => $opt{tempunit},
-			     label => q{},
-			     value => $reading,
-			     warn  => $max_warn,
-			     crit  => $max_crit,
+			     type   => 'E',
+			     id     => $opt{perfdata} eq 'minimal' ? "${encl_id}_t${index}" : "${encl_id}_temp_${index}",
+			     unit   => $opt{tempunit},
+			     label  => q{},
+			     legacy => $legacy_label,
+			     mini   => $legacy_mini,
+			     value  => $reading,
+			     warn   => $max_warn,
+			     crit   => $max_crit,
 			    };
 	}
     }
@@ -3271,15 +3280,18 @@ sub check_fans {
 	    my $pname = $location;
 	    $pname =~ s{\s}{_}gxms;
 	    $pname =~ s{proc_}{cpu#}xms;
+	    my $legacy_pname = $pname;
 	    $pname =~ s{_rpm\z}{}ixms;
 	    push @perfdata, {
-			     type  => 'F',
-			     id    => $index,
-			     unit  => 'rpm',
-			     label => $pname,
-			     value => $reading,
-			     warn  => $max_warn,
-			     crit  => $max_crit,
+			     type   => 'F',
+			     id     => $index,
+			     unit   => 'rpm',
+			     label  => $pname,
+			     legacy => lc "fan_${index}_${legacy_pname}",
+                             mini   => "f$index",
+			     value  => $reading,
+			     warn   => $max_warn,
+			     crit   => $max_crit,
 			    };
 	}
     }
@@ -3605,16 +3617,18 @@ sub check_temperatures {
 	    if (defined $opt{perfdata}) {
 		my $pname = $location;
 		$pname =~ s{\s}{_}gxms;
-		$pname =~ s{_temp\z}{}xms;
+		$pname =~ s{_temp\z}{}ixms;
 		$pname =~ s{proc_}{cpu#}xms;
 		push @perfdata, {
-				 type  => 'T',
-				 id    => $index,
-				 unit  => $opt{tempunit},
-				 label => $pname,
-				 value => $reading,
-				 warn  => $max_warn,
-				 crit  => $max_crit,
+				 type   => 'T',
+				 id     => $index,
+				 unit   => $opt{tempunit},
+				 label  => $pname,
+				 legacy => lc "temp_${index}_${pname}",
+                                 mini   => "t$index",
+				 value  => $reading,
+				 warn   => $max_warn,
+				 crit   => $max_crit,
 				};
 	    }
 	}
@@ -3996,20 +4010,20 @@ sub check_volts {
 	report('chassis', $msg, $err, $index);
 
 	# Collect performance data
-	if (defined $opt{perfdata}) {
+	if (defined $opt{perfdata} and !$opt{legacy_perfdata}) {
 	    $reading =~ s{\s+V\z}{}xms;  # remove unit
 	    $reading =~ s{\.000\z}{}xms; # if integer
 	    next VOLT if $reading !~ m{\A \d+(\.\d+)? \z}xms; # discrete reading (not number)
 	    my $label = join q{_}, $location;
 	    $label =~ s{\s}{_}gxms;
 	    push @perfdata, {
-			     type  => 'V',
-			     id    => $index,
-			     unit  => 'V',
-			     label => $label,
-			     value => $reading,
-			     warn  => 0,
-			     crit  => 0,
+			     type   => 'V',
+			     id     => $index,
+			     unit   => 'V',
+			     label  => $label,
+			     value  => $reading,
+			     warn   => 0,
+			     crit   => 0,
 			    };
 	}
     }
@@ -4244,13 +4258,15 @@ sub check_pwrmonitoring {
 	    my $label = join q{_},  $location;
 	    $label =~ s{\s}{_}gxms;
 	    push @perfdata, {
-			     type  => $unit,
-			     id    => $index,
-			     unit  => $unit,
-			     label => $label,
-			     value => $reading,
-			     warn  => $max_warn,
-			     crit  => $max_crit,
+			     type   => $unit,
+			     id     => $index,
+			     unit   => $unit,
+			     label  => $label,
+			     legacy => (join q{_}, 'pwr_mon', $index, lc $label),
+                             mini   => "p${index}" . lc $unit,
+			     value  => $reading,
+			     warn   => $max_warn,
+			     crit   => $max_crit,
 			    };
 	}
     }
@@ -4290,13 +4306,15 @@ sub check_pwrmonitoring {
 		while (exists $used{$index}) { ++$index; }
 
 		push @perfdata, {
-				 type  => $aunit,
-				 id    => $index,
-				 unit  => $aunit,
-				 label => $aname,
-				 value => $aval,
-				 warn  => 0,
-				 crit  => 0,
+				 type   => $aunit,
+				 id     => $index,
+				 unit   => $aunit,
+				 label  => $aname,
+				 legacy => "pwr_mon_${index}_${aname}",
+                                 mini   => "p${index}a",
+				 value  => $aval,
+				 warn   => 0,
+				 crit   => 0,
 				};
 		++$index;
 	    }
@@ -5333,12 +5351,25 @@ if (defined $opt{perfdata} && !$opt{debug} && @perfdata) {
 	      $a->{label} cmp $b->{label};
     }
 
+    # LEGACY sort routine for performance data
+    sub perfsort_legacy {
+	my %order = ( fan => 0, pwr => 1, tem => 2, enc => 3, );
+	return ($order{(substr $a->{legacy}, 0, 3)} cmp $order{(substr $b->{legacy}, 0, 3)}) ||
+	  $a->{legacy} cmp $b->{legacy};
+    }
+
     # Print performance data sorted
-    if ($opt{perfdata} eq 'minimal') {
-	print join $lb, map { "$_->{type}$_->{id}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+    if ($opt{legacy_perfdata}) {
+	my $type = $opt{perfdata} eq 'minimal' ? 'mini' : 'legacy';
+	print join $lb, map { "$_->{$type}=$_->{value};$_->{warn};$_->{crit}" } sort perfsort_legacy @perfdata;
     }
     else {
-	print join $lb, map { "$_->{type}$_->{id}_$_->{label}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+	if ($opt{perfdata} eq 'minimal') {
+	    print join $lb, map { "$_->{type}$_->{id}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+	}
+	else {
+	    print join $lb, map { "$_->{type}$_->{id}_$_->{label}=$_->{value}$_->{unit};$_->{warn};$_->{crit}" } sort perfsort @perfdata;
+	}
     }
 }
 
