@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-beta15';
+$VERSION = '3.7.0-beta16';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -482,26 +482,27 @@ sub parse_configfile {
     # Mapping between command line options and the corresponding
     # config file options
     our %opt2config
-      = ( 'info'           => 'output_servicetag',
-	  'extinfo'        => 'output_sysinfo',
-	  'postmsg'        => 'output_post_message',
-	  'state'          => 'output_servicestate',
-	  'shortstate'     => 'output_servicestate_abbr',
-	  'show_blacklist' => 'output_blacklist',
-	  'htmlinfo'       => 'output_html',
-	  'okinfo'         => 'output_ok_verbosity',
-	  'protocol'       => 'snmp_version',
-	  'community'      => 'snmp_community',
-	  'port'           => 'snmp_port',
-	  'ipv6'           => 'snmp_use_ipv6',
-	  'tcp'            => 'snmp_use_tcp',
-	  'warning'        => 'temp_threshold_warning',
-	  'critical'       => 'temp_threshold_critical',
-	  'all'            => 'check_everything',
-	  'perfdata'       => 'performance_data',
-	  'tempunit'       => 'temperature_unit',
-	  'timeout'        => 'timeout',
-	  'blacklist'      => 'blacklist',
+      = ( 'info'            => 'output_servicetag',
+	  'extinfo'         => 'output_sysinfo',
+	  'postmsg'         => 'output_post_message',
+	  'state'           => 'output_servicestate',
+	  'shortstate'      => 'output_servicestate_abbr',
+	  'show_blacklist'  => 'output_blacklist',
+	  'htmlinfo'        => 'output_html',
+	  'okinfo'          => 'output_ok_verbosity',
+	  'protocol'        => 'snmp_version',
+	  'community'       => 'snmp_community',
+	  'port'            => 'snmp_port',
+	  'ipv6'            => 'snmp_use_ipv6',
+	  'tcp'             => 'snmp_use_tcp',
+	  'warning'         => 'temp_threshold_warning',
+	  'critical'        => 'temp_threshold_critical',
+	  'all'             => 'check_everything',
+	  'perfdata'        => 'performance_data',
+	  'tempunit'        => 'temperature_unit',
+	  'timeout'         => 'timeout',
+	  'blacklist'       => 'blacklist',
+	  'legacy_perfdata' => 'legacy_performance_data',
 	);
 
     # Load the perl module
@@ -774,6 +775,7 @@ sub parse_configfile {
 	configfile_set_boolean($sect, 'show_blacklist');
 	configfile_set_boolean($sect, 'ipv6');
 	configfile_set_boolean($sect, 'tcp');
+	configfile_set_boolean($sect, 'legacy_perfdata');
 	configfile_set_snmp_version($sect);
 	configfile_set_snmp_community($sect);
 	configfile_set_snmp_port($sect);
