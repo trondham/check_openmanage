@@ -59,6 +59,12 @@ cases where the plugin output needs shortening, for example if the
 If given the argument C<multiline>, the plugin will output the
 performance data on multiple lines, for Nagios 3.x and above.
 
+=item --legacy-perfdata
+
+With version 3.7.0, performance data output changed. The new format is
+not compatible with the old format. Users who wish to postpone
+switching to the new performance data API may set this option.
+
 =item -w, --warning I<STRING> or I<FILE>
 
 Override the machine-default temperature warning thresholds. Syntax is
