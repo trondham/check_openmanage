@@ -178,6 +178,17 @@ either of the keywords "minimal" and "multiline". Example:
 
 The corresponding command line option is C<-p> or <--perfdata>.
 
+=item Legacy Performance data
+
+With version 3.7.0, performance data output changed. The new format is
+not compatible with the old format. Users who wish to postpone
+switching to the new performance data API may use this option. This
+option takes a boolean value. Example:
+
+    legacy_performance_data = true
+
+The corresponding command line option is C<--legacy-perfdata>.
+
 =item Temperature unit
 
 The temperature unit used for reporting, performance data etc. can be
