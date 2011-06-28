@@ -7,6 +7,10 @@
   - Voltage data was not included
 * The PNP template check_openmanage.php has been redone to work with
   the changes in perfdata output from the plugin
+* A new option '--legacy-perfdata' will make the the plugin output the
+  performance data in the old format
+* The old PNP template for performance data is available in the
+  distribution as 'check_openmanage_legacy.php'
 * Added support for a configuration file
 
 3.6.8   2011-06-07
