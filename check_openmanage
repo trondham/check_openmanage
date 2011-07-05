@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-rc1';
+$VERSION = '3.7.0-rc2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -5127,7 +5127,7 @@ else {
 	# Prefix with service tag if specified with option '-i|--info'
 	if ($opt{info}) {
 	    if (defined $opt{htmlinfo}) {
-		$msg = '[<a href="' . warranty_url($sysinfo{serial})
+		$msg = '[<a target="_blank" href="' . warranty_url($sysinfo{serial})
 		  . "\">$sysinfo{serial}</a>] " . $msg;
 	    }
 	    else {
@@ -5195,7 +5195,7 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
 }
 elsif ($exit_code == $E_OK && !$opt{debug}) {
     if (defined $opt{htmlinfo}) {
-	printf q{OK - System: '<a href="%s">%s%s</a>', SN: '<a href="%s">%s</a>'},
+	printf q{OK - System: '<a target="_blank" href="%s">%s%s</a>', SN: '<a target="_blank" href="%s">%s</a>'},
 	  documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
 	    warranty_url($sysinfo{serial}), $sysinfo{serial};
     }
@@ -5281,7 +5281,7 @@ else {
     if ($opt{extinfo}) {
 	print $linebreak;
 	if (defined $opt{htmlinfo}) {
-	    printf '------ SYSTEM: <a href="%s">%s%s</a>, SN: <a href="%s">%s</a>',
+	    printf '------ SYSTEM: <a target="_blank" href="%s">%s%s</a>, SN: <a target="_blank" href="%s">%s</a>',
 	      documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
 		warranty_url($sysinfo{serial}), $sysinfo{serial};
 	}
