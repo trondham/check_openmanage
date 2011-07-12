@@ -14,7 +14,8 @@
 * Added support for a configuration file
 * If using html output, URLs will now open in a new window
 * Added a compatibility fix for OMSA 6.5.0, related to performance
-  data for amperage probes when the plugin is used in local mode
+  data for amperage probes when the plugin is used in local
+  mode. Thanks to Benedikt Meyer for a patch.
 
 3.6.8   2011-06-07
 ------------------
