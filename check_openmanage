@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.0-rc2';
+$VERSION = '3.7.0-rc3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -4290,7 +4290,7 @@ sub check_pwrmonitoring {
       AMP2:
 	foreach my $line (@{ run_command("$omreport $omopt_chassis pwrmonitoring -fmt ssv") }) {
 	    chop $line;
-	    if ($line eq 'Location;Reading') {
+	    if ($line eq 'Location;Reading' or $line eq 'Amperage') {
 		$found = 1;
 		next AMP2;
 	    }
