@@ -2229,7 +2229,7 @@ sub check_cache_battery {
 	    $state  = get_hashval($out->{batteryState}, \%bat_state) || 'Unknown state';
 	    $learn  = get_hashval($out->{batteryLearnState}, \%bat_learn_state) || 'Unknown learn state';
 	    $pred   = get_hashval($out->{batteryPredictedCapacity}, \%bat_pred_cap) || 'Unknown predicted capacity status';
-	    $ctrl   = get_hashval($out->{batteryConnectionControllerNumber}, \%snmp_controller) || 9999;
+	    $ctrl   = $snmp_controller{$out->{batteryConnectionControllerNumber}};
 	    $nexus  = convert_nexus(($out->{batteryNexusID} || 9999));
 	    $id     = $nexus;
 	    $id     =~ s{\A \d+:(\d+) \z}{$1}xms;
