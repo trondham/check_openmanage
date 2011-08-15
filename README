@@ -11,7 +11,6 @@ Files included in the tarball and zip archive:
   check_openmanage.pod                  - Program man page source
   check_openmanage.conf.pod             - Config file man page source
   check_openmanage.php                  - PNP4Nagios template
-  check_openmanage_legacy.php           - PNP4Nagios template (for versions < 3.7.0)
   nagios-plugins-check-openmanage.spec  - RPM spec file
   COPYING                               - License information
   INSTALL                               - Install HOWTO
