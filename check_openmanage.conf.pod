@@ -176,7 +176,7 @@ either of the keywords "minimal" and "multiline". Example:
 
     performance_data = true
 
-The corresponding command line option is C<-p> or <--perfdata>.
+The corresponding command line option is C<-p> or C<--perfdata>.
 
 =item Legacy Performance data
 
