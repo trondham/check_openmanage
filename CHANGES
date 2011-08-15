@@ -9,8 +9,6 @@
   the changes in perfdata output from the plugin
 * A new option '--legacy-perfdata' will make the the plugin output the
   performance data in the old format
-* The old PNP template for performance data is available in the
-  distribution as 'check_openmanage_legacy.php'
 * Added support for a configuration file
 * Added manual page for the configuration file
 * If using html output, URLs will now open in a new window
