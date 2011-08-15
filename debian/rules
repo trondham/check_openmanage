@@ -45,6 +45,7 @@ binary-arch: build install
 	dh_installdocs
 	dh_installexamples check_openmanage.php
 	dh_installman check_openmanage.8
+	dh_installman check_openmanage.conf.5
 	dh_link
 	dh_strip
 	dh_compress
