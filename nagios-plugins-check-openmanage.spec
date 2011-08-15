@@ -6,7 +6,7 @@
 %global debug_package %{nil}
 
 Name:          nagios-plugins-check-openmanage
-Version:       3.6.8
+Version:       3.7.0
 Release:       1%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
 
@@ -39,10 +39,12 @@ pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin
 
 %install
 %{__rm} -rf %{buildroot}
-%{__install} -d %{buildroot}%{nagiospluginsdir}
-%{__install} -d %{buildroot}%{_mandir}/man8
+%{__install} -d -m 0755 %{buildroot}%{nagiospluginsdir}
+%{__install} -d -m 0755 %{buildroot}%{_mandir}/man8
+%{__install} -d -m 0755 %{buildroot}%{_mandir}/man5
 %{__install} -pD -m 0755 %{plugin} %{buildroot}%{nagiospluginsdir}
 %{__install} -pD -m 0644 %{plugin}.8 %{buildroot}%{_mandir}/man8
+%{__install} -pD -m 0644 %{plugin}.conf.5 %{buildroot}%{_mandir}/man5
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -52,9 +54,13 @@ pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin
 %doc README COPYING CHANGES
 %{nagiospluginsdir}/*
 %{_mandir}/man8/*.8*
+%{_mandir}/man5/*.5*
 
 
 %changelog
+* Tue Jun 06 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.0-1
+- Version 3.7.0
+
 * Tue Jun 06 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.8-1
 - Version 3.6.8
 
