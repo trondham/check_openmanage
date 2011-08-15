@@ -36,6 +36,7 @@ outside normal parameters.
 
 %build
 pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin}.8
+pod2man -s 5 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.conf.pod %{plugin}.5
 
 %install
 %{__rm} -rf %{buildroot}
