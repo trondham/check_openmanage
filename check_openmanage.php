@@ -485,7 +485,7 @@ else {  # --new--
 		$def[$id_volt] = rrd::def("var$KEY",$VAL['RRDFILE'],$VAL['DS'],"AVERAGE");
 	    }
 	    $def[$id_volt] .= rrd::line1("var$KEY", "#".$colors[$v++], rrd::cut($label,18) ) ;
-	    $def[$id_volt] .= rrd::gprint("var$KEY", array("LAST", "MAX", "AVERAGE"),"%8.2lf A");
+	    $def[$id_volt] .= rrd::gprint("var$KEY", array("LAST", "MAX", "AVERAGE"),"%8.2lf V");
 	}
 
 	# FANS (RPMs)
