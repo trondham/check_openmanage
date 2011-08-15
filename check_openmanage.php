@@ -4,7 +4,7 @@
 # Author: 	Trond Hasle Amundsen
 # Contact: 	t.h.amundsen@usit.uio.no
 # Website:      http://folk.uio.no/trondham/software/check_openmanage.html
-# Date: 	2011-06-01
+# Date: 	2011-08-15
 #
 # $Id$
 #
