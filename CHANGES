@@ -1,4 +1,4 @@
-3.7.0
+3.7.0   2011-08-15
 ------------------
 
 * Major overhaul of the perfdata code. This includes API breakage and
@@ -12,6 +12,7 @@
 * The old PNP template for performance data is available in the
   distribution as 'check_openmanage_legacy.php'
 * Added support for a configuration file
+* Added manual page for the configuration file
 * If using html output, URLs will now open in a new window
 * Added a compatibility fix for OMSA 6.5.0, related to performance
   data for amperage probes when the plugin is used in local
