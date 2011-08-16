@@ -514,6 +514,9 @@ else {  # --new--
 	# ENCLOSURE TEMPERATURES (Celsius)
 	if (preg_match('/^E(?P<encl>.+?)_t(emp_)?(?P<probe>\d+)/', $label, $matches)) {
 
+	    # Temperature unit and vertical label
+	    list ($unit, $vlabel) = tempunit($VAL['UNIT']);
+
 	    $this_id     = $matches['encl'];
 	    $probe_index = $matches['probe'];
 
@@ -528,7 +531,7 @@ else {  # --new--
 
 	    $ds_name[$id_enc] = "Enclosure $enclosure_id Temperatures";
 
-	    $opt[$id_enc] = "--slope-mode --vertical-label \"Celsius\" --title \"$def_title: Enclosure $enclosure_id Temperatures\" ";
+	    $opt[$id_enc] = "--slope-mode --vertical-label \"$vlabel\" --title \"$def_title: Enclosure $enclosure_id Temperatures\" ";
 
 	    if(isset($def[$id_enc])){
 		$def[$id_enc] .= rrd::def("var$KEY", $VAL['RRDFILE'],$VAL['DS'], "AVERAGE") ;
@@ -537,7 +540,7 @@ else {  # --new--
 		$def[$id_enc] = rrd::def("var$KEY", $VAL['RRDFILE'],$VAL['DS'], "AVERAGE") ;
 	    }
 	    $def[$id_enc] .= rrd::line1("var$KEY", "#".$colors[$e++], rrd::cut($label, 14) );
-	    $def[$id_enc] .= rrd::gprint("var$KEY", array("LAST", "MAX", "AVERAGE"),"%6.1lf C");
+	    $def[$id_enc] .= rrd::gprint("var$KEY", array("LAST", "MAX", "AVERAGE"),"%6.1lf $unit");
 	}
     }
 }
