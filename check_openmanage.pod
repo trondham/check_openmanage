@@ -462,6 +462,10 @@ Physical disk.
 
 Suppress warning message about non-certified physical disk.
 
+=item B<pdisk_foreign>
+
+Suppress warning message about foreign physical disk.
+
 =item B<vdisk>
 
 Logical drive (virtual disk)
