@@ -459,7 +459,7 @@ else {  # --new--
 		$def[$id_amp] .= rrd::cdef("sum$KEY", "sum".($KEY-1).",var$KEY,+");
 	    }
 	    $def[$id_amp] .= rrd::line1("sum$KEY", "#555555");
-	    $def[$id_amp] .= rrd::gprint("var$KEY", array("LAST", "MAX", "AVERAGE"),"%6.1lf A last") ;
+	    $def[$id_amp] .= rrd::gprint("var$KEY", array("LAST", "MAX", "AVERAGE"),"%6.1lf A") ;
 	}
 
 	# VOLTAGE PROBE
