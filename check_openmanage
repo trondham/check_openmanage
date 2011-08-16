@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.1-beta1';
+$VERSION = '3.7.1-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1968,6 +1968,13 @@ sub check_physical_disks {
 		  $name, $vendor, $product, $capacity, $ctrl;
 		report('storage', $msg, $E_WARNING, $nexus);
 	    }
+	}
+	# Special case: Foreign disk
+	elsif ($status eq 'Non-Critical' and $state eq 'Foreign'
+	      and blacklisted('pdisk_foreign', $nexus)) {
+	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d is %s',
+	      $name, $vendor, $product, $capacity, $ctrl, $state;
+	    report('storage', $msg, $E_OK, $nexus);
 	}
 	# Default
 	elsif ($status ne 'Ok') {
