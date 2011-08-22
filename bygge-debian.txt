@@ -1,7 +1,7 @@
 På en debian- eller ubuntu-boks:
 
 # versjon
-VER=3.7.0
+VER=3.7.1
 
 # ymse
 wget http://folk.uio.no/trondham/software/files/check_openmanage-${VER}.tar.gz
