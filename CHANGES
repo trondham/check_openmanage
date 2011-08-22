@@ -1,8 +1,11 @@
-3.7.1
+3.7.1   2011-08-22
 ------------------
 
+* Added new blacklisting keyword 'pdisk_foreign' to suppress warnings
+  about foreign physical disks
 * SNMP: Get the controller number right when reporting issues with the
   controller cache battery
+* Various minor tweaks and bugfixes in the PNP4Nagios template
 
 3.7.0   2011-08-15
 ------------------
