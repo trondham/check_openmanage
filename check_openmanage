@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.1';
+$VERSION = '3.7.2-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -4212,6 +4212,12 @@ sub check_pwrmonitoring {
 		$reading  /= 10;
 		$max_crit /= 10;
 		$max_warn /= 10;
+		$unit      = 'A';
+	    }
+	    if ($unit eq 'mA' and $type ne 'amperageProbeTypeIsDiscrete') {
+		$reading  /= 1000;
+		$max_crit /= 1000;
+		$max_warn /= 1000;
 		$unit      = 'A';
 	    }
 	}
