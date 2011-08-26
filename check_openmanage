@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.2-beta1';
+$VERSION = '3.7.2-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -167,6 +167,7 @@ END_LICENSE
 	 'privkey'           => undef,    # SMNP v3
 	 'privprotocol'      => undef,    # SMNP v3
          'use_get_table'     => 0,        # hack for SNMPv3 on Windows with net-snmp
+	 'hide_servicetag'   => 0,        # hidden servicetag
        );
 
 # Get options
@@ -210,6 +211,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'privkey=s'          => \$opt{privkey},
 	   'privprotocol=s'     => \$opt{privprotocol},
            'use-get_table'      => \$opt{use_get_table},
+	   'hide-servicetag'    => \$opt{hide_servicetag},
 	  ) or do { print $USAGE; exit $E_UNKNOWN };
 
 # If user requested help
@@ -488,6 +490,7 @@ sub parse_configfile {
 	  'state'           => 'output_servicestate',
 	  'shortstate'      => 'output_servicestate_abbr',
 	  'show_blacklist'  => 'output_blacklist',
+          'hide_servicetag' => 'output_hide_servicetag',
 	  'htmlinfo'        => 'output_html',
 	  'okinfo'          => 'output_ok_verbosity',
 	  'protocol'        => 'snmp_version',
@@ -776,6 +779,7 @@ sub parse_configfile {
 	configfile_set_boolean($sect, 'ipv6');
 	configfile_set_boolean($sect, 'tcp');
 	configfile_set_boolean($sect, 'legacy_perfdata');
+	configfile_set_boolean($sect, 'hide_servicetag');
 	configfile_set_snmp_version($sect);
 	configfile_set_snmp_community($sect);
 	configfile_set_snmp_port($sect);
@@ -4681,7 +4685,7 @@ sub get_omreport_chassis_info {
 		$sysinfo{model}  = $val;
 	    }
 	    if ($key eq 'Chassis Service Tag' or $key eq 'Service Tag') {
-		$sysinfo{serial} = $val;
+		$sysinfo{serial} = $opt{hide_servicetag} ? 'XXXXXXX' : $val;
 	    }
 	    if ($key eq 'System Revision') {
 		$sysinfo{rev} = q{ } . $val;
@@ -4771,7 +4775,7 @@ sub get_snmp_chassis_info {
 		$sysinfo{model} =~ s{\s+\z}{}xms; # remove trailing whitespace
 	    }
 	    elsif (exists $chassis_oid{$oid} and $chassis_oid{$oid} eq 'chassisServiceTagName') {
-		$sysinfo{serial} = $result->{$oid};
+		$sysinfo{serial} = $opt{hide_servicetag} ? 'XXXXXXX' : $result->{$oid};
 	    }
 	    elsif (exists $chassis_oid{$oid} and $chassis_oid{$oid} eq 'chassisSystemRevisionName') {
 		$sysinfo{rev} = q{ } . $result->{$oid};
@@ -5139,7 +5143,7 @@ else {
 
 	# Prefix with service tag if specified with option '-i|--info'
 	if ($opt{info}) {
-	    if (defined $opt{htmlinfo}) {
+	    if (defined $opt{htmlinfo} and !$opt{hide_servicetag}) {
 		$msg = '[<a target="_blank" href="' . warranty_url($sysinfo{serial})
 		  . "\">$sysinfo{serial}</a>] " . $msg;
 	    }
@@ -5207,10 +5211,15 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
     }
 }
 elsif ($exit_code == $E_OK && !$opt{debug}) {
-    if (defined $opt{htmlinfo}) {
+    if (defined $opt{htmlinfo} and !$opt{hide_servicetag}) {
 	printf q{OK - System: '<a target="_blank" href="%s">%s%s</a>', SN: '<a target="_blank" href="%s">%s</a>'},
 	  documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
 	    warranty_url($sysinfo{serial}), $sysinfo{serial};
+    }
+    if (defined $opt{htmlinfo} and $opt{hide_servicetag}) {
+	printf q{OK - System: '<a target="_blank" href="%s">%s%s</a>', SN: '%s'},
+	  documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
+	    $sysinfo{serial};
     }
     else {
 	printf q{OK - System: '%s%s', SN: '%s'},
@@ -5293,10 +5302,15 @@ elsif ($exit_code == $E_OK && !$opt{debug}) {
 else {
     if ($opt{extinfo}) {
 	print $linebreak;
-	if (defined $opt{htmlinfo}) {
+	if (defined $opt{htmlinfo} && !$opt{hide_servicetag}) {
 	    printf '------ SYSTEM: <a target="_blank" href="%s">%s%s</a>, SN: <a target="_blank" href="%s">%s</a>',
 	      documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
 		warranty_url($sysinfo{serial}), $sysinfo{serial};
+	}
+	elsif (defined $opt{htmlinfo} && $opt{hide_servicetag}) {
+	    printf '------ SYSTEM: <a target="_blank" href="%s">%s%s</a>, SN: %s',
+	      documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
+		$sysinfo{serial};
 	}
 	else {
 	    printf '------ SYSTEM: %s%s, SN: %s',
