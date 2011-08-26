@@ -238,6 +238,12 @@ monitored system.
 Same as the B<--state> option above, except that the state is
 abbreviated to a single letter (W=warning, C=critical etc.).
 
+=item --hide-servicetag
+
+This option will replace the servicetag (serial number) in the output
+with C<XXXXXXX>. Use this option to suppress or censor the servicetag
+in the plugin output.
+
 =item --linebreak I<STRING>
 
 check_openmanage will sometimes report more than one line, e.g. if
