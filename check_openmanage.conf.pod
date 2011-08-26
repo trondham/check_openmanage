@@ -354,6 +354,16 @@ as parameter. Examples:
 For more information about codes and formatting, see the corresponding
 command line option C<--postmsg> in L<check_openmanage(8)>.
 
+=item Suppress or censor the servicetag
+
+The option C<output_hide_servicetag> will censor the servicetag
+(serial number) in any output from the plugin. This option takes a
+boolean value. Example:
+
+    output_hide_servicetag = true
+
+Corresponding command line option: C<--hide-servicetag>
+
 =back
 
 =head1 SEE ALSO
