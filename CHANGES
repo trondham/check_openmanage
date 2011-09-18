@@ -1,11 +1,12 @@
-3.7.2   ?
+3.7.2   2011-09-18
 ------------------
 
 * Added a new option '--hide-servicetag' to censor the servicetag in
   the plugin output. A corresponding config file option
   'output_hide_servicetag' was created. Thanks to Sebastian Ahndorf
   for a patch.
-* SNMP: Bugfix for amperage probes perfdata when one PS has lost power
+* SNMP: Fixed bug in amperage probes perfdata output when one or more
+  PSUs has lost power, which could cause garbled graphs.
 
 3.7.1   2011-08-22
 ------------------
