@@ -6,7 +6,7 @@
 %global debug_package %{nil}
 
 Name:          nagios-plugins-check-openmanage
-Version:       3.7.1
+Version:       3.7.2
 Release:       1%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
 
@@ -17,7 +17,7 @@ Source0:       http://folk.uio.no/trondham/software/files/%{plugin}-%{version}.t
 
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: perl
+BuildRequires: /usr/bin/pod2man
 
 Obsoletes:     check_openmanage <= 3.6.3-1
 
@@ -43,9 +43,9 @@ pod2man -s 5 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.conf.pod %{p
 %{__install} -d -m 0755 %{buildroot}%{nagiospluginsdir}
 %{__install} -d -m 0755 %{buildroot}%{_mandir}/man8
 %{__install} -d -m 0755 %{buildroot}%{_mandir}/man5
-%{__install} -pD -m 0755 %{plugin} %{buildroot}%{nagiospluginsdir}
-%{__install} -pD -m 0644 %{plugin}.8 %{buildroot}%{_mandir}/man8
-%{__install} -pD -m 0644 %{plugin}.conf.5 %{buildroot}%{_mandir}/man5
+%{__install} -p -m 0755 %{plugin} %{buildroot}%{nagiospluginsdir}
+%{__install} -p -m 0644 %{plugin}.8 %{buildroot}%{_mandir}/man8
+%{__install} -p -m 0644 %{plugin}.conf.5 %{buildroot}%{_mandir}/man5
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -59,6 +59,9 @@ pod2man -s 5 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.conf.pod %{p
 
 
 %changelog
+* Mon Sep 19 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.2-1
+- Version 3.7.2
+
 * Mon Aug 22 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.1-1
 - Version 3.7.1
 
