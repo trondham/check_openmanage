@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.2';
+$VERSION = '3.7.3-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -5216,7 +5216,7 @@ elsif ($exit_code == $E_OK && !$opt{debug}) {
 	  documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
 	    warranty_url($sysinfo{serial}), $sysinfo{serial};
     }
-    if (defined $opt{htmlinfo} and $opt{hide_servicetag}) {
+    elsif (defined $opt{htmlinfo} and $opt{hide_servicetag}) {
 	printf q{OK - System: '<a target="_blank" href="%s">%s%s</a>', SN: '%s'},
 	  documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
 	    $sysinfo{serial};
