@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.3-beta1';
+$VERSION = '3.7.3-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -746,21 +746,24 @@ sub parse_configfile {
     # First: Populate the sections array with the global section
     @sections = ('_');
 
-    # Second: Populate the sections array with host glob pattern (but
-    # not exact match)
-  PATTERN:
-    foreach my $glob (sort keys %{ $tiny }) {
-	next PATTERN if $glob eq '_';            # global section
-        next PATTERN if $glob eq $opt{hostname}; # exact match
-	my $regex = glob2regex($glob);           # make regexp
-	if ($opt{hostname} =~ m{$regex}) {
-	    push @sections, $glob;
+    # Last two steps only if hostname is defined
+    if (defined $opt{hostname}) {
+	# Second: Populate the sections array with host glob pattern (but
+	# not exact match)
+      PATTERN:
+	foreach my $glob (sort keys %{ $tiny }) {
+	    next PATTERN if $glob eq '_';            # global section
+	    next PATTERN if $glob eq $opt{hostname}; # exact match
+	    my $regex = glob2regex($glob);           # make regexp
+	    if ($opt{hostname} =~ m{$regex}) {
+		push @sections, $glob;
+	    }
 	}
-    }
 
-    # Third: Populate the sections array with exact hostname
-    if (defined $tiny->{$opt{hostname}}) {
-	push @sections, $opt{hostname};
+	# Third: Populate the sections array with exact hostname
+	if (defined $tiny->{$opt{hostname}}) {
+	    push @sections, $opt{hostname};
+	}
     }
 
     # Loop through the sections array and get options
