@@ -24,8 +24,8 @@ Requires:      perl(Net::SNMP)
 Requires:      perl(Crypt::Rijndael)
 Requires:      nagios-plugins
 
-Provides:      check_openmanage = %{version}-%{release}
-Obsoletes:     nagios-plugins-check-openmanage < 3.7.2-2
+Provides:      nagios-plugins-check-openmanage = %{version}-%{release}
+Obsoletes:     nagios-plugins-check-openmanage < 3.7.2-3
 
 %description
 check_openmanage is a plugin for Nagios which checks the hardware
