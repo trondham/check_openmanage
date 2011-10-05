@@ -11,7 +11,7 @@ dist: man
 	mkdir $(NAME)-$(VER)
 	mv $(NAME).8 $(NAME).conf.5 $(NAME)-$(VER)
 	cp $(NAME){,.pod,.conf.pod,.php} $(NAME)-$(VER)
-	cp nagios-plugins-check-openmanage.spec $(NAME)-$(VER)
-	cp CHANGES COPYING INSTALL install.bat install.sh README $(NAME)-$(VER)
+	cp nagios-plugins-openmanage.spec $(NAME)-$(VER)
+	cp example.conf CHANGES COPYING INSTALL install.bat install.sh README $(NAME)-$(VER)
 	cp -r debian $(NAME)-$(VER)
 	rm -rf $(NAME)-$(VER)/debian/.svn
