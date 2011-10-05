@@ -5,7 +5,7 @@
 # No binaries here, do not build a debuginfo package
 %global debug_package %{nil}
 
-Name:          nagios-plugins-check-openmanage
+Name:          nagios-plugins-openmanage
 Version:       3.7.3
 Release:       1%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
@@ -19,7 +19,13 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: /usr/bin/pod2man
 
-Obsoletes:     check_openmanage <= 3.6.3-1
+Requires:      perl(Config::Tiny)
+Requires:      perl(Net::SNMP)
+Requires:      perl(Crypt::Rijndael)
+Requires:      nagios-plugins
+
+Provides:      check_openmanage = %{version}-%{release}
+Obsoletes:     nagios-plugins-check-openmanage < 3.7.2-2
 
 %description
 check_openmanage is a plugin for Nagios which checks the hardware
@@ -39,16 +45,14 @@ pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin
 pod2man -s 5 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.conf.pod %{plugin}.5
 
 %install
-%{__rm} -rf %{buildroot}
-%{__install} -d -m 0755 %{buildroot}%{nagiospluginsdir}
-%{__install} -d -m 0755 %{buildroot}%{_mandir}/man8
-%{__install} -d -m 0755 %{buildroot}%{_mandir}/man5
-%{__install} -p -m 0755 %{plugin} %{buildroot}%{nagiospluginsdir}
-%{__install} -p -m 0644 %{plugin}.8 %{buildroot}%{_mandir}/man8
-%{__install} -p -m 0644 %{plugin}.conf.5 %{buildroot}%{_mandir}/man5
+rm -rf %{buildroot}
+install -Dp -m 0755 %{plugin} %{buildroot}%{nagiospluginsdir}/%{plugin}
+install -Dp -m 0644 %{plugin}.8 %{buildroot}%{_mandir}/man8/%{plugin}.8
+install -Dp -m 0644 %{plugin}.conf.5 %{buildroot}%{_mandir}/man5/%{plugin}.conf.5
+install -Dp -m 0644 example.conf %{buildroot}%{_sysconfdir}/nagios/%{plugin}.conf
 
 %clean
-%{__rm} -rf %{buildroot}
+rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
@@ -56,11 +60,22 @@ pod2man -s 5 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.conf.pod %{p
 %{nagiospluginsdir}/*
 %{_mandir}/man8/*.8*
 %{_mandir}/man5/*.5*
+%dir %{_sysconfdir}/nagios
+%config(noreplace) %{_sysconfdir}/nagios/*
 
 
 %changelog
 * Wed Oct  5 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-1
 - Version 3.7.3
+- RPM name changed to nagios-plugins-openmanage
+- Added obsoletes for old name
+
+* Tue Sep 27 2011 Xavier Bachelot <xavier@bachelot.org> - 3.7.2-2
+- Add a commented configuration file.
+- Add some Requires to have all features out of the box.
+- Add Requires on nagios-plugins for %%{_libdir}/nagios/plugins directory.
+- Remove some useless command macros.
+- Fix Obsoletes/Provides.
 
 * Mon Sep 19 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.2-1
 - Version 3.7.2
