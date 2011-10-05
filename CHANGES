@@ -6,6 +6,8 @@
   correct for HTML output.
 * A bug was fixed for config file parsing, if the plugin was used in
   local mode (i.e. no hostname specified). Reported by David Jones.
+* Distribution now includes an example configuration file, contributed
+  by Xavier Bachelot
 
 3.7.2   2011-09-19
 ------------------
