@@ -42,8 +42,6 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 	     @report_storage @report_chassis @report_other
 	  );
 
-use subs qw(glob2regex);
-
 #---------------------------------------------------------------------
 # Initialization and global variables
 #---------------------------------------------------------------------
