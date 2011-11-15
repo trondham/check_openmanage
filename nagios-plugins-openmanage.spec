@@ -70,11 +70,10 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Tue Nov 15 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-2
-- Added some comments in the spec file
-- Less use of wildcards in spec file
+* Tue Nov 15 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-2
+- Spec file changes which address issues raised in rhbz#743615
 
-* Wed Oct  5 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-1
+* Wed Oct  5 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-1
 - Version 3.7.3
 - RPM name changed to nagios-plugins-openmanage
 - Added obsoletes for old name
@@ -86,151 +85,151 @@ rm -rf %{buildroot}
 - Remove some useless command macros.
 - Fix Obsoletes/Provides.
 
-* Mon Sep 19 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.2-1
+* Mon Sep 19 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.2-1
 - Version 3.7.2
 
-* Mon Aug 22 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.1-1
+* Mon Aug 22 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.1-1
 - Version 3.7.1
 
-* Mon Aug 15 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.0-1
+* Mon Aug 15 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.0-1
 - Version 3.7.0
 
-* Tue Jun 06 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.8-1
+* Tue Jun 06 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.8-1
 - Version 3.6.8
 
-* Thu May 12 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.7-1
+* Thu May 12 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.7-1
 - Version 3.6.7
 
-* Thu Apr 28 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.6-1
+* Thu Apr 28 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.6-1
 - Version 3.6.6
 
-* Wed Feb  9 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.5-1
+* Wed Feb  9 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.5-1
 - Version 3.6.5
 
-* Tue Jan  4 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.4-2
+* Tue Jan  4 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.4-2
 - Don't compress the man page, rpmbuild takes care of that. Thanks to
   Jose Pedro Oliveira for a patch that fixes this.
 
-* Tue Jan  4 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.4-1
+* Tue Jan  4 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.4-1
 - Version 3.6.4
 - Initial build with new spec file
 - Spec file adapted to Fedora/EPEL standards
 
-* Mon Dec 13 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.3-1
+* Mon Dec 13 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.3-1
 - Version 3.6.3
 
-* Thu Nov 25 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.2-1
+* Thu Nov 25 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.2-1
 - Version 3.6.2
 
-* Tue Nov  2 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.1-1
+* Tue Nov  2 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.1-1
 - Version 3.6.1
 
-* Mon Aug 30 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.6.0-1
+* Mon Aug 30 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.0-1
 - Version 3.6.0
 
-* Wed Jul 14 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.10-1
+* Wed Jul 14 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.10-1
 - Version 3.5.10
 
-* Tue Jun 29 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.9-1
+* Tue Jun 29 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.9-1
 - Version 3.5.9
 
-* Thu Jun 17 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.8-1
+* Thu Jun 17 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.8-1
 - Version 3.5.8
 
-* Wed Mar 19 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.7-1
+* Wed Mar 19 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.7-1
 - Version 3.5.7
 
-* Tue Feb 23 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.6-1
+* Tue Feb 23 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.6-1
 - Version 3.5.6
 
-* Fri Jan 22 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.5-1
+* Fri Jan 22 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.5-1
 - Version 3.5.5
 
-* Wed Jan 13 2010 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.4-1
+* Wed Jan 13 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.4-1
 - Version 3.5.4
 
-* Thu Dec 17 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.3-1
+* Thu Dec 17 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.3-1
 - Version 3.5.3
 
-* Tue Nov 17 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.2-1
+* Tue Nov 17 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.2-1
 - Version 3.5.2
 
-* Thu Oct 22 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.1-1
+* Thu Oct 22 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.1-1
 - Version 3.5.1
 
-* Tue Oct 13 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.5.0-1
+* Tue Oct 13 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.0-1
 - Version 3.5.0
 - New location for the manual page (section 3 -> 8)
 
-* Fri Aug  7 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.9-1
+* Fri Aug  7 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.9-1
 - Version 3.4.9
 
-* Fri Jul 31 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.8-1
+* Fri Jul 31 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.8-1
 - Version 3.4.8
 
-* Fri Jul 24 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.7-1
+* Fri Jul 24 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.7-1
 - Version 3.4.7
 
-* Tue Jul  7 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.6-1
+* Tue Jul  7 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.6-1
 - Version 3.4.6
 
-* Mon Jun 22 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.5-1
+* Mon Jun 22 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.5-1
 - Version 3.4.5
 
-* Mon Jun 22 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.4-1
+* Mon Jun 22 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.4-1
 - Version 3.4.4
 
-* Thu Jun 11 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.3-1
+* Thu Jun 11 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.3-1
 - Version 3.4.3
 
-* Wed Jun  3 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.2-1
+* Wed Jun  3 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.2-1
 - Version 3.4.2
 
-* Mon May 27 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.1-1
+* Mon May 27 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.1-1
 - Version 3.4.1
 
-* Mon May 25 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.4.0-1
+* Mon May 25 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.0-1
 - Version 3.4.0
 
-* Tue May  5 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.3.2-1
+* Tue May  5 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.3.2-1
 - Version 3.3.2
 
-* Tue Apr 28 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.3.1-1
+* Tue Apr 28 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.3.1-1
 - Version 3.3.1
 
-* Tue Apr  7 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.3.0-1
+* Tue Apr  7 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.3.0-1
 - Version 3.3.0
 
-* Sun Mar 29 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.2.7-1
+* Sun Mar 29 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.2.7-1
 - Version 3.2.7
 
-* Thu Mar  5 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.2.6-1
+* Thu Mar  5 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.2.6-1
 - Version 3.2.6
 
-* Tue Feb 24 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.2.5-1
+* Tue Feb 24 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.2.5-1
 - Version 3.2.5
 - take 64bit (other libdir) into consideration
 
-* Tue Feb 17 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.2.4-1
+* Tue Feb 17 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.2.4-1
 - Version 3.2.4
 
-* Mon Feb  9 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.2.3-1
+* Mon Feb  9 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.2.3-1
 - Version 3.2.3
 
-* Tue Feb  3 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.2.2-1
+* Tue Feb  3 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.2.2-1
 - Version 3.2.2
 
-* Tue Feb  3 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.2.1-1
+* Tue Feb  3 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.2.1-1
 - Version 3.2.1
 
-* Tue Jan 27 2009 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.2.0-1
+* Tue Jan 27 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.2.0-1
 - Version 3.2.0
 
-* Sat Dec 20 2008 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.0.2-1
+* Sat Dec 20 2008 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.0.2-1
 - Version 3.0.2
 
-* Thu Dec  4 2008 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.0.0-1
+* Thu Dec  4 2008 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.0.0-1
 - Version 3.0.0
 
-* Wed Nov 19 2008 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 2.1.0-0
+* Wed Nov 19 2008 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 2.1.0-0
 - first RPM release
