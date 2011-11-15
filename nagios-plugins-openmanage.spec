@@ -1,13 +1,12 @@
-# Definitions used throughout the spec file
+# Name of the plugin
 %global plugin check_openmanage
-%global nagiospluginsdir %{_libdir}/nagios/plugins
 
 # No binaries here, do not build a debuginfo package
 %global debug_package %{nil}
 
 Name:          nagios-plugins-openmanage
 Version:       3.7.3
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
 
 Group:         Applications/System
@@ -17,13 +16,19 @@ Source0:       http://folk.uio.no/trondham/software/files/%{plugin}-%{version}.t
 
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: /usr/bin/pod2man
+# Building requires pod2man
+BuildRequires: perl
 
+# Rpmbuild doesn't find these perl dependencies
 Requires:      perl(Config::Tiny)
 Requires:      perl(Net::SNMP)
 Requires:      perl(Crypt::Rijndael)
+
+# Owns the nagios plugins directory
 Requires:      nagios-plugins
 
+# Make the transition to Fedora/EPEL packages easier for existing
+# users of the non-Fedora/EPEL RPM packages
 Provides:      nagios-plugins-check-openmanage = %{version}-%{release}
 Obsoletes:     nagios-plugins-check-openmanage < 3.7.2-3
 
@@ -46,7 +51,7 @@ pod2man -s 5 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.conf.pod %{p
 
 %install
 rm -rf %{buildroot}
-install -Dp -m 0755 %{plugin} %{buildroot}%{nagiospluginsdir}/%{plugin}
+install -Dp -m 0755 %{plugin} %{buildroot}%{_libdir}/nagios/plugins/%{plugin}
 install -Dp -m 0644 %{plugin}.8 %{buildroot}%{_mandir}/man8/%{plugin}.8
 install -Dp -m 0644 %{plugin}.conf.5 %{buildroot}%{_mandir}/man5/%{plugin}.conf.5
 install -Dp -m 0644 example.conf %{buildroot}%{_sysconfdir}/nagios/%{plugin}.conf
@@ -57,14 +62,18 @@ rm -rf %{buildroot}
 %files
 %defattr(-, root, root, -)
 %doc README COPYING CHANGES
-%{nagiospluginsdir}/*
-%{_mandir}/man8/*.8*
-%{_mandir}/man5/*.5*
+%{_libdir}/nagios/plugins/%{plugin}
+%{_mandir}/man8/%{plugin}.8*
+%{_mandir}/man5/%{plugin}.conf.5*
 %dir %{_sysconfdir}/nagios
-%config(noreplace) %{_sysconfdir}/nagios/*
+%config(noreplace) %{_sysconfdir}/nagios/%{plugin}.conf
 
 
 %changelog
+* Tue Nov 15 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-2
+- Added some comments in the spec file
+- Less use of wildcards in spec file
+
 * Wed Oct  5 2011 Trond H. Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-1
 - Version 3.7.3
 - RPM name changed to nagios-plugins-openmanage
