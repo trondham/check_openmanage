@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.4-beta1';
+$VERSION = '3.7.4-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -177,7 +177,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'w|warning=s'        => \@{ $opt{warning} },
 	   'tempunit=s'         => \$opt{tempunit},
 	   'F|fahrenheit'       => \$opt{fahrenheit},
-           'f|configfile=s'     => \$opt{configfile},
+           'f|config=s'         => \$opt{configfile},
 	   't|timeout=i'        => \$opt{timeout},
 	   'd|debug'            => \$opt{debug},
 	   'h|help'             => \$opt{help},
