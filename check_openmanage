@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.3';
+$VERSION = '3.7.4-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -88,7 +88,7 @@ SNMP OPTIONS:
 
    -H, --hostname       Hostname or IP (required for SNMP)
    -C, --community      SNMP community string [default=public]
-   -P, --protocol       SNMP protocol version [default=2]
+   -P, --protocol       SNMP protocol version [default=2c]
    --port               SNMP port number [default=161]
    -6, --ipv6           Use IPv6 instead of IPv4 [default=no]
    --tcp                Use TCP instead of UDP [default=no]
@@ -156,7 +156,7 @@ END_LICENSE
 	 'port'              => 161,      # default SNMP port
 	 'hostname'          => undef,    # hostname or IP
 	 'community'         => 'public', # SMNP v1 or v2c
-	 'protocol'          => 2,        # default SNMP protocol 2c
+	 'protocol'          => '2c',     # default SNMP protocol 2c
 	 'ipv6'              => 0,        # default is IPv4
 	 'tcp'               => 0,        # default is UDP
 	 'username'          => undef,    # SMNP v3
@@ -200,7 +200,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'port=i'             => \$opt{port},
 	   'H|hostname=s'       => \$opt{hostname},
 	   'C|community=s'      => \$opt{community},
-	   'P|protocol=i'       => \$opt{protocol},
+	   'P|protocol=s'       => \$opt{protocol},
 	   '6|ipv6'             => \$opt{ipv6},
 	   'tcp'                => \$opt{tcp},
 	   'U|username=s'       => \$opt{username},
@@ -648,11 +648,11 @@ sub parse_configfile {
 	my $keyword = shift;
 	my $conf = $opt2config{protocol};
 	if (defined $tiny->{$keyword}->{$conf} and $tiny->{$keyword}->{$conf} ne q{}) {
-	    if ($tiny->{$keyword}->{$conf} =~ m{\A 1|2|3 \z}xms) {
+	    if ($tiny->{$keyword}->{$conf} =~ m{\A (1|2(?:c)?|3) \z}xms) {
 		$opt{protocol} = $tiny->{$keyword}->{$conf};
 	    }
 	    else {
-		report('other', "CONFIG ERROR: Rvalue for '$conf' must be '1', '2' or '3'", $E_UNKNOWN);
+		report('other', "CONFIG ERROR: Rvalue for '$conf' must be '1', '2', '2c' or '3'", $E_UNKNOWN);
 	    }
 	}
 	return;
@@ -869,14 +869,14 @@ sub snmp_initialize {
     $param{'-domain'} = "$transport/$ipversion";
 
     # Parameters for SNMP v3
-    if ($opt{protocol} == 3) {
+    if ($opt{protocol} eq '3') {
 
 	# Username is mandatory
 	if (defined $opt{username}) {
 	    $param{'-username'} = $opt{username};
 	}
 	else {
-	    print "SNMP ERROR: With SNMPv3 the username must be specified\n";
+	    print "SNMP ERROR: With SNMPv3 a username must be specified\n";
 	    exit $E_UNKNOWN;
 	}
 
@@ -906,7 +906,7 @@ sub snmp_initialize {
 		$param{'-privprotocol'} = $opt{privprotocol};
 	    }
 	    else {
-		print "SNMP ERROR: Unknown privprotocol '$opt{privprotocol}', "
+		print "SNMP ERROR: Unknown or invalid privprotocol [$opt{privprotocol}], "
 		  . "must be one of [des|aes|aes128|3des|3desde]\n";
 		exit $E_UNKNOWN;
 	    }
@@ -918,18 +918,18 @@ sub snmp_initialize {
 		$param{'-authprotocol'} = $opt{authprotocol};
 	    }
 	    else {
-		print "SNMP ERROR: Unknown authprotocol '$opt{authprotocol}', "
+		print "SNMP ERROR: Unknown or invalid authprotocol [$opt{authprotocol}], "
 		  . "must be one of [md5|sha]\n";
 		exit $E_UNKNOWN;
 	    }
 	}
     }
     # Parameters for SNMP v2c or v1
-    elsif ($opt{protocol} == 2 or $opt{protocol} == 1) {
+    elsif ($opt{protocol} =~ m{\A (1|2(?:c)?) \z}xms) {
 	$param{'-community'} = $opt{community};
     }
     else {
-	print "SNMP ERROR: Unknown SNMP version '$opt{protocol}'\n";
+	print "SNMP ERROR: Unknown or invalid SNMP version [$opt{protocol}]\n";
 	exit $E_UNKNOWN;
     }
 
