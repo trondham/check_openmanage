@@ -234,7 +234,7 @@ Corresponding command line option: C<-C> or C<--community>
 
 The SNMP protocol version can be set with C<snmp_version>. Example:
 
-    snmp_version = 2
+    snmp_version = 2c
 
 Corresponding command line option: C<-P> or C<--protocol>
 
