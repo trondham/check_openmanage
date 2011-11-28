@@ -6,7 +6,7 @@
 
 Name:          nagios-plugins-openmanage
 Version:       3.7.3
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
 
 Group:         Applications/System
@@ -44,6 +44,7 @@ outside normal parameters.
 
 %prep
 %setup -q -n %{plugin}-%{version}
+rm -f %{plugin}.exe
 
 %build
 pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin}.8
@@ -54,22 +55,24 @@ rm -rf %{buildroot}
 install -Dp -m 0755 %{plugin} %{buildroot}%{_libdir}/nagios/plugins/%{plugin}
 install -Dp -m 0644 %{plugin}.8 %{buildroot}%{_mandir}/man8/%{plugin}.8
 install -Dp -m 0644 %{plugin}.conf.5 %{buildroot}%{_mandir}/man5/%{plugin}.conf.5
-install -Dp -m 0644 example.conf %{buildroot}%{_sysconfdir}/nagios/%{plugin}.conf
 
 %clean
 rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
-%doc README COPYING CHANGES
+%doc README COPYING CHANGES example.conf
 %{_libdir}/nagios/plugins/%{plugin}
 %{_mandir}/man8/%{plugin}.8*
 %{_mandir}/man5/%{plugin}.conf.5*
-%dir %{_sysconfdir}/nagios
-%config(noreplace) %{_sysconfdir}/nagios/%{plugin}.conf
 
 
 %changelog
+* Mon Nov 28 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-3
+- Provide example config file as documentation rather than installing
+  it under /etc/nagios
+- Remove win32 binary in prep section
+
 * Tue Nov 15 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-2
 - Spec file changes which address issues raised in rhbz#743615
 
