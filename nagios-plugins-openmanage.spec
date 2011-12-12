@@ -4,9 +4,18 @@
 # No binaries here, do not build a debuginfo package
 %global debug_package %{nil}
 
+# SUSE installs Nagios plugins under /usr/lib, even on 64-bit
+# It also uses noarch for non-binary Nagios plugins
+%if %{defined suse_version}
+%global nagiospluginsdir /usr/lib/nagios/plugins
+BuildArch:     noarch
+%else
+%global nagiospluginsdir %{_libdir}/nagios/plugins
+%endif
+
 Name:          nagios-plugins-openmanage
 Version:       3.7.3
-Release:       3%{?dist}
+Release:       4%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
 
 Group:         Applications/System
@@ -52,7 +61,7 @@ pod2man -s 5 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.conf.pod %{p
 
 %install
 rm -rf %{buildroot}
-install -Dp -m 0755 %{plugin} %{buildroot}%{_libdir}/nagios/plugins/%{plugin}
+install -Dp -m 0755 %{plugin} %{buildroot}%{nagiospluginsdir}/%{plugin}
 install -Dp -m 0644 %{plugin}.8 %{buildroot}%{_mandir}/man8/%{plugin}.8
 install -Dp -m 0644 %{plugin}.conf.5 %{buildroot}%{_mandir}/man5/%{plugin}.conf.5
 
@@ -62,12 +71,15 @@ rm -rf %{buildroot}
 %files
 %defattr(-, root, root, -)
 %doc README COPYING CHANGES example.conf
-%{_libdir}/nagios/plugins/%{plugin}
+%{nagiospluginsdir}/%{plugin}
 %{_mandir}/man8/%{plugin}.8*
 %{_mandir}/man5/%{plugin}.conf.5*
 
 
 %changelog
+* Mon Dec 12 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-4
+- Added some SUSE spec file compatibility
+
 * Mon Nov 28 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.3-3
 - Provide example config file as documentation rather than installing
   it under /etc/nagios
