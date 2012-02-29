@@ -4,6 +4,8 @@
 * Allow "2c" to be specified as SNMP version via command line and
   config file option. Patch from Oskar Liljeblad.
 * Corrected a typo for the '--config' command line option
+* Added check for 'servicetag', checks whether the servicetag is sane
+  (i.e. not empty, "unknown" or other bogus value)
 
 
 3.7.3   2011-10-05
