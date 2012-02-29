@@ -7,7 +7,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2008-2011 Trond H. Amundsen
+# Copyright (C) 2008-2012 Trond H. Amundsen
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.4-beta2';
+$VERSION = '3.7.4-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -118,7 +118,7 @@ END_HELP
 # Version and license text
 $LICENSE = <<"END_LICENSE";
 $NAME $VERSION
-Copyright (C) 2008-2011 $AUTHOR
+Copyright (C) 2008-2012 $AUTHOR
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -244,6 +244,7 @@ if ($opt{version}) {
 	   'alertlog'    => 0,   # check the alert log
 	   'esmlog'      => 0,   # check the ESM log (hardware log)
 	   'esmhealth'   => 1,   # check the ESM log overall health
+	   'servicetag'  => 1,   # check that the servicetag is sane
 	 );
 
 # Messages
@@ -4649,6 +4650,22 @@ sub check_esmlog {
     return;
 }
 
+#-----------------------------------------
+# CHASSIS: Check service tag
+#-----------------------------------------
+sub check_servicetag {
+    if ($sysinfo{serial} !~ m{\A [0-9A-Z]{7} \z}xms) {
+        my $msg = sprintf q{Chassis Service Tag is bogus: '%s'}, $sysinfo{serial};
+	report('other', $msg, $E_WARNING);
+    }
+    else {
+        my $msg = sprintf 'Chassis Service Tag is sane';
+        report('other', $msg, $E_OK);
+    }
+    return;
+}
+
+
 #
 # Handy function for checking all storage components
 #
@@ -5022,6 +5039,14 @@ sub get_firmware_info {
 # Main program
 #=====================================================================
 
+# Get system information
+get_sysinfo();
+
+# Get firmware info if requested via option
+if ($opt{okinfo} >= 1) {
+    get_firmware_info();
+}
+
 # Here we do the actual checking of components
 # Check global status if applicable
 if ($global) {
@@ -5043,11 +5068,16 @@ if ($check{sdcard})      { check_sdcard();        }
 if ($check{alertlog})    { check_alertlog();      }
 if ($check{esmlog})      { check_esmlog();        }
 if ($check{esmhealth})   { check_esmlog_health(); }
-
+if ($check{servicetag})  { check_servicetag();    }
 
 #---------------------------------------------------------------------
 # Finish up
 #---------------------------------------------------------------------
+
+# Close SNMP session
+if ($snmp) {
+    $snmp_session->close;
+}
 
 # Counter variable
 %nagios_alert_count
@@ -5057,19 +5087,6 @@ if ($check{esmhealth})   { check_esmlog_health(); }
      'CRITICAL' => 0,
      'UNKNOWN'  => 0,
     );
-
-# Get system information
-get_sysinfo();
-
-# Get firmware info if requested via option
-if ($opt{okinfo} >= 1) {
-    get_firmware_info();
-}
-
-# Close SNMP session
-if ($snmp) {
-    $snmp_session->close;
-}
 
 # Print messages
 if ($opt{debug}) {
