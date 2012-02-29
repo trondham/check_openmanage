@@ -5,7 +5,8 @@
   config file option. Patch from Oskar Liljeblad.
 * Corrected a typo for the '--config' command line option
 * Added check for 'servicetag', checks whether the servicetag is sane
-  (i.e. not empty, "unknown" or other bogus value)
+  (i.e. not empty, "unknown" or other bogus value). Thanks to Xavier
+  Bachelot for a patch.
 
 
 3.7.3   2011-10-05
