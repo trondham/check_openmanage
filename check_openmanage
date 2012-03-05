@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.4-beta3';
+$VERSION = '3.7.4-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -4655,7 +4655,9 @@ sub check_esmlog {
 #-----------------------------------------
 sub check_servicetag {
     if ($sysinfo{serial} !~ m{\A [0-9A-Z]{7} \z}xms) {
-        my $msg = sprintf q{Chassis Service Tag is bogus: '%s'}, $sysinfo{serial};
+	my $msg = $sysinfo{serial} eq q{}
+	  ? q{Chassis Service Tag is empty}
+	    : sprintf q{Chassis Service Tag is bogus: '%s'}, $sysinfo{serial};
 	report('other', $msg, $E_WARNING);
     }
     else {
