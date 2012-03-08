@@ -51,7 +51,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.4-beta4';
+$VERSION = '3.7.4-beta5';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1417,58 +1417,52 @@ sub documentation_url {
 # Return the URL for warranty information for a server with a given
 # serial number (servicetag)
 sub warranty_url {
-    my $tag = shift;
+    my $tag       = shift;
+    my $url_start = 'http://www.dell.com/support/troubleshooting';
+    my $url_end   = 'Index?t=warranty&servicetag';
 
-    # Dell support sites for different parts of the world
-    my %supportsite
-      = (
-	 'emea' => 'http://support.euro.dell.com/support/topics/topic.aspx/emea/shared/support/my_systems_info/',
-	 'ap'   => 'http://supportapj.dell.com/support/topics/topic.aspx/ap/shared/support/my_systems_info/en/details?',
-	 'glob' => 'http://support.dell.com/support/topics/global.aspx/support/my_systems_info/details?',
-	);
-
-    # warranty URLs for different country codes
-    my %url
+    my %country
       = (
 	 # EMEA
-	 'at' => $supportsite{emea} . 'de/details?c=at&l=de&ServiceTag=',  # Austria
-	 'be' => $supportsite{emea} . 'nl/details?c=be&l=nl&ServiceTag=',  # Belgium
-	 'cz' => $supportsite{emea} . 'cs/details?c=cz&l=cs&ServiceTag=',  # Czech Republic
-	 'de' => $supportsite{emea} . 'de/details?c=de&l=de&ServiceTag=',  # Germany
-	 'dk' => $supportsite{emea} . 'da/details?c=dk&l=da&ServiceTag=',  # Denmark
-	 'es' => $supportsite{emea} . 'es/details?c=es&l=es&ServiceTag=',  # Spain
-	 'fi' => $supportsite{emea} . 'fi/details?c=fi&l=fi&ServiceTag=',  # Finland
-	 'fr' => $supportsite{emea} . 'fr/details?c=fr&l=fr&ServiceTag=',  # France
-	 'gr' => $supportsite{emea} . 'en/details?c=gr&l=el&ServiceTag=',  # Greece
-	 'it' => $supportsite{emea} . 'it/details?c=it&l=it&ServiceTag=',  # Italy
-	 'il' => $supportsite{emea} . 'en/details?c=il&l=en&ServiceTag=',  # Israel
-	 'me' => $supportsite{emea} . 'en/details?c=me&l=en&ServiceTag=',  # Middle East
-	 'no' => $supportsite{emea} . 'no/details?c=no&l=no&ServiceTag=',  # Norway
-	 'nl' => $supportsite{emea} . 'nl/details?c=nl&l=nl&ServiceTag=',  # The Netherlands
-	 'pl' => $supportsite{emea} . 'pl/details?c=pl&l=pl&ServiceTag=',  # Poland
-	 'pt' => $supportsite{emea} . 'en/details?c=pt&l=pt&ServiceTag=',  # Portugal
-	 'ru' => $supportsite{emea} . 'ru/details?c=ru&l=ru&ServiceTag=',  # Russia
-	 'se' => $supportsite{emea} . 'sv/details?c=se&l=sv&ServiceTag=',  # Sweden
-	 'uk' => $supportsite{emea} . 'en/details?c=uk&l=en&ServiceTag=',  # United Kingdom
-	 'za' => $supportsite{emea} . 'en/details?c=za&l=en&ServiceTag=',  # South Africa
+	 at => { c => 'at', l => 'de' },  # Austria
+	 be => { c => 'be', l => 'nl' },  # Belgium
+	 cz => { c => 'cz', l => 'cs' },  # Czech Republic
+	 de => { c => 'de', l => 'de' },  # Germany
+	 dk => { c => 'dk', l => 'da' },  # Denmark
+	 es => { c => 'es', l => 'es' },  # Spain
+	 fi => { c => 'fi', l => 'fi' },  # Finland
+	 fr => { c => 'fr', l => 'fr' },  # France
+	 gr => { c => 'gr', l => 'el' },  # Greece
+	 it => { c => 'it', l => 'it' },  # Italy
+	 il => { c => 'il', l => 'en' },  # Israel
+	 me => { c => 'me', l => 'en' },  # Middle East
+	 no => { c => 'no', l => 'no' },  # Norway
+	 nl => { c => 'nl', l => 'nl' },  # The Netherlands
+	 pl => { c => 'pl', l => 'pl' },  # Poland
+	 pt => { c => 'pt', l => 'pt' },  # Portugal
+	 ru => { c => 'ru', l => 'ru' },  # Russia
+	 se => { c => 'se', l => 'sv' },  # Sweden
+	 uk => { c => 'uk', l => 'en' },  # United Kingdom
+	 za => { c => 'za', l => 'en' },  # South Africa
 	 # America
-	 'br' => $supportsite{glob} . 'c=br&l=pt&ServiceTag=',  # Brazil
-	 'ca' => $supportsite{glob} . 'c=ca&l=en&ServiceTag=',  # Canada
-	 'mx' => $supportsite{glob} . 'c=mx&l=es&ServiceTag=',  # Mexico
-	 'us' => $supportsite{glob} . 'c=us&l=en&ServiceTag=',  # USA
+	 br => { c => 'br', l => 'pt' },  # Brazil
+	 ca => { c => 'ca', l => 'en' },  # Canada
+	 mx => { c => 'mx', l => 'es' },  # Mexico
+	 us => { c => 'us', l => 'en' },  # USA
 	 # Asia/Pacific
-	 'au' => $supportsite{ap} . 'c=au&l=en&ServiceTag=',  # Australia
-	 'cn' => $supportsite{ap} . 'c=cn&l=zh&ServiceTag=',  # China
-	 'in' => $supportsite{ap} . 'c=in&l=en&ServiceTag=',  # India
-	 # default fallback
-	 'XX' => $supportsite{glob} . 'ServiceTag=',  # default
+	 au => { c => 'au', l => 'en' },  # Australia
+	 cn => { c => 'cn', l => 'zh' },  # China
+	 in => { c => 'in', l => 'en' },  # India
+	 jp => { c => 'jp', l => 'ja' },  # Japan
 	);
 
-    if (exists $url{$opt{htmlinfo}}) {
-	return $url{$opt{htmlinfo}} . $tag;
+    if (exists $country{$opt{htmlinfo}}) {
+	return sprintf '%s/%s/%s/nodhs1/%s=%s',
+	  $url_start, $country{$opt{htmlinfo}}->{c},
+	  $country{$opt{htmlinfo}}->{l}, $url_end, $tag;
     }
     else {
-	return $url{XX} . $tag;
+	return sprintf '%s/%s=%s', $url_start, $url_end, $tag;
     }
 }
 
