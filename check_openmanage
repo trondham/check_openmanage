@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.4';
+$VERSION = '3.7.5-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2863,11 +2863,11 @@ sub check_enclosure_temp {
 
 	# Convert temp units
 	if ($opt{tempunit} ne 'C') {
-	    $reading  = temp_from_celsius($reading,  $opt{tempunit});
-	    $max_warn = temp_from_celsius($max_warn, $opt{tempunit});
-	    $max_crit = temp_from_celsius($max_crit, $opt{tempunit});
-	    $min_warn = temp_from_celsius($min_warn, $opt{tempunit});
-	    $min_crit = temp_from_celsius($min_crit, $opt{tempunit});
+	    $reading  = temp_from_celsius($reading,  $opt{tempunit}) if $reading  ne '[N/A]';
+	    $max_warn = temp_from_celsius($max_warn, $opt{tempunit}) if $max_warn ne '[N/A]';
+	    $max_crit = temp_from_celsius($max_crit, $opt{tempunit}) if $max_crit ne '[N/A]';
+	    $min_warn = temp_from_celsius($min_warn, $opt{tempunit}) if $min_warn ne '[N/A]';
+	    $min_crit = temp_from_celsius($min_crit, $opt{tempunit}) if $min_crit ne '[N/A]';
 	}
 
 	# Inactive temp probes
@@ -3544,11 +3544,11 @@ sub check_temperatures {
 
 	# Convert temp units
 	if ($opt{tempunit} ne 'C') {
-	    $reading  = temp_from_celsius($reading,  $opt{tempunit});
-	    $max_warn = temp_from_celsius($max_warn, $opt{tempunit});
-	    $max_crit = temp_from_celsius($max_crit, $opt{tempunit});
-	    $min_warn = temp_from_celsius($min_warn, $opt{tempunit});
-	    $min_crit = temp_from_celsius($min_crit, $opt{tempunit});
+	    $reading  = temp_from_celsius($reading,  $opt{tempunit}) if $reading  ne '[N/A]';
+	    $max_warn = temp_from_celsius($max_warn, $opt{tempunit}) if $max_warn ne '[N/A]';
+	    $max_crit = temp_from_celsius($max_crit, $opt{tempunit}) if $max_crit ne '[N/A]';
+	    $min_warn = temp_from_celsius($min_warn, $opt{tempunit}) if $min_warn ne '[N/A]';
+	    $min_crit = temp_from_celsius($min_crit, $opt{tempunit}) if $min_crit ne '[N/A]';
 	}
 
 	if ($type eq 'Discrete') {

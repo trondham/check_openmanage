@@ -1,3 +1,9 @@
+3.7.5
+------------------
+
+* A bug was fixed which could lead to perl warnings when either of the
+  options '--tempunit' or '--fahrenheit' was used.
+
 3.7.4   2012-03-29
 ------------------
 
