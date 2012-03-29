@@ -1,4 +1,4 @@
-3.7.4   
+3.7.4   2012-03-29
 ------------------
 
 * Allow "2c" to be specified as SNMP version via command line and

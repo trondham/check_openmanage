@@ -1,18 +1,17 @@
-På en debian- eller ubuntu-boks:
+# On a debian or ubuntu box
 
 # versjon
-VER=3.7.3
+VER=3.7.4
 
-# ymse
+# get ready
 wget http://folk.uio.no/trondham/software/files/check_openmanage-${VER}.tar.gz
 tar xvfz check_openmanage-${VER}.tar.gz 
 mv check_openmanage-${VER} check-openmanage-${VER}
 tar cvfz check-openmanage_${VER}.orig.tar.gz check-openmanage-${VER}
 cd check-openmanage-${VER}
 
-# bygge
+# build
 debuild -us -uc
 
-# synce ut deb-pakka
-cd ..
-scp check-openmanage_${VER}-1_all.deb trondham@tux:www_docs/software/files/
+# get package
+scp ../check-openmanage_${VER}-1_all.deb trondham@ulrik:www_docs/software/files/
