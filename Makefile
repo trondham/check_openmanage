@@ -14,4 +14,3 @@ dist: man
 	cp nagios-plugins-openmanage.spec $(NAME)-$(VER)
 	cp example.conf CHANGES COPYING INSTALL install.bat install.sh README $(NAME)-$(VER)
 	cp -r debian $(NAME)-$(VER)
-	rm -rf $(NAME)-$(VER)/debian/.svn
