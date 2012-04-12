@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.5-beta2';
+$VERSION = '3.7.5-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2876,25 +2876,25 @@ sub check_enclosure_temp {
 	      $name, $encl_id, $encl_name, $state;
 	    report('storage', $msg, $E_OK, $nexus);
 	}
-	elsif ($status ne 'Ok' and $max_crit ne '[N/A]' and $reading > $max_crit) {
+	elsif ($status ne 'Ok' and $reading ne '[N/A]' and $max_crit ne '[N/A]' and $reading > $max_crit) {
 	    my $msg = sprintf '%s in enclosure %s [%s] is critically high at %s %s',
 	      $name, $encl_id, $encl_name, $reading, $opt{tempunit};
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	    report('chassis', $msg, $err, $nexus);
 	}
-	elsif ($status ne 'Ok' and $max_warn ne '[N/A]' and $reading > $max_warn) {
+	elsif ($status ne 'Ok' and $reading ne '[N/A]' and $max_warn ne '[N/A]' and $reading > $max_warn) {
 	    my $msg = sprintf '%s in enclosure %s [%s] is too high at %s %s',
 	      $name, $encl_id, $encl_name, $reading, $opt{tempunit};
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	    report('chassis', $msg, $err, $nexus);
 	}
-	elsif ($status ne 'Ok' and $min_crit ne '[N/A]' and $reading < $min_crit) {
+	elsif ($status ne 'Ok' and $reading ne '[N/A]' and $min_crit ne '[N/A]' and $reading < $min_crit) {
 	    my $msg = sprintf '%s in enclosure %s [%s] is critically low at %s %s',
 	      $name, $encl_id, $encl_name, $reading, $opt{tempunit};
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	    report('chassis', $msg, $err, $nexus);
 	}
-	elsif ($status ne 'Ok' and $min_warn ne '[N/A]' and $reading < $min_warn) {
+	elsif ($status ne 'Ok' and $reading ne '[N/A]' and $min_warn ne '[N/A]' and $reading < $min_warn) {
 	    my $msg = sprintf '%s in enclosure %s [%s] is too low at %s %s',
 	      $name, $encl_id, $encl_name, $reading, $opt{tempunit};
 	    my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
