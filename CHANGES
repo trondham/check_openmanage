@@ -1,8 +1,13 @@
-3.7.5
+3.7.5   2012-04-13
 ------------------
 
 * A bug was fixed which could lead to perl warnings when either of the
   options '--tempunit' or '--fahrenheit' was used.
+* A workaround was added for an SNMP bug in OMSA 7.0.0 related to the
+  "firmwareType" OID for iDRAC6 management cards.
+* A bug was fixed for a corner case where the temperature probe
+  readings for storage enclosures were empty. Previously, this could
+  produce perl warnings (internal errors).
 
 3.7.4   2012-03-29
 ------------------
