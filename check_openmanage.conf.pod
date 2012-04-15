@@ -127,6 +127,7 @@ check control, listed here with their default values:
         check_intrusion = true
         check_sdcard = true
         check_esmhealth = true
+        check_servicetag = true
         check_esmlog = false
         check_alertlog = false
         check_everything = false

@@ -637,6 +637,10 @@ Only check SD cards
 
 Only check ESM log overall health, i.e. fill grade
 
+=item B<servicetag>
+
+Only check for sane service tag
+
 =item B<esmlog>
 
 Only check the event log (ESM) content
@@ -716,6 +720,10 @@ Check SD cards. Default: ON
 =item B<esmhealth>
 
 Check the ESM log health, i.e. fill grade. Default: ON
+
+=item B<servicetag>
+
+Check that the service tag (serial number) is sane and not empty. Default: ON
 
 =item B<esmlog>
 
