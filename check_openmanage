@@ -1813,6 +1813,7 @@ sub check_physical_disks {
 	 6 => 'USB',
 	 7 => 'SATA',
 	 8 => 'SAS',
+	 9 => 'PCIe',
 	);
 
     my %pdisk_state
@@ -1825,6 +1826,7 @@ sub check_physical_disks {
 	 6  => 'Degraded',
 	 7  => 'Recovering',
 	 11 => 'Removed',
+	 13 => 'Non-RAID',
 	 15 => 'Resynching',
          22 => 'Replacing', # FIXME: this one is not defined in the OMSA MIBs
 	 24 => 'Rebuilding',
@@ -2217,6 +2219,7 @@ sub check_cache_battery {
 	 4  => 'Timed out',
 	 8  => 'Requested',
 	 16 => 'Idle',
+	 32 => 'Due',
 	);
 
     # This property displays the battery's ability to be charged
