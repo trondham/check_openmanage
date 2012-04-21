@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.5';
+$VERSION = '3.7.6-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -4016,8 +4016,20 @@ sub check_volts {
 	$count{volt}++;
 	next VOLT if blacklisted('volt', $index);
 
-	my $msg = sprintf 'Voltage sensor %d [%s] is %s',
-	  $index, $location, $reading;
+	# remove trailing zeroes (if reading is an integer)
+	$reading =~ s{\A (\d+)\.000\sV \z}{$1 V}xms;
+
+	my $msg = undef;
+	if ($reading =~ m{\A \d+(:?\.\d+)?\sV \z}xms) {
+	    # number reading
+	    $msg = sprintf 'Voltage sensor %d [%s] reads %s',
+	      $index, $location, $reading;
+	}
+	else {
+	    # discrete reading
+	    $msg = sprintf 'Voltage sensor %d [%s] is %s',
+	      $index, $location, $reading;
+	}
 	my $err = $snmp ? $probestatus2nagios{$status} : $status2nagios{$status};
 	report('chassis', $msg, $err, $index);
 
