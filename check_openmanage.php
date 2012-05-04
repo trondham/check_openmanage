@@ -1,14 +1,14 @@
 <?php
 #
-# PNP4Nagios template for check_openmanage 
+# PNP4Nagios template for check_openmanage
+#
 # Author: 	Trond Hasle Amundsen
 # Contact: 	t.h.amundsen@usit.uio.no
 # Website:      http://folk.uio.no/trondham/software/check_openmanage.html
-# Date: 	2011-08-15
+# Date: 	___DATE___
+# Version:      ___VERSION___
 #
-# $Id$
-#
-# Copyright (C) 2008-2011 Trond H. Amundsen
+# Copyright (C) 2008-2012 Trond Hasle Amundsen
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
