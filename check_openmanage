@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.6-beta1';
+$VERSION = '3.7.6-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -3510,11 +3510,11 @@ sub check_temperatures {
 	    $discrete = $out->{temperatureProbeDiscreteReading} || '[N/A]';
 
 	    # If numeric values, i.e. not discrete
-	    $reading  /= 10 if $reading  =~ m{\A \d+ \z}xms;
-	    $max_crit /= 10 if $max_crit =~ m{\A \d+ \z}xms;
-	    $max_warn /= 10 if $max_warn =~ m{\A \d+ \z}xms;
-	    $min_crit /= 10 if $min_crit =~ m{\A \d+ \z}xms;
-	    $min_warn /= 10 if $min_warn =~ m{\A \d+ \z}xms;
+	    $reading  /= 10 if $reading  =~ m{\A -?\d+ \z}xms;
+	    $max_crit /= 10 if $max_crit =~ m{\A -?\d+ \z}xms;
+	    $max_warn /= 10 if $max_warn =~ m{\A -?\d+ \z}xms;
+	    $min_crit /= 10 if $min_crit =~ m{\A -?\d+ \z}xms;
+	    $min_warn /= 10 if $min_warn =~ m{\A -?\d+ \z}xms;
 
 	    # workaround for bad temp probes
 	    if ($type eq 'AmbientESM' and $reading !~ m{\A \d+(\.\d+)? \z}xms) {
@@ -3538,7 +3538,7 @@ sub check_temperatures {
 	    $min_crit =~ s{\.0\s+C}{}xms;
 	    $min_warn =~ s{\.0\s+C}{}xms;
 
-	    $type     = $reading =~ m{\A\d+\z}xms ? 'AmbientESM' : 'Discrete';
+	    $type     = $reading =~ m{\A-?\d+\z}xms ? 'AmbientESM' : 'Discrete';
 	    $discrete = $reading;
 	}
 
