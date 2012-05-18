@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.6-beta2';
+$VERSION = '3.7.6-beta3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1945,12 +1945,11 @@ sub check_physical_disks {
 	elsif (! defined $bus && defined $media) { $busmedia = "$media ";      }
 
 	# Special case: Failure predicted
-	if ($fpred) {
+	if ($fpred and $status2nagios{$status} == $E_OK) {
 	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
 	      $name, $vendor, $product, $capacity, $ctrl;
             $msg .= " ($state)" if $state ne 'Predictive failure';
-	    report('storage', $msg,
-                   ($status2nagios{$status} == $E_CRITICAL ? $E_CRITICAL : $E_WARNING), $nexus);
+	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Special case: Rebuilding / Replacing
 	elsif ($state =~ m{\A Rebuilding|Replacing \z}xms) {
