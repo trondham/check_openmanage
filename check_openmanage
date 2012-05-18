@@ -1945,7 +1945,7 @@ sub check_physical_disks {
 	elsif (! defined $bus && defined $media) { $busmedia = "$media ";      }
 
 	# Special case: Failure predicted
-	if ($fpred and $status2nagios{$status} == $E_OK) {
+	if ($fpred and $status eq 'Ok') {
 	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
 	      $name, $vendor, $product, $capacity, $ctrl;
             $msg .= " ($state)" if $state ne 'Predictive failure';
