@@ -1,0 +1,1436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DocBook V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<reference>
+<title>Nagios plugin</title>
+<refentry>
+
+  <refentryinfo>
+    <productname>check_openmanage</productname>
+    <orgname>Trond Hasle Amundsen &lt;t.h.amundsen@usit.uio.no&gt;</orgname>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>check_openmanage</refentrytitle>
+    <manvolnum>8</manvolnum>
+  </refmeta>
+
+  <refnamediv id='name'>
+    <refname>check_openmanage</refname>
+    <refpurpose>
+      Nagios plugin for checking the hardware status on Dell servers
+      running OpenManage
+    </refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv id='synopsis'>
+    <cmdsynopsis>
+      <command>check_openmanage</command>
+      <arg choice='opt'>
+	<replaceable>option</replaceable>...
+      </arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>check_openmanage</command>
+      <arg choice='plain'>
+	-H <replaceable>hostname</replaceable>
+      </arg>
+      <arg choice='opt'>
+	<replaceable>option</replaceable>...
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 id='description'>
+    <title>DESCRIPTION</title>
+    <para>
+      <command>check_openmanage</command> is a plugin for Nagios which
+      checks the hardware health of Dell servers running OpenManage
+      Server Administrator (<acronym>OMSA</acronym>). The plugin
+      checks the health of the storage subsystem, power supplies,
+      memory modules, temperature probes etc., and gives an alert if
+      any of the components are faulty or operate outside normal
+      parameters.
+    </para>
+    <para>
+      <command>check_openmanage</command> is designed to be used by
+      either locally (using NRPE or similar) or remotely (using
+      SNMP). In either mode, the output is (nearly) the same. Note
+      that checking the alert log is not supported in SNMP mode.
+    </para>
+  </refsect1>
+
+  <refsect1 id='general_options'>
+    <title>GENERAL OPTIONS</title>
+    <variablelist remap='IP'>
+      <varlistentry>
+	<term>
+	  <option>-f</option>, <option>--config <replaceable>file</replaceable></option>
+	</term>
+	<listitem>
+	  <para>
+	    Specify a configuration file. For reference on the config
+	    file syntax and options, consult the
+ 	    <citerefentry>
+	      <refentrytitle>check_openmanage.conf</refentrytitle>
+	      <manvolnum>5</manvolnum>
+	    </citerefentry>
+	    manual page.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-t</option>, <option>--timeout <replaceable>seconds</replaceable></option>
+	</term>
+	<listitem>
+	  <para>
+	    The number of seconds after which the plugin will
+	    abort. Default timeout is 30 seconds if the option is not
+	    present.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-p</option>, <option>--perfdata</option>
+	  [<replaceable>argument</replaceable>]
+	</term>
+	<listitem>
+	  <para>
+	    Collect performance data. Performance data collected
+	    include temperatures (in Celsius) and fan speeds (in
+	    rpm). On systems that support it, power consumption is
+	    also collected (in Watts). This option takes one of two
+	    arguments, both of which are optional:
+	  </para>
+	  <variablelist>
+	    <varlistentry>
+	      <term><emphasis>minimal</emphasis></term>
+	      <listitem>
+		<para>
+		  If <emphasis>minimal</emphasis> is specified as
+		  argument, the plugin will use shorter names for the
+		  performance data labels, e.g. <quote>t0</quote>
+		  instead of
+		  <quote>temp_0_system_board_ambient</quote>. This can
+		  be used as a workaround in cases where the plugin
+		  output needs shortening, for example if the 1024
+		  character limit of NRPE is reached.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term><emphasis>multiline</emphasis></term>
+	      <listitem>
+		<para>
+		  If <emphasis>multiline</emphasis> is specified as
+		  argument, the plugin will output the performance
+		  data on multiple lines, for Nagios 3.x and above.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	  <para>
+	    The default behaviour should be sufficient for most users.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--legacy-perfdata</option>
+	</term>
+	<listitem>
+	  <para>
+	    With version 3.7.0, performance data output changed. The
+	    new format is not compatible with the old format. Users
+	    who wish to postpone switching to the new performance data
+	    API may set this option.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-w</option>, <option>--warning</option>
+	  <replaceable>string</replaceable> | <replaceable>file</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    Override the machine-default temperature warning thresholds. Syntax is:
+	    <programlisting>
+<replaceable>id1</replaceable>=<replaceable>max</replaceable>[/<replaceable>min</replaceable>],<replaceable>id2</replaceable>=<replaceable>max</replaceable>[/<replaceable>min</replaceable>],...
+	    </programlisting>
+	    The following example sets warning limits to max 50C for
+	    probe 0, and max 45C and min 10C for probe 1:
+	    <programlisting>
+check_openmanage -w 0=50,1=45/10
+	    </programlisting>
+	    The minimum limit can be omitted, if desired. Most often, you are only
+	    interested in setting the maximum thresholds.
+	  </para>
+	  <para>
+	    This parameter can be either a string with the limits, or a file
+	    containing the limits string. The option can be specified multiple
+	    times.
+	  </para>
+	  <para>
+	    <emphasis>NOTE</emphasis>: This option should only be used
+	    to narrow the field of OK temperatures wrt. the OMSA
+	    defaults. To expand the field of OK temperatures, increase
+	    the OMSA thresholds. See the plugin web page for more
+	    information.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-c</option>, <option>--critical</option>
+	  <replaceable>string</replaceable> | <replaceable>file</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    Override the machine-default temperature critical
+	    thresholds. Syntax and behaviour is the same as for
+	    warning thresholds described above.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-F</option>, <option>--fahrenheit</option>
+	</term>
+	<listitem>
+	  <para>
+	    Set Fahrenheit as unit for all temperatures. This option will override
+	    the <option>--tempunit</option> option, if used simultaneously.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--tempunit</option> <replaceable>unit</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    Set temperature unit. Legal values are:
+	  </para>
+	  <para><emphasis>F</emphasis>: Fahrenheit</para>
+	  <para><emphasis>C</emphasis>: Celsius</para>
+	  <para><emphasis>K</emphasis>: Kelvin</para>
+	  <para><emphasis>R</emphasis>: Rankine</para>
+	  <para>
+	    Default: C
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--omreport</option> <replaceable>path</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    Specify full path to omreport, if it is not installed in
+	    any of the regular places. Usually this option is only
+	    needed on Windows, if omreport is not installed on the C:
+	    drive.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-d</option>, <option>--debug</option>
+	</term>
+	<listitem>
+	  <para>
+	    Debug output. Will report status on everything, even if
+	    status is ok. Blacklisted or unchecked components are
+	    ignored (i.e. no output).
+	  </para>
+	  <para>
+	    <emphasis>NOTE</emphasis>: This option is intended for
+	    diagnostics and debugging purposes only. Do not use this
+	    option from within Nagios, i.e. in the Nagios config.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-h</option>, <option>--help</option>
+	</term>
+	<listitem>
+	  <para>
+	    Display help message and exit.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-V</option>, <option>--version</option>
+	</term>
+	<listitem>
+	  <para>
+	    Print version info and exit.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 id='output_options'>
+    <title>OUTPUT OPTIONS</title>
+    <variablelist remap='IP'>
+      <varlistentry>
+	<term>
+	  <option>-o</option>, <option>--ok-info</option>
+	  <replaceable>level</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    This option lets you define how much output you want the
+	    plugin to give when everything is OK, i.e. the verbosity
+	    level. The default value is 0 (one line of output). The
+	    output levels are cumulative.
+	  </para>
+	  <para>
+	    <emphasis>0</emphasis>: Only one line
+	  </para>
+	  <para>
+	    <emphasis>1</emphasis>: BIOS and firmware info on a
+	    separate line
+	  </para>
+	  <para>
+	    <emphasis>2</emphasis>: Storage controller and enclosure
+	    info on separate lines
+	  </para>
+	  <para>
+	    <emphasis>3</emphasis>: OMSA version on separate line
+	  </para>
+	  <para>
+	    Default: 0
+	  </para>
+	  <para>
+	    The reason that OMSA version is separated from the rest is that
+	    finding it requires running a really slow omreport command, when the
+	    plugin is run locally via NRPE.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-B</option>, <option>--show-blacklist</option>
+	</term>
+	<listitem>
+	  <para>
+	    If used together with blacklisting, this option will make
+	    the plugin output all blacklistings that are being
+	    used. The output will have the correct blacklisting
+	    syntax, and will make it easy to maintain control over
+	    which blacklistings that are used for each server, as any
+	    blacklistings can be viewed from Nagios.
+	  </para>
+	  <para>
+	    When blacklisting is not used, this option has no effect.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-i</option>, <option>--info</option>
+	</term>
+	<listitem>
+	  <para>
+	    Prefix any alerts with the service tag.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-e</option>, <option>--extinfo</option>
+	</term>
+	<listitem>
+	  <para>
+	    Display a short summary of system information (model and
+	    service tag) in case of an alert.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-I</option>, <option>--htmlinfo</option>
+	  [<replaceable>code</replaceable>]
+	</term>
+	<listitem>
+	  <para>
+	    Using this option will make the servicetag and model name
+	    into clickable HTML links in the output. The model name
+	    link will point to the official Dell documentation for
+	    that model, while the servicetag link will point to a
+	    website containing support info for that particular
+	    server.
+	  </para>
+	  <para>
+	    This option takes an optional argument, which should be a
+	    country or area code or. If the country code is omitted
+	    the servicetag link will still work, but it will not be
+	    speficic for your country or area. Example for Germany:
+	    <programlisting>
+check_openmanage --htmlinfo de
+	    </programlisting>
+	    If this option is used together with either the
+	    <option>--extinfo</option> or <option>--info</option>
+	    options, it is particularly useful. Only the most common
+	    country codes is supported at this time:
+	  </para>
+	  <informaltable frame='none' pgwide='1'>
+	    <tgroup cols='3'>
+	      <colspec colname='c1'/>
+	      <colspec colname='c2'/>
+	      <colspec colname='c3'/>
+	      <tbody>
+		<row>
+		  <entry namest='c1' nameend='c3'>Europe, Middle East and Africa (EMEA)</entry>
+		</row>
+		<row>
+		  <entry><emphasis>at</emphasis>: Austria</entry>
+		  <entry><emphasis>be</emphasis>: Belgium</entry>
+		  <entry><emphasis>cz</emphasis>: Czech Republic</entry>
+		</row>
+		<row>
+		  <entry><emphasis>de</emphasis>: Germany</entry>
+		  <entry><emphasis>dk</emphasis>: Denmark</entry>
+		  <entry><emphasis>es</emphasis>: Spain</entry>
+		</row>
+		<row>
+		  <entry><emphasis>fi</emphasis>: Finland</entry>
+		  <entry><emphasis>fr</emphasis>: France</entry>
+		  <entry><emphasis>gr</emphasis>: Greece</entry>
+		</row>
+		<row>
+		  <entry><emphasis>it</emphasis>: Italy</entry>
+		  <entry><emphasis>il</emphasis>: Israel</entry>
+		  <entry><emphasis>me</emphasis>: Middle East</entry>
+		</row>
+		<row>
+		  <entry><emphasis>no</emphasis>: Norway</entry>
+		  <entry><emphasis>nl</emphasis>: The Netherlands</entry>
+		  <entry><emphasis>pl</emphasis>: Poland</entry>
+		</row>
+		<row>
+		  <entry><emphasis>pt</emphasis>: Portugal</entry>
+		  <entry><emphasis>ru</emphasis>: Russia</entry>
+		  <entry><emphasis>se</emphasis>: Sweden</entry>
+		</row>
+		<row>
+		  <entry><emphasis>uk</emphasis>: United Kingdom</entry>
+		  <entry><emphasis>za</emphasis>: South Africa</entry>
+		  <entry><emphasis></emphasis></entry>
+		</row>
+		<row>
+		  <entry namest='c1' nameend='c3'></entry>
+		</row>
+		<row>
+		  <entry namest='c1' nameend='c3'>America</entry>
+		</row>
+		<row>
+		  <entry><emphasis>br</emphasis>: Brazil</entry>
+		  <entry><emphasis>ca</emphasis>: Canada</entry>
+		  <entry><emphasis>mx</emphasis>: Mexico</entry>
+		</row>
+		<row>
+		  <entry><emphasis>us</emphasis>: USA</entry>
+		  <entry><emphasis></emphasis></entry>
+		  <entry><emphasis></emphasis></entry>
+		</row>
+		<row>
+		  <entry namest='c1' nameend='c3'></entry>
+		</row>
+		<row>
+		  <entry namest='c1' nameend='c3'>Asia / Pacific</entry>
+		</row>
+		<row>
+		  <entry><emphasis>au</emphasis>: Australia</entry>
+		  <entry><emphasis>cn</emphasis>: China</entry>
+		  <entry><emphasis>in</emphasis>: India</entry>
+		</row>
+		<row>
+		  <entry><emphasis>jp</emphasis>: Japan</entry>
+		  <entry><emphasis></emphasis></entry>
+		  <entry><emphasis></emphasis></entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </informaltable>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--postmsg</option>
+	  <replaceable>string</replaceable> | <replaceable>file</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    User specified post message. Useful for displaying arbitrary or
+	    various system information at the end of alerts. The argument is
+	    either a string with the message, or a file containing that
+	    string. You can control the format with the following interpreted
+	    sequences:
+	  </para>
+	  <para>
+	    <emphasis>%m</emphasis>: System model
+	  </para>
+	  <para>
+	    <emphasis>%s</emphasis>: Service tag
+	  </para>
+	  <para>
+	    <emphasis>%b</emphasis>: BIOS version
+	  </para>
+	  <para>
+	    <emphasis>%d</emphasis>: BIOS release date
+	  </para>
+	  <para>
+	    <emphasis>%o</emphasis>: Operating system name
+	  </para>
+	  <para>
+	    <emphasis>%r</emphasis>: Operating system release
+	  </para>
+	  <para>
+	    <emphasis>%p</emphasis>: Number of physical drives
+	  </para>
+	  <para>
+	    <emphasis>%l</emphasis>: Number of logical drives
+	  </para>
+	  <para>
+	    <emphasis>%n</emphasis>: Line break. Will be a regular
+	    line break if run from a TTY, else an HTML line break.
+	  </para>
+	  <para>
+	    <emphasis>%%</emphasis>: A literal <quote>%</quote>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-s</option>, <option>--state</option>
+	</term>
+	<listitem>
+	  <para>
+	    Prefix each alert with its corresponding service state
+	    (i.e. warning, critical etc.). This is useful in case of
+	    several alerts from the same monitored system.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-S</option>, <option>--short-state</option>
+	</term>
+	<listitem>
+	  <para>
+	    Same as the <option>--state</option> option above, except
+	    that the state is abbreviated to a single letter
+	    (<emphasis>W</emphasis>=warning,
+	    <emphasis>C</emphasis>=critical etc.).
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--hide-servicetag</option>
+	</term>
+	<listitem>
+	  <para>
+	    This option will replace the servicetag (serial number) in
+	    the output with <quote>XXXXXXX</quote>. Use this option to
+	    suppress or censor the servicetag in the plugin output.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--linebreak</option> <replaceable>string</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    check_openmanage will sometimes report more than one line, e.g. if
+	    there are several alerts. If the script has a TTY, it will use regular
+	    linebreaks. If not (which is the case with NRPE) it will use HTML
+	    linebreaks. Sometimes it can be useful to control what the plugin uses
+	    as a line separator, and this option provides that control.
+	  </para>
+	  <para>
+	    The argument is the exact string to be used as the line
+	    separator. There are two exceptions, i.e. two keywords
+	    that translates to the following:
+	  </para>
+	  <para>
+	    <emphasis>REG</emphasis>: Regular linebreaks,
+	    i.e. <quote>\n</quote>.
+	  </para>
+	  <para>
+	    <emphasis>HTML</emphasis>: HTML linebreaks,
+	    i.e. <quote>&lt;br/&gt;</quote>.
+	  </para>
+	  <para>
+	    This is a rather special option that is normally not
+	    needed. The default behaviour should be sufficient for
+	    most users.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 id='snmp_options'>
+    <title>SNMP OPTIONS</title>
+    <variablelist remap='IP'>
+      <varlistentry>
+	<term>
+	  <option>-H</option>, <option>--hostname <replaceable>hostname</replaceable></option>
+	</term>
+	<listitem>
+	  <para>
+	    The transport address of the destination SNMP
+	    device. Using this option triggers SNMP mode.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-P</option>, <option>--protocol</option>
+	  <replaceable>protocol-number</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    SNMP protocol version. This option is optional and expects either of
+	    the following:
+	  </para>
+	  <para><emphasis>1</emphasis>: SNMP version 1</para>
+	  <para><emphasis>2</emphasis>, <emphasis>2c</emphasis>: SNMP version 2c</para>
+	  <para><emphasis>3</emphasis>: SNMP version 3</para>
+	  <para>
+	    Default: 2c
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--port</option> <replaceable>port-number</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    SNMP port of the remote (monitored) system. Defaults to
+	    the well-known SNMP port 161.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-6</option>, <option>--ipv6</option>
+	</term>
+	<listitem>
+	  <para>
+	    This option will cause the plugin to use IPv6. The default
+	    is IPv4 if the option is not present.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--tcp</option>
+	</term>
+	<listitem>
+	  <para>
+	    This option will cause the plugin to use TCP as transport
+	    protocol. The default is UDP if the option is not present.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>-U</option>, <option>--username</option>
+	  <replaceable>securityname</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    [SNMPv3] The User-based Security Model (USM) used by
+	    SNMPv3 requires that a securityName be specified. This
+	    option is required when using SNMP version 3, and expects
+	    a string 1 to 32 octets in lenght.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--authpassword</option> <replaceable>password</replaceable>,
+	  <option>--authkey</option> <replaceable>key</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    [SNMPv3] By default a securityLevel of
+	    <emphasis>noAuthNoPriv</emphasis> is assumed.  If the
+	    <option>--authpassword</option> option is specified, the
+	    securityLevel becomes <emphasis>authNoPriv</emphasis>.  The
+	    <option>--authpassword</option> option expects a string
+	    which is at least 1 octet in length as argument.
+	  </para>
+	  <para>
+	    Optionally, instead of the <option>--authpassword</option>
+	    option, the <option>--authkey</option> option can be used
+	    so that a plain text password does not have to be
+	    specified in a script.  The <option>--authkey</option>
+	    option expects a hexadecimal string produced by localizing
+	    the password with the authoritativeEngineID for the
+	    specific destination device.  The
+	    <command>snmpkey</command> utility included with the
+	    Net::SNMP distribution can be used to create the
+	    hexadecimal string. See
+ 	    <citerefentry>
+	      <refentrytitle>snmpkey</refentrytitle>
+	      <manvolnum>1</manvolnum>
+	    </citerefentry>
+	    for more information.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--authprotocol</option> <replaceable>algorithm</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    [SNMPv3] Two different hash algorithms
+	    are defined by SNMPv3 which can be used by the Security
+	    Model for authentication. These algorithms are HMAC-MD5-96
+	    <quote>MD5</quote> (RFC 1321) and HMAC-SHA-96
+	    <quote>SHA-1</quote> (NIST FIPS PUB 180-1). The default
+	    algorithm used by the plugin is HMAC-MD5-96.  This
+	    behavior can be changed by using this option. The option
+	    expects either the string <replaceable>md5</replaceable>
+	    or <replaceable>sha</replaceable> to be passed as argument
+	    to modify the hash algorithm.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--privpassword</option> <replaceable>password</replaceable>,
+	  <option>--privkey</option> <replaceable>key</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    [SNMPv3] By specifying the options
+	    <option>--privkey</option> or
+	    <option>--privpassword</option>, the securityLevel
+	    associated with the object becomes
+	    <emphasis>authPriv</emphasis>. According to SNMPv3,
+	    privacy requires the use of authentication. Therefore, if
+	    either of these two options are present and the
+	    <option>--authkey</option> or
+	    <option>--authpassword</option> arguments are missing, the
+	    creation of the object fails.  The
+	    <option>--privkey</option> and
+	    <option>--privpassword</option> options expect the same
+	    input as the <option>--authkey</option> and
+	    <option>--authpassword</option> options respectively.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--privprotocol</option> <replaceable>algorithm</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    [SNMPv3] The User-based Security Model described in RFC
+	    3414 defines a single encryption protocol to be used for
+	    privacy.  This protocol, CBC-DES <quote>DES</quote> (NIST
+	    FIPS PUB 46-1), is used by default or if the string
+	    <replaceable>des</replaceable> is passed to the
+	    <option>--privprotocol</option> option. The Net::SNMP
+	    module also supports RFC 3826 which describes the use of
+	    CFB128-AES-128 <quote>AES</quote> (NIST FIPS PUB 197) in
+	    the USM.  The AES encryption protocol can be selected by
+	    passing <replaceable>aes</replaceable> or
+	    <replaceable>aes128</replaceable> to the
+	    <option>--privprotocol</option> option.
+	  </para>
+	  <para>
+	    One of the following arguments are required: des, aes,
+	    aes128, 3des, 3desde
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--use-get_table</option>
+	</term>
+	<listitem>
+	  <para>
+	    This option exists as a workaround when using
+	    check_openmanage with SNMPv3 on Windows with
+	    net-snmp. Using this option will make check_openmanage use
+	    the Net::SNMP function get_table() instead of
+	    get_entries() while fetching values via SNMP. The latter
+	    is faster and is the default.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 id='blacklisting'>
+    <title>BLACKLISTING</title>
+    <variablelist remap='IP'>
+      <varlistentry>
+	<term>
+	  <option>-b</option>, <option>--blacklist</option>
+	  <replaceable>string</replaceable> | <replaceable>file</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    Blacklist missing and/or failed components, if you do not
+	    plan to fix them. The parameter is either the blacklist
+	    string, or a file (that may or may not exist) containing
+	    the string. The blacklist string contains component names
+	    with component IDs separated by slash
+	    <quote>/</quote>. Blacklisted components are left
+	    unchecked.
+	  </para>
+	  <para>
+	    <emphasis>TIP</emphasis>: Use the option
+	    <option>-d</option> or <option>--debug</option> to get the
+	    blacklist ID for devices. The ID is listed in a separate
+	    column in the debug output.
+	  </para>
+	  <para>
+	    <emphasis>NOTE</emphasis>: If blacklisting is in effect,
+	    the global health of the system is not checked.
+	  </para>
+	  <para>
+	    Syntax:
+	    <programlisting>
+<replaceable>component1</replaceable>=<replaceable>id1</replaceable>[,<replaceable>id2</replaceable>,...]/<replaceable>component2</replaceable>=<replaceable>id1</replaceable>[,<replaceable>id2</replaceable>,...]/...
+	    </programlisting>
+	    The ID part can also be <quote>all</quote>, in which all
+	    components of that type is blacklisted.
+	  </para>
+	  <para>
+	    Example:
+	    <programlisting>
+check_openmanage -b ps=0/fan=3,5/pdisk=1:0:0:1/ctrl_driver=all
+	    </programlisting>
+	    In the example we blacklist powersupply 0, fans 3 and 5, physical disk
+	    1:0:0:1, and warnings about out-of-date drivers for all
+	    controllers. Legal component names include:
+	    <variablelist>
+	      <varlistentry>
+		<term><emphasis>ctrl</emphasis></term>
+		<listitem>
+		  <para>
+		    Storage controller. Note that if a controller is
+		    blacklisted, all components on that controller
+		    (such as physical and logical drives) are
+		    blacklisted as well.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>ctrl_fw</emphasis></term>
+		<listitem>
+		  <para>
+		    Suppress the special warning message about old
+		    controller firmware. Use this if you can not or
+		    will not upgrade the firmware.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>ctrl_driver</emphasis></term>
+		<listitem>
+		  <para>
+		    Suppress the special warning message about old
+		    controller driver.  Particularly useful on systems
+		    where you can not upgrade the driver.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>ctrl_stdr</emphasis></term>
+		<listitem>
+		  <para>
+		    Suppress the special warning message about old
+		    Storport driver on Windows.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>ctrl_pdisk</emphasis></term>
+		<listitem>
+		  <para>
+		    This blacklisting keyword exists as a possible
+		    workaround for physical drives with bad firmware
+		    which makes Openmanage choke. It takes the
+		    controller number as argument. Use this option to
+		    blacklist all physical drives on a specific
+		    controller. This blacklisting keyword is only
+		    available in local mode, i.e. not with SNMP.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>pdisk</emphasis></term>
+		<listitem>
+		  <para>Physical disk.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>pdisk_cert</emphasis></term>
+		<listitem>
+		  <para>
+		    Suppress warning message about non-certified
+		    physical disk.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>pdisk_foreign</emphasis></term>
+		<listitem>
+		  <para>
+		    Suppress warning message about foreign physical
+		    disk.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>vdisk</emphasis></term>
+		<listitem>
+		  <para>Logical drive (virtual disk).</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>bat</emphasis></term>
+		<listitem>
+		  <para>Controller cache battery.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>bat_charge</emphasis></term>
+		<listitem>
+		  <para>
+		    Ignore warnings related to the controller cache
+		    battery charging cycle, which happens
+		    approximately every 40-90 days on Dell
+		    servers. Note that using this blacklist keyword
+		    makes check_openmanage ignore non-critical cache
+		    battery errors.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>conn</emphasis></term>
+		<listitem>
+		  <para>Connector (channel).</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>encl</emphasis></term>
+		<listitem>
+		  <para>Storage enclosure.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>encl_fan</emphasis></term>
+		<listitem>
+		  <para>Enclosure fan.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>encl_ps</emphasis></term>
+		<listitem>
+		  <para>Enclosure power supply.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>encl_temp</emphasis></term>
+		<listitem>
+		  <para>Enclosure temperature probe.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>encl_emm</emphasis></term>
+		<listitem>
+		  <para>Enclosure management module (EMM).</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>dimm</emphasis></term>
+		<listitem>
+		  <para>Memory module.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>fan</emphasis></term>
+		<listitem>
+		  <para>Chassis fan.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>ps</emphasis></term>
+		<listitem>
+		  <para>Power supply.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>temp</emphasis></term>
+		<listitem>
+		  <para>Temperature sensor.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>cpu</emphasis></term>
+		<listitem>
+		  <para>Processor (CPU).</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>volt</emphasis></term>
+		<listitem>
+		  <para>Voltage probe.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>bp</emphasis></term>
+		<listitem>
+		  <para>System battery.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>amp</emphasis></term>
+		<listitem>
+		  <para>
+		    Amperage probe (power consumption monitoring).
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>intr</emphasis></term>
+		<listitem>
+		  <para>Intrusion detection sensor.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>sd</emphasis></term>
+		<listitem>
+		  <para>SD card</para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 id='check_control'>
+    <title>CHECK CONTROL</title>
+    <variablelist remap='IP'>
+      <varlistentry>
+	<term>
+	 <option>--no-storage</option>
+	</term>
+	<listitem>
+	  <para>
+	    Turn off storage checking. This is an alias for
+	    <quote>--check storage=0</quote>.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	 <option>--only</option> <replaceable>keyword</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    Makes check_openmanage check and/or report on a single
+	    class of components or warning level.  This option can be
+	    specifed once and expects an argument. The different
+	    arguments and the corresponding behaviour are described
+	    below.
+	    <variablelist remap='IP'>
+	      <varlistentry>
+		<term><emphasis>critical</emphasis></term>
+		<listitem>
+		  <para>
+		    Print only critical alerts. With this option any
+		    warning alerts are suppressed.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>warning</emphasis></term>
+		<listitem>
+		  <para>
+		    Print only warning alerts. With this option any
+		    critical alerts are suppressed.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>chassis</emphasis></term>
+		<listitem>
+		  <para>
+		    Check all chassis components and nothing else.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>storage</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check storage
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>memory</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check memory modules
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>fans</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check fans
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>power</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check power supplies
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>temp</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check temperatures
+		  </para>
+		</listitem></varlistentry><varlistentry>
+		<term><emphasis>cpu</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check processors
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>voltage</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check voltage probes
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>batteries</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check batteries
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>amperage</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check power usage
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>intrusion</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check chassis intrusion
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>sdcard</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check SD cards
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>esmhealth</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check ESM log overall health, i.e. fill grade
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>servicetag</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check for sane service tag
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>esmlog</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check the event log (ESM) content
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>alertlog</emphasis></term>
+		<listitem>
+		  <para>
+		    Only check the alert log content
+		  </para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <option>--check</option>
+	  <replaceable>string</replaceable> | <replaceable>file</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    This parameter allows you to adjust which components that
+	    should be checked at all. This is a rougher approach than
+	    blacklisting, which require that you specify component id
+	    or index. The parameter should be either a string
+	    containing the adjustments, or a file containing the
+	    string. No errors are raised if the file does not exist.
+	  </para>
+	  <para>
+	    Example:
+	    <programlisting>
+check_openmanage --check storage=0,intrusion=1
+	    </programlisting>
+	    Legal values are described below, along with the default value.
+	    <variablelist remap='IP'>
+	      <varlistentry>
+		<term><emphasis>storage</emphasis></term>
+		<listitem>
+		  <para>
+		    Check storage subsystem (controllers, disks
+		    etc.). Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>memory</emphasis></term>
+		<listitem>
+		  <para>
+		    Check memory (dimms). Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>fans</emphasis></term>
+		<listitem>
+		  <para>
+		    Check chassis fans. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>power</emphasis></term>
+		<listitem>
+		  <para>
+		    Check power supplies. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>temp</emphasis></term>
+		<listitem>
+		  <para>
+		    Check temperature sensors. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>cpu</emphasis></term>
+		<listitem>
+		  <para>
+		    Check CPUs. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>voltage</emphasis></term>
+		<listitem>
+		  <para>
+		    Check voltage sensors. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>batteries</emphasis></term>
+		<listitem>
+		  <para>
+		    Check system batteries. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>amperage</emphasis></term>
+		<listitem>
+		  <para>
+		    Check amperage probes. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>intrusion</emphasis></term>
+		<listitem>
+		  <para>
+		    Check chassis intrusion. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>sdcard</emphasis></term>
+		<listitem>
+		  <para>
+		    Check SD cards. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>esmhealth</emphasis></term>
+		<listitem>
+		  <para>
+		    Check the ESM log health, i.e. fill
+		    grade. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>servicetag</emphasis></term>
+		<listitem>
+		  <para>
+		    Check that the service tag (serial number) is sane
+		    and not empty. Default: ON
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>esmlog</emphasis></term>
+		<listitem>
+		  <para>
+		    Check the ESM log content. Default: OFF
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term><emphasis>alertlog</emphasis></term>
+		<listitem>
+		  <para>
+		    Check the alert log content. Default: OFF
+		  </para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 id='diagnostics'>
+    <title>DIAGNOSTICS</title>
+    <para>
+      The option <option>-d</option> or <option>--debug</option> can
+      be specified to display all monitored components.
+    </para>
+  </refsect1>
+
+  <refsect1 id='exit_status'>
+    <title>EXIT STATUS</title>
+    <para>
+      If no errors are discovered, a value of 0 (OK) is returned. An
+      exit value of 1 (WARNING) signifies one or more non-critical
+      errors, while 2 (CRITICAL) signifies one or more critical
+      errors.
+    </para>
+    <para>
+      The exit value 3 (UNKNOWN) is reserved for errors within the
+      script, or errors getting values from Dell OMSA.
+    </para>
+  </refsect1>
+
+  <refsect1 id='bugs_and_limitations'>
+    <title>BUGS AND LIMITATIONS</title>
+    <para>
+      Storage info is not collected or checked on very old PowerEdge
+      models and/or old OMSA versions, due to limitations in OMSA. The
+      overall support on those models/versions by this plugin is not
+      well tested.
+    </para>
+  </refsect1>
+
+  <refsect1 id='license_and_copyright'>
+    <title>LICENSE AND COPYRIGHT</title>
+    <para>
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or (at
+      your option) any later version.
+    </para>
+    <para>
+      This program is distributed in the hope that it will be useful, but
+      WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+      General Public License for more details.
+    </para>
+    <para>
+      You should have received a copy of the GNU General Public License
+      along with this program.  If not, see http://www.gnu.org/licenses/.
+    </para>
+  </refsect1>
+
+  <refsect1 id='see_also'>
+    <title>SEE ALSO</title>
+    <para>
+      <citerefentry>
+	<refentrytitle>check_openmanage.conf</refentrytitle><manvolnum>5</manvolnum>
+	</citerefentry>,
+      <citerefentry>
+	<refentrytitle>Net::SNMP</refentrytitle><manvolnum>3</manvolnum>
+	</citerefentry>,
+	<uri>
+	  http://folk.uio.no/trondham/software/check_openmanage.html
+	</uri>
+<!--
+      <citerefentry>
+	<refentrytitle>tele</refentrytitle><manvolnum>1</manvolnum>
+	</citerefentry>,
+      <citerefentry>
+	<refentrytitle>ng</refentrytitle><manvolnum>1</manvolnum>
+	</citerefentry>.
+-->
+    </para>
+  </refsect1>
+
+</refentry>
+</reference>
+

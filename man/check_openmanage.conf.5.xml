@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DocBook V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<reference>
+<title>Nagios plugin</title>
+<refentry>
+
+  <refentryinfo>
+    <productname>check_openmanage</productname>
+    <orgname>Trond Hasle Amundsen &lt;t.h.amundsen@usit.uio.no&gt;</orgname>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>check_openmanage.conf</refentrytitle>
+    <manvolnum>5</manvolnum>
+  </refmeta>
+
+  <refnamediv id='name'>
+    <refname>check_openmanage.conf</refname>
+    <refpurpose>
+      Configuration file for check_openmanage
+    </refpurpose>
+  </refnamediv>
+
+  <refsect1 id='file_format'>
+    <title>FILE FORMAT</title>
+    <para>
+      The file has an ini-style syntax and consists of sections and
+      parameters. A section begins with the name of the section in
+      square brackets and continues until the next section begins. An
+      example of section with two keywords and parameters:
+      <programlisting>
+        <replaceable>[section]</replaceable>
+            <replaceable>key1</replaceable> = <replaceable>boolean</replaceable>
+            <replaceable>key2</replaceable> = <replaceable>string</replaceable>
+      </programlisting>
+    </para>
+    <para>
+      The data types used are string (no quotes needed) and bool (with
+      values of <quote>TRUE/FALSE</quote>). For boolean values,
+      <quote>1</quote>, <quote>on</quote> and <quote>true</quote> are
+      equivalent, likewise for <quote>0</quote>, <quote>off</quote>
+      and <quote>false</quote>. They are also case insensitive.
+    </para>
+    <para>
+      The root section or global section has no section name in
+      brackets:
+      <programlisting>
+        <replaceable>key1</replaceable> = <replaceable>value1</replaceable>
+        <replaceable>key2</replaceable> = <replaceable>value2</replaceable>
+        
+        <replaceable>[section]</replaceable>
+            <replaceable>key3</replaceable> = <replaceable>value3</replaceable>
+            <replaceable>key4</replaceable> = <replaceable>value4</replaceable>
+      </programlisting>
+    </para>
+    <para>
+      The values set in a bracket section will override those set in the
+      root section, in case of conflicts.
+    </para>
+    <para>
+      Lines starting with <quote>#</quote> or <quote>;</quote> are
+      considered comments and ignored, as are blank lines.
+    </para>
+    <para>
+      The configuration file must be a regular file. Owner and group
+      does not matter, but the Nagios user must have read access.
+    </para>
+  </refsect1>
+
+  <refsect1 id='sections_and_ordering'>
+    <title>SECTIONS AND ORDERING</title>
+    <para>
+      The section name should correspond to the hostname, i.e. the
+      value passed to the <option>-H</option> or
+      <option>--hostname</option> command line option. The section
+      name itself can be either an exact match to the hostname, or a
+      glob pattern.
+    </para>
+    <para>
+      The sections are read in order of significance. The root section
+      is read first. Then any sections with glob patterns that match
+      the hostname are read (alphabetically). Any section whose name
+      is an exact match to the hostname is read last.
+    </para>
+    <para>
+      For boolean values, any conflicts are resolved by letting the
+      section with the most significance (closest match to the
+      hostname) override any previous definitions. For string values,
+      they are simply added together.
+    </para>
+    <para>
+      Normal shell globbing may be used for the section names. This is
+      limited to <quote>*</quote>, <quote>?</quote> and
+      <quote>[]</quote>. Some examples:
+      <programlisting>
+        [web*.example.com]
+            # matches e.g. webmail.example.com
+
+        [pgsql-[34].example.com]
+            # matches pgsql-3.example.com and pgsql-4.example.com
+
+        [login?.example.com]
+            # mathces e.g. login1.example.com
+      </programlisting>
+    </para>
+    <para>
+      <emphasis>CAUTION</emphasis>: Be careful not to have more than
+      one glob pattern section match any single host. This may lead to
+      unpredictable results.
+    </para>
+  </refsect1>
+
+  <refsect1 id='configuration'>
+    <title>CONFIGURATION</title>
+    <para>
+      All configuration file options have a corresponding command line
+      option. Usually, the command line option will override the
+      configuration file option, if used simultaneously.
+    </para>
+    <para>
+      Each option is described briefly. For more information about
+      syntax, legal values etc. refer to the corresponding command
+      line option in
+      <citerefentry>
+	<refentrytitle>check_openmanage</refentrytitle>
+	<manvolnum>8</manvolnum>
+      </citerefentry>.
+    </para>
+
+    <refsect2 id='check_control'>
+      <title>Check control configuration options</title>
+      <para>
+	Any keyword to the <option>--check</option> command line
+	option are accepted in the configuration file, as
+	<quote>check_&lt;<replaceable>keyword</replaceable>&gt;</quote>. These
+	options take boolean values (<quote>true</quote> or
+	<quote>false</quote>). The following keywords are accepted for
+	check control, listed here with their default values:
+      </para>
+      <variablelist>
+	<varlistentry>
+	  <term><emphasis>check_storage</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check storage subsystem (controllers, disks
+	      etc.). Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_memory</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check memory (dimms). Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_fans</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check chassis fans. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_power</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check power supplies. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_temp</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check temperature sensors. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_cpu</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check CPUs. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_voltage</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check voltage sensors. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_batteries</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check system batteries. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_amperage</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check amperage probes. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_intrusion</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check chassis intrusion. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_sdcard</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check SD cards. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_esmhealth</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check the ESM log health, i.e. fill grade. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_servicetag</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check that the service tag (serial number) is sane and
+	      not empty. Default: TRUE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_esmlog</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check the ESM log content. Default: FALSE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_alertlog</emphasis></term>
+	  <listitem>
+	    <para>
+	      Check the alert log content. Default: FALSE
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>check_everything</emphasis></term>
+	  <listitem>
+	    <para>
+	      Special option that turns on all checks. Setting this
+	      option to "true" will effectively negate any other check
+	      options. This option corresponds to the
+	      <option>-a</option> or <option>--all</option> command
+	      line option.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+      <para>
+	If used together with the <option>--check</option>
+	command line option, the command line option will
+	override the configuration file, if there is a conflict.
+      </para>
+      <para>
+	For more information about check control, see the CHECK
+	CONTROL section in
+	<citerefentry>
+	  <refentrytitle>check_openmanage</refentrytitle>
+	  <manvolnum>8</manvolnum>
+	  </citerefentry>.
+      </para>
+    </refsect2>
+
+    <refsect2 id='general'>
+      <title>General configuration options</title>
+      <variablelist>
+	<varlistentry>
+	  <term><emphasis>blacklist</emphasis> (string)</term>
+	  <listitem>
+	    <para>
+	      Blacklist components. The argument is a string that uses
+	      the same syntax as the <option>-b</option> or
+	      <option>--blacklist</option> command line
+	      option.
+	    </para>
+	    <para>
+	      If used together with the <option>-b</option> or
+	      <option>--blacklist</option> command line option, the
+	      two blacklists from the config file and command line are
+	      merged together.
+	    </para>
+	    <para>
+	    For more information about blacklisting, including syntax,
+	    see the BLACKLISTING section in
+	    <citerefentry>
+	      <refentrytitle>check_openmanage</refentrytitle>
+	      <manvolnum>8</manvolnum>
+	      </citerefentry>.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>timeout</emphasis> (integer)</term>
+	  <listitem>
+	    <para>
+	      The plugin timeout. The argument is number of seconds
+	      and should be a positive integer.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-t</option>, <option>--timeout</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>performance_data</emphasis> (boolean or string)</term>
+	  <listitem>
+	    <para>
+	      Turn on/off performance data reporting. Accepted values
+	      are boolean (TRUE/FALSE) or either of the keywords
+	      <quote>minimal</quote> and
+	      <quote>multiline</quote>.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-p</option>, <option>--perfdata</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>legacy_performance_data</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      With version 3.7.0, performance data output changed. The
+	      new format is not compatible with the old format. Users
+	      who wish to postpone switching to the new performance
+	      data API may use this option. This option takes a
+	      boolean value.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>--legacy-perfdata</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>temperature_unit</emphasis> (char)</term>
+	  <listitem>
+	    <para>
+	      The temperature unit used for reporting, performance data etc. can be
+	      set with the this option.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>--tempunit</option>
+	    </para>
+	    <para>
+	      <emphasis>NOTE</emphasis>: The command line option
+	      <option>-F</option> or <option>--fahrenheit</option>
+	      will override both the command line option and the
+	      configuration file option.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>temp_threshold_warning</emphasis> (string)</term>
+	  <listitem>
+	    <para>
+	      Custom temperature warning limits.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-w</option>, <option>--warning</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>temp_threshold_critical</emphasis> (string)</term>
+	  <listitem>
+	    <para>
+	      Custom temperature critical limits.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-c</option>, <option>--critical</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsect2>
+
+    <refsect2 id='snmp_configuration_options'>
+      <title>SNMP configuration options</title>
+      <para>
+	Several SNMP related options may be set in the configuration
+	file. The configuration file may contain the following SNMP
+	options:
+      </para>
+      <variablelist>
+	<varlistentry>
+	  <term><emphasis>snmp_community</emphasis> (string)</term>
+	  <listitem>
+	    <para>
+	      The SNMP community string.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-C</option>, <option>--community</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>snmp_version</emphasis> (string)</term>
+	  <listitem>
+	    <para>
+	      The SNMP protocol version.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-P</option>, <option>--protocol</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>snmp_port</emphasis> (integer)</term>
+	  <listitem>
+	    <para>
+	      The remote port number used with SNMP.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>--port</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>snmp_use_ipv6</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      Toggle using IPv6 instead of IPv4.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-6</option>, <option>--ipv6</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>snmp_use_tcp</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      Toggle using TCP instead of UDP as transport
+	      protocol.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>--tcp</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsect2>
+
+    <refsect2 id='output_configuration_options'>
+      <title>Output configuration options</title>
+      <para>
+	These options gives some control over the output given by the
+	plugin.
+      </para>
+      <variablelist>
+	<varlistentry>
+	  <term><emphasis>output_servicetag</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      Toggle inclusion of the service tag (serial number) of
+	      the monitored host in alerts.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-i</option>, <option>--info</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>output_servicestate</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      Toggle inclusion of the service state in alerts.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-s</option>, <option>--state</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>output_servicestate_abbr</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      Toggle inclusion of the abbreviated service state in
+	      alerts.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-S</option>, <option>--short-state</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>output_sysinfo</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      Toggle inclusion of a short system information summary
+	      in case of alerts.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-e</option>, <option>--extinfo</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>output_blacklist</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      Toggle showing any blacklistings in the OK output.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-B</option>, <option>--show-blacklist</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>output_ok_verbosity</emphasis> (integer)</term>
+	  <listitem>
+	    <para>
+	      This option specifies how much information is shown in
+	      the OK output.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-o</option>, <option>--ok-info</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>output_html</emphasis> (boolean or code)</term>
+	  <listitem>
+	    <para>
+	      This option toggles HTML output. Argument is either a
+	      boolean value, or a country or area code. Se
+	      <citerefentry>
+		<refentrytitle>check_openmanage</refentrytitle>
+		<manvolnum>8</manvolnum>
+	      </citerefentry>
+	      for more information and list of supported country and
+	      area codes.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>-I</option>, <option>--htmlinfo</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>output_post_message</emphasis> (string)</term>
+	  <listitem>
+	    <para>
+	      Specify one line of information to be shown after
+	      alerts.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>--postmsg</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>output_hide_servicetag</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      This option toggles censoring of the service tag (serial
+	      number) in any output from the plugin.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>--hide-servicetag</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </refsect2>
+  </refsect1>
+
+  <refsect1 id='example'>
+    <title>EXAMPLE</title>
+    <para>
+      The following example shows a typical check_openmanage config,
+      with a global section and a few host sections.
+      <programlisting>
+# Global definitions
+output_blacklist = true
+output_ok_verbosity = 3
+output_sysinfo = true
+output_html = us
+
+# Local definitions (exact or glob pattern)
+[esx??.example.com]
+    blacklist = ctrl_fw=all
+    check_storage = false
+
+[mysql01.example.com]
+    performance_data = true
+
+[web0[123].example.com]
+    performance_data = true
+    blacklist = ctrl_driver=all
+
+[*.hpc.example.com]
+    performance_data = true
+      </programlisting>
+    </para>
+  </refsect1>
+
+  <refsect1 id='see_also'>
+    <title>SEE ALSO</title>
+    <para>
+      <citerefentry>
+	<refentrytitle>check_openmanage</refentrytitle><manvolnum>8</manvolnum>
+      </citerefentry>,
+      <uri>
+	http://folk.uio.no/trondham/software/check_openmanage.html
+      </uri>
+    </para>
+  </refsect1>
+
+</refentry>
+</reference>
+
