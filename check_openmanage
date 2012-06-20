@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.6-beta3';
+$VERSION = '3.7.6-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -5006,6 +5006,7 @@ sub get_firmware_info {
 	 18 => 'iDRAC',                              # Same as above (OMSA 7.0.0 bug!)
 	 19 => 'unifiedServerConfigurator',          # Unified Server Configurator
 	 20 => 'lifecycleController',                # Lifecycle Controller
+         21 => 'iDRAC7',                             # iDRAC7 (not defined in 7.0.0 MIB!)
 	);
 
 
@@ -5015,7 +5016,7 @@ sub get_firmware_info {
 		$sysinfo{'bmc'} = 1;
 		$sysinfo{'bmc_fw'} = $out->{firmwareVersionName};
 	    }
-	    elsif ($fw_type{$out->{firmwareType}} =~ m{\A rac|iDRAC \z}xms) {
+	    elsif ($fw_type{$out->{firmwareType}} =~ m{\A rac|iDRAC. \z}xms) {
 		my $name = $out->{firmwareTypeName}; $name =~ s/\s//gxms;
 		$sysinfo{'rac'} = 1;
 		$sysinfo{'rac_name'} = $name;
