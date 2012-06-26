@@ -51,8 +51,8 @@ fi
 
 # Install
 install -p -m 0755 check_openmanage $plugindir
-install -m 0644 check_openmanage.8 $man8dir
-install -m 0644 check_openmanage.conf.5 $man5dir
+install -m 0644 man/check_openmanage.8 $man8dir
+install -m 0644 man/check_openmanage.conf.5 $man5dir
 
 # Done
 echo "done."
