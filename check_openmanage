@@ -5003,7 +5003,7 @@ sub get_firmware_info {
 	 15 => 'secondaryBackPlaneESM3And4',         # Secondary Backplane for ESM 3 and 4 systems
 	 16 => 'rac',                                # Remote Access Controller
 	 17 => 'iDRAC',                              # Integrated Dell Remote Access Controller
-	 18 => 'iDRAC',                              # Same as above (OMSA 7.0.0 bug!)
+	 18 => 'iDRAC6',                             # iDRAC6 (not defined in 7.0.0 MIB!)
 	 19 => 'unifiedServerConfigurator',          # Unified Server Configurator
 	 20 => 'lifecycleController',                # Lifecycle Controller
          21 => 'iDRAC7',                             # iDRAC7 (not defined in 7.0.0 MIB!)
