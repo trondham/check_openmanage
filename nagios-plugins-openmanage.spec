@@ -14,7 +14,7 @@ BuildArch:     noarch
 %endif
 
 Name:          nagios-plugins-openmanage
-Version:       3.7.5
+Version:       3.7.6
 Release:       1%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
 
@@ -25,8 +25,10 @@ Source0:       http://folk.uio.no/trondham/software/files/%{plugin}-%{version}.t
 
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-# Building requires pod2man
-BuildRequires: perl
+# Building requires Docbook XML
+BuildRequires: libxslt
+BuildRequires: libxml2
+BuildRequires: docbook-style-xsl
 
 # Rpmbuild doesn't find these perl dependencies
 Requires:      perl(Config::Tiny)
@@ -56,14 +58,15 @@ outside normal parameters.
 rm -f %{plugin}.exe
 
 %build
-pod2man -s 8 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.pod %{plugin}.8
-pod2man -s 5 -r "%{plugin} %{version}" -c "Nagios plugin" %{plugin}.conf.pod %{plugin}.5
+pushd man
+make clean && make
+popd
 
 %install
 rm -rf %{buildroot}
 install -Dp -m 0755 %{plugin} %{buildroot}%{nagiospluginsdir}/%{plugin}
-install -Dp -m 0644 %{plugin}.8 %{buildroot}%{_mandir}/man8/%{plugin}.8
-install -Dp -m 0644 %{plugin}.conf.5 %{buildroot}%{_mandir}/man5/%{plugin}.conf.5
+install -Dp -m 0644 man/%{plugin}.8 %{buildroot}%{_mandir}/man8/%{plugin}.8
+install -Dp -m 0644 man/%{plugin}.conf.5 %{buildroot}%{_mandir}/man5/%{plugin}.conf.5
 
 %clean
 rm -rf %{buildroot}
@@ -77,6 +80,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Jun 28 2012 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.6-1
+- Version 3.7.6
+- Added BuildRequires for Docbook XML (manual pages)
+- Changed building of manual pages
+
 * Fri Apr 13 2012 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.5-1
 - Version 3.7.5
 

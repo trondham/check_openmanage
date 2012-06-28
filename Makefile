@@ -18,6 +18,7 @@ oldman:
 
 dist: man
 	mkdir $(NAME)-$(VER)
+	cp $(NAME) $(NAME)-$(VER)
 	cp -r man $(NAME)-$(VER)
 	cp *.php $(NAME)-$(VER)
 	cp nagios-plugins-openmanage.spec $(NAME)-$(VER)

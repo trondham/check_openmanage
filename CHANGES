@@ -1,3 +1,24 @@
+3.7.6   2012-06-28
+------------------
+
+* Support for PCI attached storage (new in OMSA 7.0.0) was added
+* Support was added for negative temperature readings and thresholds
+  from temp probes
+* Fix for physical disk check. If a disk was marked as predictive
+  failure, and also had other failure conditions of a more severe
+  nature, check_openmange only reported the predictive failure
+  state. This has been fixed so that the most severe failure takes
+  precedence.
+* The iDRAC6 and iDRAC7 controllers was identified via SNMP using
+  integer values that are not defined in the MIB. This resulted in
+  internal error warnings if the '-o' option was used. The plugin now
+  defines these integer identifiers even though they are undocumented
+  in the MIB.
+* The PNP template now contains comments which identifies which plugin
+  version it was built for.
+* The manual pages were revised and completely rewritten from perl POD
+  to Docbook XML format.
+
 3.7.5   2012-04-13
 ------------------
 
