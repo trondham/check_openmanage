@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.6';
+$VERSION = '3.7.7-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2295,6 +2295,13 @@ sub check_cache_battery {
 	    next BATTERY if blacklisted('bat_charge', $nexus);
 	    my $msg = sprintf 'Cache Battery %d in controller %d is %s (%s) [probably harmless]',
 	      $id, $ctrl, $state, $status;
+	    report('storage', $msg, $E_WARNING, $nexus);
+	}
+	# Special case: Ready and Non-Critical and "Unknown" predicted status
+	elsif ($state eq 'Ready' && $status eq 'Non-Critical' && $pred eq 'Unknown') {
+	    next BATTERY if blacklisted('bat_charge', $nexus);
+		my $msg = sprintf 'Cache Battery %d in controller %d predicted capacity is %s [probably harmless]',
+		  $id, $ctrl, $pred;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
