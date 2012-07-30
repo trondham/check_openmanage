@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.7-beta1';
+$VERSION = '3.7.7-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1827,8 +1827,10 @@ sub check_physical_disks {
 	 7  => 'Recovering',
 	 11 => 'Removed',
 	 13 => 'Non-RAID',
+	 14 => 'Not Ready',
 	 15 => 'Resynching',
-         22 => 'Replacing', # FIXME: this one is not defined in the OMSA MIBs
+         22 => 'Replacing',
+	 23 => 'Spinning Down',
 	 24 => 'Rebuilding',
 	 25 => 'No Media',
 	 26 => 'Formatting',
@@ -1839,6 +1841,7 @@ sub check_physical_disks {
 	 40 => 'Clear',
 	 41 => 'Unsupported',
 	 53 => 'Incompatible',
+	 56 => 'Read Only',
 	);
 
     # Check physical disks on each of the controllers
