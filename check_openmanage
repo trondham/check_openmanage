@@ -166,6 +166,7 @@ END_LICENSE
 	 'privprotocol'      => undef,    # SMNP v3
          'use_get_table'     => 0,        # hack for SNMPv3 on Windows with net-snmp
 	 'hide_servicetag'   => 0,        # hidden servicetag
+	 'reverse_cert'      => 0,        # reverse pdisk certification (OMSA 7.1.0 bug)
        );
 
 # Get options
@@ -210,6 +211,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'privprotocol=s'     => \$opt{privprotocol},
            'use-get_table'      => \$opt{use_get_table},
 	   'hide-servicetag'    => \$opt{hide_servicetag},
+	   'reverse-cert'       => \$opt{reverse_cert},
 	  ) or do { print $USAGE; exit $E_UNKNOWN };
 
 # If user requested help
@@ -1877,6 +1879,12 @@ sub check_physical_disks {
 		# last resort... use the nexus id (old/broken hardware)
 		$ctrl = $nexus;
 		$ctrl =~ s{\A (\d+) : .* \z}{$1}xms;
+	    }
+
+	    # workaround for OMSA 7.1.0 bug
+	    if ($opt{reverse_cert}) {
+		if    ($cert == 1) { $cert = 0; }
+		elsif ($cert == 0) { $cert = 1; }
 	    }
 	}
 	else {
