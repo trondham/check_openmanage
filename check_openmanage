@@ -492,6 +492,7 @@ sub parse_configfile {
 	  'shortstate'      => 'output_servicestate_abbr',
 	  'show_blacklist'  => 'output_blacklist',
           'hide_servicetag' => 'output_hide_servicetag',
+          'reverse_cert'    => 'reverse_pdisk_certification',
 	  'htmlinfo'        => 'output_html',
 	  'okinfo'          => 'output_ok_verbosity',
 	  'protocol'        => 'snmp_version',
@@ -784,6 +785,7 @@ sub parse_configfile {
 	configfile_set_boolean($sect, 'tcp');
 	configfile_set_boolean($sect, 'legacy_perfdata');
 	configfile_set_boolean($sect, 'hide_servicetag');
+	configfile_set_boolean($sect, 'reverse_cert');
 	configfile_set_snmp_version($sect);
 	configfile_set_snmp_community($sect);
 	configfile_set_snmp_port($sect);
