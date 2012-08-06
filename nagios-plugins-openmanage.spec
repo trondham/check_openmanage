@@ -5,12 +5,15 @@
 %global debug_package %{nil}
 
 # SUSE installs Nagios plugins under /usr/lib, even on 64-bit
-# It also uses noarch for non-binary Nagios plugins
+# It also uses noarch for non-binary Nagios plugins and has different
+# package names for docbook.
 %if %{defined suse_version}
 %global nagiospluginsdir /usr/lib/nagios/plugins
+%global docbookpkg docbook-xsl-stylesheets
 BuildArch:     noarch
 %else
 %global nagiospluginsdir %{_libdir}/nagios/plugins
+%global docbookpkg docbook-style-xsl
 %endif
 
 Name:          nagios-plugins-openmanage
@@ -28,7 +31,7 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # Building requires Docbook XML
 BuildRequires: libxslt
 BuildRequires: libxml2
-BuildRequires: docbook-style-xsl
+BuildRequires: %{docbookpkg}
 
 # Rpmbuild doesn't find these perl dependencies
 Requires:      perl(Config::Tiny)
