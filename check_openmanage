@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.7-beta7';
+$VERSION = '3.7.7-beta8';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1701,7 +1701,7 @@ sub check_controllers {
 	}
         # Default
 	else {
-	    my $msg = sprintf 'Controller %d [%s] needs attention: %s',
+	    my $msg = sprintf 'Controller %d [%s] is %s',
 	      $nexus, $name, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
@@ -2639,7 +2639,7 @@ sub check_enclosure_fans {
 
 	# Default
 	if ($status ne 'Ok') {
-	    my $msg = sprintf '%s in enclosure %s [%s] needs attention: %s',
+	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
 	      $name, $encl_id, $encl_name, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
@@ -2742,17 +2742,9 @@ sub check_enclosure_pwr {
 	next PS if blacklisted('encl_ps', $nexus);
 
 	# Default
-	if ($status ne 'Ok') {
-	    my $msg = sprintf '%s in enclosure %s [%s] needs attention: %s',
-	      $name, $encl_id, $encl_name, $state;
-	    report('storage', $msg, $status2nagios{$status}, $nexus);
-	}
-	# Ok
-	else {
-	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
-	      $name, $encl_id, $encl_name, $state;
-	    report('storage', $msg, $E_OK, $nexus);
-	}
+	my $msg = sprintf '%s in enclosure %s [%s] is %s',
+	  $name, $encl_id, $encl_name, $state;
+	report('storage', $msg, $status2nagios{$status}, $nexus);
     }
     return;
 }
@@ -3077,16 +3069,10 @@ sub check_enclosure_emms {
 	    report('storage', $msg, $E_OK, $nexus);
 	}
 	# Default
-	elsif ($status ne 'Ok') {
-	    my $msg = sprintf '%s in enclosure %s [%s] needs attention: %s',
-	      $name, $encl_id, $encl_name, $state;
-	    report('storage', $msg, $status2nagios{$status}, $nexus);
-	}
-	# Ok
 	else {
 	    my $msg = sprintf '%s in enclosure %s [%s] is %s',
 	      $name, $encl_id, $encl_name, $state;
-	    report('storage', $msg, $E_OK, $nexus);
+	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
     }
     return;
@@ -3203,7 +3189,7 @@ sub check_memory {
 		  $index, $location, $size, $status;
 	    }
 	    else {
-		$msg = sprintf 'Memory module %d [%s, %s] needs attention: %s',
+		$msg = sprintf 'Memory module %d [%s, %s]: %s',
 		  $index, $location, $size, (join q{, }, @failures);
 	    }
 
@@ -3431,16 +3417,9 @@ sub check_powersupplies {
 	$count{power}++;
 	next PS if blacklisted('ps', $index);
 
-	if ($status ne 'Ok') {
-	    my $msg = sprintf 'Power Supply %d [%s] needs attention: %s',
-	      $index, $type, $state;
-	    report('chassis', $msg, $status2nagios{$status}, $index);
-	}
-	else {
-	    my $msg = sprintf 'Power Supply %d [%s]: %s',
-	      $index, $type, $state;
-	    report('chassis', $msg, $E_OK, $index);
-	}
+	my $msg = sprintf 'Power Supply %d [%s]: %s',
+	  $index, $type, $state;
+	report('chassis', $msg, $status2nagios{$status}, $index);
     }
     return;
 }
@@ -3942,17 +3921,9 @@ sub check_processors {
 	}
 
 	# Default
-	if ($status ne 'Ok') {
-	    my $msg = sprintf 'Processor %d [%s] needs attention: %s',
-	      $index, $brand, $state;
-	    report('chassis', $msg, $status2nagios{$status}, $index);
-	}
-	# Ok
-	else {
-	    my $msg = sprintf 'Processor %d [%s] is %s',
-	      $index, $brand, $state;
-	    report('chassis', $msg, $E_OK, $index);
-	}
+	my $msg = sprintf 'Processor %d [%s] is %s',
+	  $index, $brand, $state;
+	report('chassis', $msg, $status2nagios{$status}, $index);
     }
     return;
 }
@@ -4540,7 +4511,7 @@ sub check_sdcard {
 	next SDCARD if blacklisted('sd', $index);
 
 	if ($status ne 'Ok') {
-	    my $msg = sprintf 'SD Card %d needs attention: %s',
+	    my $msg = sprintf 'SD Card %d is %s',
 	      $index, $state;
 	    report('chassis', $msg, $E_WARNING, $index);
 	}
