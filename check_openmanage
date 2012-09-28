@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.7-beta6';
+$VERSION = '3.7.7-beta7';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2139,16 +2139,10 @@ sub check_virtual_disks {
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
 	# Default
-	elsif ($status ne 'Ok') {
-	    my $msg = sprintf q{Logical Drive '%s' [%s, %s] needs attention: %s},
-	      $dev, $layout, $size, $state;
-	    report('storage', $msg, $status2nagios{$status}, $nexus);
-	}
-	# Ok
 	else {
 	    my $msg = sprintf q{Logical Drive '%s' [%s, %s] is %s},
 	      $dev, $layout, $size, $state;
-	    report('storage', $msg, $E_OK, $nexus);
+	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
     }
     return;
