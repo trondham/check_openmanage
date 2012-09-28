@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.7-beta3';
+$VERSION = '3.7.7-beta4';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1957,49 +1957,48 @@ sub check_physical_disks {
 	elsif (defined $bus && ! defined $media) { $busmedia = "$bus ";        }
 	elsif (! defined $bus && defined $media) { $busmedia = "$media ";      }
 
+	# Variables to collect statuses and states
+	my @states = ($state);
+	my $stack  = $status2nagios{$status};
+
 	# Special case: Failure predicted
-	if ($fpred and $status eq 'Ok') {
-	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d needs attention: Failure Predicted',
-	      $name, $vendor, $product, $capacity, $ctrl;
-            $msg .= " ($state)" if $state ne 'Predictive failure';
-	    report('storage', $msg, $E_WARNING, $nexus);
+	if ($fpred) {
+	    push @states, 'Failure Predicted';
+	    ++$stack;
 	}
+	# Special case: Uncertified disk
+	if (!$cert) {
+	    push @states, 'Not Certified';
+	    ++$stack if !blacklisted('pdisk_cert', $nexus);
+	}
+	# Special case: Foreign disk
+	if ($state eq 'Foreign' and blacklisted('pdisk_foreign', $nexus)) {
+	    --$stack;
+	}
+
+	# Create combined status and state
+	my $combo_state = join ', ', @states;
+	my $combo_status = undef;
+	if ($stack >= 2) { $combo_status = $E_CRITICAL; }
+	if ($stack == 1) { $combo_status = $E_WARNING; }
+	if ($stack <= 0) { $combo_status = $E_OK; }
+
 	# Special case: Rebuilding / Replacing
-	elsif ($state =~ m{\A Rebuilding|Replacing \z}xms) {
+	if ($state =~ m{\A Rebuilding|Replacing \z}xms) {
 	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d is %s%s',
 	      $name, $vendor, $product, $capacity, $ctrl, $state, $progr;
 	    report('storage', $msg, $E_WARNING, $nexus);
 	}
-	# Special case: Uncertified disk
-	elsif ($status eq 'Non-Critical' and !$cert) {
-	    if (blacklisted('pdisk_cert', $nexus)) {
-		my $msg = sprintf '%s [%s %s, %s] on ctrl %d is %s, Not Certified',
-		  $name, $vendor, $product, $capacity, $ctrl, $state;
-		report('storage', $msg, $E_OK, $nexus);
-	    }
-	    else {
-		my $msg = sprintf '%s [%s %s, %s] on ctrl %d is Not Certified',
-		  $name, $vendor, $product, $capacity, $ctrl;
-		report('storage', $msg, $E_WARNING, $nexus);
-	    }
-	}
-	# Special case: Foreign disk
-	elsif ($status eq 'Non-Critical' and $state eq 'Foreign'
-	      and blacklisted('pdisk_foreign', $nexus)) {
-	    my $msg = sprintf '%s [%s %s, %s] on ctrl %d is %s',
-	      $name, $vendor, $product, $capacity, $ctrl, $state;
-	    report('storage', $msg, $E_OK, $nexus);
-	}
 	# Default
-	elsif ($status ne 'Ok') {
+	elsif ($combo_status != $E_OK) {
 	    my $msg =  sprintf '%s [%s %s, %s] on ctrl %d needs attention: %s',
-	      $name, $vendor, $product, $capacity, $ctrl, $state;
-	    report('storage', $msg, $status2nagios{$status}, $nexus);
+	      $name, $vendor, $product, $capacity, $ctrl, $combo_state;
+	    report('storage', $msg, $combo_status, $nexus);
 	}
 	# Ok
 	else {
 	    my $msg = sprintf '%s [%s%s] on ctrl %d is %s',
-	      $name, $busmedia, $capacity, $ctrl, $state;
+	      $name, $busmedia, $capacity, $ctrl, $combo_state;
 	    if (defined $spare) { $msg .= " ($spare)"; }
 	    report('storage', $msg, $E_OK, $nexus);
 	}
