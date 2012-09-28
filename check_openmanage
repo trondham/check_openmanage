@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.7-beta5';
+$VERSION = '3.7.7-beta6';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1979,9 +1979,9 @@ sub check_physical_disks {
 	# Create combined status and state
 	my $combo_state = join ', ', @states;
 	my $combo_status = undef;
-	if ($stack >= 2) { $combo_status = $E_CRITICAL; }
-	if ($stack == 1) { $combo_status = $E_WARNING; }
-	if ($stack <= 0) { $combo_status = $E_OK; }
+	if    ($stack >= 2) { $combo_status = $E_CRITICAL; }
+	elsif ($stack == 1) { $combo_status = $E_WARNING;  }
+	elsif ($stack <= 0) { $combo_status = $E_OK;       }
 
 	# Special case: Rebuilding / Replacing
 	if ($state =~ m{\A Rebuilding|Replacing \z}xms) {
@@ -1991,7 +1991,7 @@ sub check_physical_disks {
 	}
 	# Default
 	elsif ($combo_status != $E_OK) {
-	    my $msg =  sprintf '%s [%s %s, %s] on ctrl %d needs attention: %s',
+	    my $msg =  sprintf '%s [%s %s, %s] on ctrl %d is %s',
 	      $name, $vendor, $product, $capacity, $ctrl, $combo_state;
 	    report('storage', $msg, $combo_status, $nexus);
 	}
