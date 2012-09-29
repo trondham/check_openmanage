@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.7-beta8';
+$VERSION = '3.7.7-beta9';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -166,7 +166,6 @@ END_LICENSE
 	 'privprotocol'      => undef,    # SMNP v3
          'use_get_table'     => 0,        # hack for SNMPv3 on Windows with net-snmp
 	 'hide_servicetag'   => 0,        # hidden servicetag
-	 'reverse_cert'      => 0,        # reverse pdisk certification (OMSA 7.1.0 bug)
        );
 
 # Get options
@@ -211,7 +210,6 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'privprotocol=s'     => \$opt{privprotocol},
            'use-get_table'      => \$opt{use_get_table},
 	   'hide-servicetag'    => \$opt{hide_servicetag},
-	   'reverse-cert'       => \$opt{reverse_cert},
 	  ) or do { print $USAGE; exit $E_UNKNOWN };
 
 # If user requested help
@@ -492,7 +490,6 @@ sub parse_configfile {
 	  'shortstate'      => 'output_servicestate_abbr',
 	  'show_blacklist'  => 'output_blacklist',
           'hide_servicetag' => 'output_hide_servicetag',
-          'reverse_cert'    => 'reverse_pdisk_certification',
 	  'htmlinfo'        => 'output_html',
 	  'okinfo'          => 'output_ok_verbosity',
 	  'protocol'        => 'snmp_version',
@@ -785,7 +782,6 @@ sub parse_configfile {
 	configfile_set_boolean($sect, 'tcp');
 	configfile_set_boolean($sect, 'legacy_perfdata');
 	configfile_set_boolean($sect, 'hide_servicetag');
-	configfile_set_boolean($sect, 'reverse_cert');
 	configfile_set_snmp_version($sect);
 	configfile_set_snmp_community($sect);
 	configfile_set_snmp_port($sect);
@@ -1884,7 +1880,7 @@ sub check_physical_disks {
 	    }
 
 	    # workaround for OMSA 7.1.0 bug
-	    if ($opt{reverse_cert}) {
+	    if ($snmp && $sysinfo{om} eq '7.1.0') {
 		if    ($cert == 1) { $cert = 0; }
 		elsif ($cert == 0) { $cert = 1; }
 	    }
@@ -4899,9 +4895,14 @@ sub get_sysinfo
 	$snmp ? get_snmp_chassis_bios() : get_omreport_chassis_bios();
     }
 
-    # Get OMSA information. Only if needed
-    if ($opt{okinfo} >= 3 or $opt{debug}) {
-	$snmp ? get_snmp_about() : get_omreport_about();
+    # Get OMSA version information
+    if ($snmp) {
+	# always for SNMP because of OMSA 7.1.0 bug
+	get_snmp_about();
+    }
+    elsif ($opt{okinfo} >= 3 or $opt{debug}) {
+	# only if needed
+	get_omreport_about();
     }
 
     # Return now if debug
