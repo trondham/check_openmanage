@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.7-beta9';
+$VERSION = '3.7.7-beta10';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1897,7 +1897,7 @@ sub check_physical_disks {
 	    $media    = get_nonempty_string('Media', $out, undef);
 	    $bus      = get_nonempty_string('Bus Protocol', $out, undef);
 	    $spare    = get_nonempty_string('Hot Spare', $out, q{});
-            $cert     = get_nonempty_string('Certified', $out, 1);
+            $cert     = get_nonempty_string('Certified', $out, 'Yes');
 	    $ctrl     = $out->{ctrl};
 	    $capacity = get_nonempty_string('Capacity', $out, q{});
 	    $capacity =~ s{\A .*? \((\d+) \s bytes\) \z}{$1}xms;
