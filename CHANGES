@@ -1,3 +1,16 @@
+3.7.7   2012-12-06
+------------------
+
+* Small fixes in PNP template
+* Fixed handling of functional but uncertified disks (Matthew Kent)
+* Fixed regression for pdisk cert on old hardware/OMSA
+* Reverse pdisk cert for OMSA 7.1.0 via SNMP, this works around an
+  OMSA SNMP bug
+* Shortened a lot of reporting messages to make things more consistent
+* Rewritten logic on reporting pdisks
+* RPM spec: Fix docbook pkg name for suse
+* Added new special case for controller batteries
+
 3.7.6   2012-06-28
 ------------------
 
