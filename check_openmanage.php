@@ -67,11 +67,11 @@ if (!defined('tempunit_defined')) {
 	switch ($arg) {
 	default:
 	    $vlabel = "Celsius";
-	    $unit = "°C";
+	    $unit = "\xc2\xb0C";
 	    break;
 	case "F":
 	    $vlabel = "Fahrenheit";
-	    $unit = "°F";
+	    $unit = "\xc2\xb0F";
 	    break;
 	case "K":
 	    $vlabel = "Kelvin";
@@ -79,7 +79,7 @@ if (!defined('tempunit_defined')) {
 	    break;
 	case "R":
 	    $vlabel = "Rankine";
-	    $unit = "°R";
+	    $unit = "\xc2\xb0R";
 	    break;
 	}
 	return array($unit, $vlabel);
