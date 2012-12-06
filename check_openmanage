@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.7';
+$VERSION = '3.7.8-beta1';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -1965,7 +1965,8 @@ sub check_physical_disks {
 	# Special case: Uncertified disk
 	if (!$cert) {
 	    # Functional non Dell disks get a Non-Critical status
-	    if ($state eq 'Online' and $status eq 'Non-Critical' and blacklisted('pdisk_cert', $nexus)) {
+	    if (($state eq 'Online' or $state eq 'Ready')
+		and $status eq 'Non-Critical' and blacklisted('pdisk_cert', $nexus)) {
 		--$stack;
 	    }
 	    else {
