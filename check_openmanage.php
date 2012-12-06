@@ -409,7 +409,7 @@ else {  # --new--
 	}
 
 	# AMPERAGE PROBE
-	if (preg_match('/^A/', $label)) {
+	if (preg_match('/^A/', $label) && preg_match('/Current/', $label)) {
 
 	    $first = 0;
 	    if ($visited_amp == 0) {
