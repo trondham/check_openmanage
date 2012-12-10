@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.8-beta1';
+$VERSION = '3.7.8-beta2';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -133,6 +133,7 @@ END_LICENSE
 	 'fahrenheit'        => 0,        # Use fahrenheit
          'configfile'        => undef,    # configuration file
 	 'timeout'           => 30,       # default timeout is 30 seconds
+	 'snmp_timeout'      => 5,        # SNMP transport layer timeout
 	 'debug'             => 0,        # debugging / verbose output
 	 'help'              => 0,        # display help output
 	 'perfdata'          => undef,    # output performance data
@@ -177,6 +178,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'F|fahrenheit'       => \$opt{fahrenheit},
            'f|config=s'         => \$opt{configfile},
 	   't|timeout=i'        => \$opt{timeout},
+	   'snmp-timeout=i'     => \$opt{snmp_timeout},
 	   'd|debug'            => \$opt{debug},
 	   'h|help'             => \$opt{help},
 	   'V|version'          => \$opt{version},
@@ -503,6 +505,7 @@ sub parse_configfile {
 	  'perfdata'        => 'performance_data',
 	  'tempunit'        => 'temperature_unit',
 	  'timeout'         => 'timeout',
+	  'snmp_timeout'    => 'snmp_timeout',
 	  'blacklist'       => 'blacklist',
 	  'legacy_perfdata' => 'legacy_performance_data',
 	);
@@ -586,6 +589,20 @@ sub parse_configfile {
 	    }
 	    else {
 		report('other', "CONFIG ERROR: Rvalue for 'timeout' must be a positive integer", $E_UNKNOWN);
+	    }
+	}
+	return;
+    }
+
+    # Set SNMP timeout according to statements in the configuration file
+    sub configfile_set_snmp_timeout {
+	my $keyword = shift;
+	if (defined $tiny->{$keyword}->{snmp_timeout} and $tiny->{$keyword}->{snmp_timeout} ne q{}) {
+	    if ($tiny->{$keyword}->{snmp_timeout} =~ m{\A \d+ \z}xms) { # integer
+		$opt{snmp_timeout} = $tiny->{$keyword}->{snmp_timeout};
+	    }
+	    else {
+		report('other', "CONFIG ERROR: Rvalue for 'snmp_timeout' must be a positive integer", $E_UNKNOWN);
 	    }
 	}
 	return;
@@ -770,6 +787,7 @@ sub parse_configfile {
 	configfile_adjust_checks($sect);
 	configfile_set_blacklist($sect);
 	configfile_set_timeout($sect);
+	configfile_set_snmp_timeout($sect);
 	configfile_set_htmlinfo($sect);
         configfile_set_ok_verbosity($sect);
 	configfile_set_boolean($sect, 'all');
@@ -860,6 +878,7 @@ sub snmp_initialize {
 	 '-port'     => $opt{port},
 	 '-hostname' => $opt{hostname},
 	 '-version'  => $opt{protocol},
+	 '-timeout'  => $opt{snmp_timeout},
 	);
 
     # Setting the domain (IP version and transport protocol)
