@@ -647,6 +647,27 @@ check_openmanage --htmlinfo de
       </varlistentry>
       <varlistentry>
 	<term>
+	  <option>--snmp-timeout</option> <replaceable>seconds</replaceable>
+	</term>
+	<listitem>
+	  <para>
+	    This option sets the timeout for the SNMP object of the
+	    Net::SNMP perl module. Legal values are between 1 and 60
+	    seconds, and the default is 5 seconds if the option is not
+	    present. Note that there is one retry (with the same
+	    timeout) before the SNMP object times out completely. For
+	    an unresponsive SNMP server, you'll see that the plugin
+	    times out with an SNMP error after 10 seconds if the 5
+	    second default is used.
+	  </para>
+	  <para>
+	    This option is usually not needed. The default timeout of
+	    5 seconds is more than sufficient in most cases.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
 	  <option>-U</option>, <option>--username</option>
 	  <replaceable>securityname</replaceable>
 	</term>

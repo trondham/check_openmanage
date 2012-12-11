@@ -476,6 +476,18 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>snmp_timeout</emphasis> (integer)</term>
+	  <listitem>
+	    <para>
+	      Set timeout in seconds for the SNMP object of Net::SNMP.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>--snmp-timeout</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
       </variablelist>
     </refsect2>
 
