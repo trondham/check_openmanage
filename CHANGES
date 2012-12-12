@@ -1,3 +1,12 @@
+3.7.8   2012-12-12
+------------------
+
+* Fixed a regression regarding un-certified physical disks in "Ready"
+  state (e.g. hot-spare) when using the blacklisting keyword
+  "pdisk_cert"
+* Added an option "--snmp-timeout" which allows setting the SNMP
+  object timeout for the Net::SNMP perl module
+
 3.7.7   2012-12-06
 ------------------
 
