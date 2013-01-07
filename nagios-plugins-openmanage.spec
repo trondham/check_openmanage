@@ -17,7 +17,7 @@ BuildArch:     noarch
 %endif
 
 Name:          nagios-plugins-openmanage
-Version:       3.7.8
+Version:       3.7.9
 Release:       1%{?dist}
 Summary:       Nagios plugin to monitor hardware health on Dell servers
 
@@ -83,6 +83,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Jan  7 2013 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.9-1
+- Version 3.7.9
+
 * Wed Dec 12 2012 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.8-1
 - Version 3.7.8
 
