@@ -101,7 +101,7 @@
             # matches pgsql-3.example.com and pgsql-4.example.com
 
         [login?.example.com]
-            # mathces e.g. login1.example.com
+            # matches e.g. login1.example.com
       </programlisting>
     </para>
     <para>
