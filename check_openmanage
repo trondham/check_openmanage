@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.9';
+$VERSION = '3.7.10-alpha';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -108,6 +108,7 @@ CHECK CONTROL AND BLACKLISTING:
    --only               Only check a certain component or alert type
    --check              Fine-tune which components are checked
    --no-storage         Don't check storage
+   --vdisk-critical     Make any alerts on virtual disks critical
 
 For more information and advanced options, see the manual page or URL:
   http://folk.uio.no/trondham/software/check_openmanage.html
@@ -167,6 +168,7 @@ END_LICENSE
 	 'privprotocol'      => undef,    # SMNP v3
          'use_get_table'     => 0,        # hack for SNMPv3 on Windows with net-snmp
 	 'hide_servicetag'   => 0,        # hidden servicetag
+	 'vdisk_critical'    => 0,        # make vdisk alerts critical
        );
 
 # Get options
@@ -212,6 +214,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
 	   'privprotocol=s'     => \$opt{privprotocol},
            'use-get_table'      => \$opt{use_get_table},
 	   'hide-servicetag'    => \$opt{hide_servicetag},
+	   'vdisk-critical'     => \$opt{vdisk_critical},
 	  ) or do { print $USAGE; exit $E_UNKNOWN };
 
 # If user requested help
@@ -2164,13 +2167,18 @@ sub check_virtual_disks {
 	if ($state eq 'Regenerating') {
 	    my $msg = sprintf q{Logical Drive '%s' [%s, %s] is %s%s},
 	      $dev, $layout, $size, $state, $progr;
-	    report('storage', $msg, $E_WARNING, $nexus);
+	    my $lvl = $opt{vdisk_critical} ? $E_CRITICAL : $E_WARNING;
+	    report('storage', $msg, $lvl, $nexus);
 	}
 	# Default
 	else {
 	    my $msg = sprintf q{Logical Drive '%s' [%s, %s] is %s},
 	      $dev, $layout, $size, $state;
-	    report('storage', $msg, $status2nagios{$status}, $nexus);
+	    my $lvl = $status2nagios{$status};
+	    if ($opt{vdisk_critical} && $lvl != $E_OK) {
+		$lvl = $E_CRITICAL;
+	    }
+	    report('storage', $msg, $lvl, $nexus);
 	}
     }
     return;
