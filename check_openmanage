@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.10-alpha';
+$VERSION = '3.7.10-beta';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -414,6 +414,42 @@ $globalstatus   = $E_OK;  # default global health status is "OK"
      'rac_name' => 'N/A',  # remote access controller (RAC)
      'bmc_fw'   => 'N/A',  # BMC firmware
      'rac_fw'   => 'N/A',  # RAC firmware
+    );
+
+# Country and language list for URL generation
+my %country
+  = (
+     # EMEA
+     at => { c => 'at', l => 'de' },  # Austria
+     be => { c => 'be', l => 'nl' },  # Belgium
+     cz => { c => 'cz', l => 'cs' },  # Czech Republic
+     de => { c => 'de', l => 'de' },  # Germany
+     dk => { c => 'dk', l => 'da' },  # Denmark
+     es => { c => 'es', l => 'es' },  # Spain
+     fi => { c => 'fi', l => 'fi' },  # Finland
+     fr => { c => 'fr', l => 'fr' },  # France
+     gr => { c => 'gr', l => 'el' },  # Greece
+     it => { c => 'it', l => 'it' },  # Italy
+     il => { c => 'il', l => 'en' },  # Israel
+     me => { c => 'me', l => 'en' },  # Middle East
+     no => { c => 'no', l => 'no' },  # Norway
+     nl => { c => 'nl', l => 'nl' },  # The Netherlands
+     pl => { c => 'pl', l => 'pl' },  # Poland
+     pt => { c => 'pt', l => 'pt' },  # Portugal
+     ru => { c => 'ru', l => 'ru' },  # Russia
+     se => { c => 'se', l => 'sv' },  # Sweden
+     uk => { c => 'uk', l => 'en' },  # United Kingdom
+     za => { c => 'za', l => 'en' },  # South Africa
+     # America
+     br => { c => 'br', l => 'pt' },  # Brazil
+     ca => { c => 'ca', l => 'en' },  # Canada
+     mx => { c => 'mx', l => 'es' },  # Mexico
+     us => { c => 'us', l => 'en' },  # USA
+     # Asia/Pacific
+     au => { c => 'au', l => 'en' },  # Australia
+     cn => { c => 'cn', l => 'zh' },  # China
+     in => { c => 'in', l => 'en' },  # India
+     jp => { c => 'jp', l => 'ja' },  # Japan
     );
 
 # Adjust which checks to perform
@@ -1423,15 +1459,26 @@ sub map_item {
 # PowerEdge server
 sub documentation_url {
     my $model = shift;
+    my $rev = shift;
 
-    # create model short form, e.g. "r710"
-    $model =~ s{\A PowerEdge \s (.+?) \z}{lc($1)}exms;
+    # Special case: R210 II
+    if ($model eq 'R210' and $rev eq 'II') {
+	$model = 'r210-2';
+    }
 
-    # special case for blades (e.g. M600, M710), they have common
-    # documentation
-    $model =~ s{\A m\d+ \z}{m}xms;
+    # create model name used in URLs, e.g. "poweredge-r710"
+    $model = lc($model);
+    $model =~ s{\s}{-}xms;
 
-    return 'http://support.dell.com/support/edocs/systems/pe' . $model . '/';
+    if (exists $country{$opt{htmlinfo}}) {
+	return sprintf 'http://www.dell.com/support/troubleshooting/%s/%s/19/Product/%s#ui-tabs-4',
+	  $country{$opt{htmlinfo}}->{c}, $country{$opt{htmlinfo}}->{l}, $model;
+    }
+    else {
+	return sprintf 'http://www.dell.com/support/troubleshooting/us/en/19/Product/%s#ui-tabs-4',
+	  $model;
+    }
+    return;
 }
 
 # Return the URL for warranty information for a server with a given
@@ -1440,41 +1487,6 @@ sub warranty_url {
     my $tag       = shift;
     my $url_start = 'http://www.dell.com/support/troubleshooting';
     my $url_end   = 'Index?t=warranty&servicetag';
-
-    my %country
-      = (
-	 # EMEA
-	 at => { c => 'at', l => 'de' },  # Austria
-	 be => { c => 'be', l => 'nl' },  # Belgium
-	 cz => { c => 'cz', l => 'cs' },  # Czech Republic
-	 de => { c => 'de', l => 'de' },  # Germany
-	 dk => { c => 'dk', l => 'da' },  # Denmark
-	 es => { c => 'es', l => 'es' },  # Spain
-	 fi => { c => 'fi', l => 'fi' },  # Finland
-	 fr => { c => 'fr', l => 'fr' },  # France
-	 gr => { c => 'gr', l => 'el' },  # Greece
-	 it => { c => 'it', l => 'it' },  # Italy
-	 il => { c => 'il', l => 'en' },  # Israel
-	 me => { c => 'me', l => 'en' },  # Middle East
-	 no => { c => 'no', l => 'no' },  # Norway
-	 nl => { c => 'nl', l => 'nl' },  # The Netherlands
-	 pl => { c => 'pl', l => 'pl' },  # Poland
-	 pt => { c => 'pt', l => 'pt' },  # Portugal
-	 ru => { c => 'ru', l => 'ru' },  # Russia
-	 se => { c => 'se', l => 'sv' },  # Sweden
-	 uk => { c => 'uk', l => 'en' },  # United Kingdom
-	 za => { c => 'za', l => 'en' },  # South Africa
-	 # America
-	 br => { c => 'br', l => 'pt' },  # Brazil
-	 ca => { c => 'ca', l => 'en' },  # Canada
-	 mx => { c => 'mx', l => 'es' },  # Mexico
-	 us => { c => 'us', l => 'en' },  # USA
-	 # Asia/Pacific
-	 au => { c => 'au', l => 'en' },  # Australia
-	 cn => { c => 'cn', l => 'zh' },  # China
-	 in => { c => 'in', l => 'en' },  # India
-	 jp => { c => 'jp', l => 'ja' },  # Japan
-	);
 
     if (exists $country{$opt{htmlinfo}}) {
 	return sprintf '%s/%s/%s/nodhs1/%s=%s',
@@ -5268,12 +5280,12 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
 elsif ($exit_code == $E_OK && !$opt{debug}) {
     if (defined $opt{htmlinfo} and !$opt{hide_servicetag}) {
 	printf q{OK - System: '<a target="_blank" href="%s">%s%s</a>', SN: '<a target="_blank" href="%s">%s</a>'},
-	  documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
+	  documentation_url($sysinfo{model},$sysinfo{rev}), $sysinfo{model}, $sysinfo{rev},
 	    warranty_url($sysinfo{serial}), $sysinfo{serial};
     }
     elsif (defined $opt{htmlinfo} and $opt{hide_servicetag}) {
 	printf q{OK - System: '<a target="_blank" href="%s">%s%s</a>', SN: '%s'},
-	  documentation_url($sysinfo{model}), $sysinfo{model}, $sysinfo{rev},
+	  documentation_url($sysinfo{model},$sysinfo{rev}), $sysinfo{model}, $sysinfo{rev},
 	    $sysinfo{serial};
     }
     else {
