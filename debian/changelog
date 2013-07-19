@@ -1,3 +1,9 @@
+check-openmanage (3.7.10-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Trond Hasle Amundsen <t.h.amundsen@usit.uio.no>  Fri, 19 Jul 2013 15:00:00 +0200
+
 check-openmanage (3.7.9-1) unstable; urgency=low
 
   * New upstream release.

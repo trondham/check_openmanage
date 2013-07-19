@@ -404,6 +404,19 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
+	<varlistentry>
+	  <term><emphasis>vdisk_critical</emphasis> (boolean)</term>
+	  <listitem>
+	    <para>
+	      Make all alerts concerning virtual disks appear as
+	      critical.
+	    </para>
+	    <para>
+	      Corresponding command line option:
+	      <option>--vdisk-critical</option>
+	    </para>
+	  </listitem>
+	</varlistentry>
       </variablelist>
     </refsect2>
 

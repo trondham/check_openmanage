@@ -1,3 +1,12 @@
+3.7.10  2013-07-19
+------------------
+
+* Added option "--vdisk-critical" which will make any alerts on
+  virtual disks appear as critical
+* Dell changed their web site again. The documentation URLs with HTML
+  output have been changed accordingly
+* Fixed bug with option "--only servicetag"
+
 3.7.9   2013-01-07
 ------------------
 

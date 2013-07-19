@@ -238,6 +238,17 @@ check_openmanage -w 0=50,1=45/10
       </varlistentry>
       <varlistentry>
 	<term>
+	  <option>--vdisk-critical</option>
+	</term>
+	<listitem>
+	  <para>
+	    Make any alerts concerning virtual disks appear as
+	    critical.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
 	  <option>-d</option>, <option>--debug</option>
 	</term>
 	<listitem>

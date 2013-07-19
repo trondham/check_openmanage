@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.10-beta';
+$VERSION = '3.7.10';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -547,6 +547,7 @@ sub parse_configfile {
 	  'snmp_timeout'    => 'snmp_timeout',
 	  'blacklist'       => 'blacklist',
 	  'legacy_perfdata' => 'legacy_performance_data',
+          'vdisk_critical'  => 'vdisk_critical',
 	);
 
     # Load the perl module
@@ -839,6 +840,7 @@ sub parse_configfile {
 	configfile_set_boolean($sect, 'tcp');
 	configfile_set_boolean($sect, 'legacy_perfdata');
 	configfile_set_boolean($sect, 'hide_servicetag');
+	configfile_set_boolean($sect, 'vdisk_critical');
 	configfile_set_snmp_version($sect);
 	configfile_set_snmp_community($sect);
 	configfile_set_snmp_port($sect);
