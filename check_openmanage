@@ -5263,6 +5263,7 @@ if ($exit_code == $E_OK && defined $opt{only} && $opt{only} !~ m{\A critical|war
 	  'esmlog'      => "OK - ESM Log content: $count{esm}{Ok} ok, $count{esm}{'Non-Critical'} warning and $count{esm}{Critical} critical",
 	  'esmhealth'   => "ESM LOG OK - less than 80% used",
           'sdcard'      => "SD CARDS OK - $count{sd} SD cards installed",
+          'servicetag'  => sprintf 'ServiceTag OK: %s', $opt{hide_servicetag} ? 'XXXXXXX' : $sysinfo{serial},
 	);
 
     print $okmsg{$opt{only}};
