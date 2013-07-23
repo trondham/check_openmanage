@@ -467,7 +467,7 @@ if (scalar keys %blacklist > 0) {
 # ASN prefix for SNMP OIDs
 if ($snmp) {
     $ASN_chassis = $opt{idrac} ? '1.3.6.1.4.1.674.10892.5.4' : '1.3.6.1.4.1.674.10892.1';
-    $ASN_storage = $opt{idrac} ? '1.3.6.1.4.1.674.10893.1' : '1.3.6.1.4.1.674.10893.1';
+    $ASN_storage = $opt{idrac} ? '1.3.6.1.4.1.674.10892.5.5.1' : '1.3.6.1.4.1.674.10893.1';
 }
 
 # Take into account new hardware and blades
@@ -1019,7 +1019,7 @@ sub snmp_initialize {
 # servers should have
 #
 sub snmp_check {
-    my $chassisModelName = $opt{idrac} ? '1.3.6.1.4.1.674.10892.5.1.3.12.0' : "${ASN_chassis}.300.10.1.9.1";
+    my $chassisModelName = "${ASN_chassis}.300.10.1.9.1";
     my $result = $snmp_session->get_request(-varbindlist => [$chassisModelName]);
 
     # Typically if remote host isn't responding
@@ -1618,23 +1618,23 @@ sub check_controllers {
     if ($snmp) {
 	my %ctrl_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.1'  => 'controllerNumber',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.2'  => 'controllerName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.5'  => 'controllerState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.8'  => 'controllerFWVersion',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.38' => 'controllerComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.39' => 'controllerNexusID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.41' => 'controllerDriverVersion',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.44' => 'controllerMinFWVersion',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.45' => 'controllerMinDriverVersion',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.55' => 'controllerStorportDriverVersion',
-	     '1.3.6.1.4.1.674.10893.1.20.130.1.1.56' => 'controllerMinRequiredStorportVer',
+	     "${ASN_storage}.20.130.1.1.1"  => 'controllerNumber',
+	     "${ASN_storage}.20.130.1.1.2"  => 'controllerName',
+	     "${ASN_storage}.20.130.1.1.5"  => 'controllerState',
+	     "${ASN_storage}.20.130.1.1.8"  => 'controllerFWVersion',
+	     "${ASN_storage}.20.130.1.1.38" => 'controllerComponentStatus',
+	     "${ASN_storage}.20.130.1.1.39" => 'controllerNexusID',
+	     "${ASN_storage}.20.130.1.1.41" => 'controllerDriverVersion',
+	     "${ASN_storage}.20.130.1.1.44" => 'controllerMinFWVersion',
+	     "${ASN_storage}.20.130.1.1.45" => 'controllerMinDriverVersion',
+	     "${ASN_storage}.20.130.1.1.55" => 'controllerStorportDriverVersion',
+	     "${ASN_storage}.20.130.1.1.56" => 'controllerMinRequiredStorportVer',
 	    );
 
 	# We use get_table() here for the odd case where a server has
 	# two or more controllers, and where some OIDs are missing on
 	# one of the controllers.
-	my $controllerTable = '1.3.6.1.4.1.674.10893.1.20.130.1';
+	my $controllerTable = "${ASN_storage}.20.130.1";
 	my $result = $snmp_session->get_table(-baseoid => $controllerTable);
 
 	if (!defined $result) {
@@ -1781,29 +1781,29 @@ sub check_physical_disks {
     if ($snmp) {
 	my %pdisk_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.2'  => 'arrayDiskName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.3'  => 'arrayDiskVendor',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.4'  => 'arrayDiskState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.6'  => 'arrayDiskProductID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.9'  => 'arrayDiskEnclosureID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.10' => 'arrayDiskChannel',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.11' => 'arrayDiskLengthInMB',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.15' => 'arrayDiskTargetID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.21' => 'arrayDiskBusType',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.22' => 'arrayDiskSpareState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.24' => 'arrayDiskComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.26' => 'arrayDiskNexusID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.31' => 'arrayDiskSmartAlertIndication',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.35' => 'arrayDiskMediaType',
-	     '1.3.6.1.4.1.674.10893.1.20.130.4.1.36' => 'arrayDiskDellCertified',
-	     '1.3.6.1.4.1.674.10893.1.20.130.5.1.7'  => 'arrayDiskEnclosureConnectionControllerNumber',
-	     '1.3.6.1.4.1.674.10893.1.20.130.6.1.7'  => 'arrayDiskChannelConnectionControllerNumber',
+	     "${ASN_storage}.20.130.4.1.2"  => 'arrayDiskName',
+	     "${ASN_storage}.20.130.4.1.3"  => 'arrayDiskVendor',
+	     "${ASN_storage}.20.130.4.1.4"  => 'arrayDiskState',
+	     "${ASN_storage}.20.130.4.1.6"  => 'arrayDiskProductID',
+	     "${ASN_storage}.20.130.4.1.9"  => 'arrayDiskEnclosureID',
+	     "${ASN_storage}.20.130.4.1.10" => 'arrayDiskChannel',
+	     "${ASN_storage}.20.130.4.1.11" => 'arrayDiskLengthInMB',
+	     "${ASN_storage}.20.130.4.1.15" => 'arrayDiskTargetID',
+	     "${ASN_storage}.20.130.4.1.21" => 'arrayDiskBusType',
+	     "${ASN_storage}.20.130.4.1.22" => 'arrayDiskSpareState',
+	     "${ASN_storage}.20.130.4.1.24" => 'arrayDiskComponentStatus',
+	     "${ASN_storage}.20.130.4.1.26" => 'arrayDiskNexusID',
+	     "${ASN_storage}.20.130.4.1.31" => 'arrayDiskSmartAlertIndication',
+	     "${ASN_storage}.20.130.4.1.35" => 'arrayDiskMediaType',
+	     "${ASN_storage}.20.130.4.1.36" => 'arrayDiskDellCertified',
+	     "${ASN_storage}.20.130.5.1.7"  => 'arrayDiskEnclosureConnectionControllerNumber',
+	     "${ASN_storage}.20.130.6.1.7"  => 'arrayDiskChannelConnectionControllerNumber',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $arrayDiskTable = '1.3.6.1.4.1.674.10893.1.20.130.4';
-	    my $arrayDiskEnclosureConnectionControllerNumber = '1.3.6.1.4.1.674.10893.1.20.130.5.1.7';
-	    my $arrayDiskChannelConnectionControllerNumber = '1.3.6.1.4.1.674.10893.1.20.130.6.1.7';
+	    my $arrayDiskTable = "${ASN_storage}.20.130.4";
+	    my $arrayDiskEnclosureConnectionControllerNumber = "${ASN_storage}.20.130.5.1.7";
+	    my $arrayDiskChannelConnectionControllerNumber = "${ASN_storage}.20.130.6.1.7";
 
 	    $result  = $snmp_session->get_table(-baseoid => $arrayDiskTable);
 	    my $ext1 = $snmp_session->get_table(-baseoid => $arrayDiskEnclosureConnectionControllerNumber);
@@ -2079,16 +2079,16 @@ sub check_virtual_disks {
     if ($snmp) {
 	my %vdisk_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.3'  => 'virtualDiskDeviceName',
-	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.4'  => 'virtualDiskState',
-	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.6'  => 'virtualDiskLengthInMB',
-	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.13' => 'virtualDiskLayout',
-	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.20' => 'virtualDiskComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.140.1.1.21' => 'virtualDiskNexusID',
+	     "${ASN_storage}.20.140.1.1.3"  => 'virtualDiskDeviceName',
+	     "${ASN_storage}.20.140.1.1.4"  => 'virtualDiskState',
+	     "${ASN_storage}.20.140.1.1.6"  => 'virtualDiskLengthInMB',
+	     "${ASN_storage}.20.140.1.1.13" => 'virtualDiskLayout',
+	     "${ASN_storage}.20.140.1.1.20" => 'virtualDiskComponentStatus',
+	     "${ASN_storage}.20.140.1.1.21" => 'virtualDiskNexusID',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $virtualDiskTable = '1.3.6.1.4.1.674.10893.1.20.140.1';
+	    my $virtualDiskTable = "${ASN_storage}.20.140.1";
 	    $result = $snmp_session->get_table(-baseoid => $virtualDiskTable);
 	}
 	else {
@@ -2224,17 +2224,17 @@ sub check_cache_battery {
     if ($snmp) {
 	my %bat_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.4'  => 'batteryState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.6'  => 'batteryComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.9'  => 'batteryNexusID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.10' => 'batteryPredictedCapacity',
-	     '1.3.6.1.4.1.674.10893.1.20.130.15.1.12' => 'batteryLearnState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.16.1.5'  => 'batteryConnectionControllerNumber',
+	     "${ASN_storage}.20.130.15.1.4"  => 'batteryState',
+	     "${ASN_storage}.20.130.15.1.6"  => 'batteryComponentStatus',
+	     "${ASN_storage}.20.130.15.1.9"  => 'batteryNexusID',
+	     "${ASN_storage}.20.130.15.1.10" => 'batteryPredictedCapacity',
+	     "${ASN_storage}.20.130.15.1.12" => 'batteryLearnState',
+	     "${ASN_storage}.20.130.16.1.5"  => 'batteryConnectionControllerNumber',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $batteryTable = '1.3.6.1.4.1.674.10893.1.20.130.15';
-            my $batteryConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.16';
+	    my $batteryTable = "${ASN_storage}.20.130.15";
+            my $batteryConnectionTable = "${ASN_storage}.20.130.16";
 
 	    $result = $snmp_session->get_table(-baseoid => $batteryTable);
             my $ext = $snmp_session->get_table(-baseoid => $batteryConnectionTable);
@@ -2395,15 +2395,15 @@ sub check_connectors {
     if ($snmp) {
         my %conn_oid
           = (
-             '1.3.6.1.4.1.674.10893.1.20.130.2.1.2'  => 'channelName',
-             '1.3.6.1.4.1.674.10893.1.20.130.2.1.3'  => 'channelState',
-             '1.3.6.1.4.1.674.10893.1.20.130.2.1.8'  => 'channelComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.130.2.1.9'  => 'channelNexusID',
-             '1.3.6.1.4.1.674.10893.1.20.130.2.1.11' => 'channelBusType',
+             "${ASN_storage}.20.130.2.1.2"  => 'channelName',
+             "${ASN_storage}.20.130.2.1.3"  => 'channelState',
+             "${ASN_storage}.20.130.2.1.8"  => 'channelComponentStatus',
+	     "${ASN_storage}.20.130.2.1.9"  => 'channelNexusID',
+             "${ASN_storage}.20.130.2.1.11" => 'channelBusType',
             );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $channelTable = '1.3.6.1.4.1.674.10893.1.20.130.2';
+	    my $channelTable = "${ASN_storage}.20.130.2";
 	    $result = $snmp_session->get_table(-baseoid => $channelTable);
 	}
 	else {
@@ -2495,19 +2495,19 @@ sub check_enclosures {
     if ($snmp) {
         my %encl_oid
           = (
-             '1.3.6.1.4.1.674.10893.1.20.130.3.1.1'  => 'enclosureNumber',
-             '1.3.6.1.4.1.674.10893.1.20.130.3.1.2'  => 'enclosureName',
-             '1.3.6.1.4.1.674.10893.1.20.130.3.1.4'  => 'enclosureState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.19' => 'enclosureChannelNumber',
-             '1.3.6.1.4.1.674.10893.1.20.130.3.1.24' => 'enclosureComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.25' => 'enclosureNexusID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.26' => 'enclosureFirmwareVersion',
-	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.31' => 'enclosureOccupiedSlotCount', # new in OMSA 6.3.0
-	     '1.3.6.1.4.1.674.10893.1.20.130.3.1.32' => 'enclosureTotalSlots', # new in OMSA 6.3.0
+             "${ASN_storage}.20.130.3.1.1"  => 'enclosureNumber',
+             "${ASN_storage}.20.130.3.1.2"  => 'enclosureName',
+             "${ASN_storage}.20.130.3.1.4"  => 'enclosureState',
+	     "${ASN_storage}.20.130.3.1.19" => 'enclosureChannelNumber',
+             "${ASN_storage}.20.130.3.1.24" => 'enclosureComponentStatus',
+	     "${ASN_storage}.20.130.3.1.25" => 'enclosureNexusID',
+	     "${ASN_storage}.20.130.3.1.26" => 'enclosureFirmwareVersion',
+	     "${ASN_storage}.20.130.3.1.31" => 'enclosureOccupiedSlotCount', # new in OMSA 6.3.0
+	     "${ASN_storage}.20.130.3.1.32" => 'enclosureTotalSlots', # new in OMSA 6.3.0
             );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $enclosureTable = '1.3.6.1.4.1.674.10893.1.20.130.3';
+	    my $enclosureTable = "${ASN_storage}.20.130.3";
 	    $result = $snmp_session->get_table(-baseoid => $enclosureTable);
 	}
 	else {
@@ -2621,18 +2621,18 @@ sub check_enclosure_fans {
     if ($snmp) {
 	my %fan_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.7.1.2'  => 'fanName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.7.1.4'  => 'fanState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.7.1.11' => 'fanProbeCurrValue',
-	     '1.3.6.1.4.1.674.10893.1.20.130.7.1.15' => 'fanComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.130.7.1.16' => 'fanNexusID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.8.1.4'  => 'fanConnectionEnclosureName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.8.1.5'  => 'fanConnectionEnclosureNumber',
+	     "${ASN_storage}.20.130.7.1.2"  => 'fanName',
+	     "${ASN_storage}.20.130.7.1.4"  => 'fanState',
+	     "${ASN_storage}.20.130.7.1.11" => 'fanProbeCurrValue',
+	     "${ASN_storage}.20.130.7.1.15" => 'fanComponentStatus',
+	     "${ASN_storage}.20.130.7.1.16" => 'fanNexusID',
+	     "${ASN_storage}.20.130.8.1.4"  => 'fanConnectionEnclosureName',
+	     "${ASN_storage}.20.130.8.1.5"  => 'fanConnectionEnclosureNumber',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $fanTable = '1.3.6.1.4.1.674.10893.1.20.130.7';
-            my $fanConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.8';
+	    my $fanTable = "${ASN_storage}.20.130.7";
+            my $fanConnectionTable = "${ASN_storage}.20.130.8";
 
 	    $result = $snmp_session->get_table(-baseoid => $fanTable);
             my $ext = $snmp_session->get_table(-baseoid => $fanConnectionTable);
@@ -2728,17 +2728,17 @@ sub check_enclosure_pwr {
     if ($snmp) {
 	my %ps_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.9.1.2'  => 'powerSupplyName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.9.1.4'  => 'powerSupplyState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.9.1.9'  => 'powerSupplyComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.130.9.1.10' => 'powerSupplyNexusID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.10.1.4' => 'powerSupplyConnectionEnclosureName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.10.1.5' => 'powerSupplyConnectionEnclosureNumber',
+	     "${ASN_storage}.20.130.9.1.2"  => 'powerSupplyName',
+	     "${ASN_storage}.20.130.9.1.4"  => 'powerSupplyState',
+	     "${ASN_storage}.20.130.9.1.9"  => 'powerSupplyComponentStatus',
+	     "${ASN_storage}.20.130.9.1.10" => 'powerSupplyNexusID',
+	     "${ASN_storage}.20.130.10.1.4" => 'powerSupplyConnectionEnclosureName',
+	     "${ASN_storage}.20.130.10.1.5" => 'powerSupplyConnectionEnclosureNumber',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $powerSupplyTable = '1.3.6.1.4.1.674.10893.1.20.130.9';
-            my $powerSupplyConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.10';
+	    my $powerSupplyTable = "${ASN_storage}.20.130.9";
+            my $powerSupplyConnectionTable = "${ASN_storage}.20.130.10";
 
 	    $result = $snmp_session->get_table(-baseoid => $powerSupplyTable);
             my $ext = $snmp_session->get_table(-baseoid => $powerSupplyConnectionTable);
@@ -2830,23 +2830,23 @@ sub check_enclosure_temp {
     if ($snmp) {
 	my %temp_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.2'  => 'temperatureProbeName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.4'  => 'temperatureProbeState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.6'  => 'temperatureProbeUnit',
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.7'  => 'temperatureProbeMinWarning',
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.8'  => 'temperatureProbeMinCritical',
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.9'  => 'temperatureProbeMaxWarning',
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.10' => 'temperatureProbeMaxCritical',
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.11' => 'temperatureProbeCurValue',
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.13' => 'temperatureProbeComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.130.11.1.14' => 'temperatureProbeNexusID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.12.1.4'  => 'temperatureConnectionEnclosureName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.12.1.5'  => 'temperatureConnectionEnclosureNumber',
+	     "${ASN_storage}.20.130.11.1.2"  => 'temperatureProbeName',
+	     "${ASN_storage}.20.130.11.1.4"  => 'temperatureProbeState',
+	     "${ASN_storage}.20.130.11.1.6"  => 'temperatureProbeUnit',
+	     "${ASN_storage}.20.130.11.1.7"  => 'temperatureProbeMinWarning',
+	     "${ASN_storage}.20.130.11.1.8"  => 'temperatureProbeMinCritical',
+	     "${ASN_storage}.20.130.11.1.9"  => 'temperatureProbeMaxWarning',
+	     "${ASN_storage}.20.130.11.1.10" => 'temperatureProbeMaxCritical',
+	     "${ASN_storage}.20.130.11.1.11" => 'temperatureProbeCurValue',
+	     "${ASN_storage}.20.130.11.1.13" => 'temperatureProbeComponentStatus',
+	     "${ASN_storage}.20.130.11.1.14" => 'temperatureProbeNexusID',
+	     "${ASN_storage}.20.130.12.1.4"  => 'temperatureConnectionEnclosureName',
+	     "${ASN_storage}.20.130.12.1.5"  => 'temperatureConnectionEnclosureNumber',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $temperatureProbeTable = '1.3.6.1.4.1.674.10893.1.20.130.11';
-            my $temperatureConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.12';
+	    my $temperatureProbeTable = "${ASN_storage}.20.130.11";
+            my $temperatureConnectionTable = "${ASN_storage}.20.130.12";
 
 	    $result = $snmp_session->get_table(-baseoid => $temperatureProbeTable);
             my $ext = $snmp_session->get_table(-baseoid => $temperatureConnectionTable);
@@ -3048,17 +3048,17 @@ sub check_enclosure_emms {
     if ($snmp) {
 	my %emms_oid
 	  = (
-	     '1.3.6.1.4.1.674.10893.1.20.130.13.1.2'  => 'enclosureManagementModuleName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.13.1.4'  => 'enclosureManagementModuleState',
-	     '1.3.6.1.4.1.674.10893.1.20.130.13.1.11' => 'enclosureManagementModuleComponentStatus',
-	     '1.3.6.1.4.1.674.10893.1.20.130.13.1.12' => 'enclosureManagementModuleNexusID',
-	     '1.3.6.1.4.1.674.10893.1.20.130.14.1.4'  => 'enclosureManagementModuleConnectionEnclosureName',
-	     '1.3.6.1.4.1.674.10893.1.20.130.14.1.5'  => 'enclosureManagementModuleConnectionEnclosureNumber',
+	     "${ASN_storage}.20.130.13.1.2"  => 'enclosureManagementModuleName',
+	     "${ASN_storage}.20.130.13.1.4"  => 'enclosureManagementModuleState',
+	     "${ASN_storage}.20.130.13.1.11" => 'enclosureManagementModuleComponentStatus',
+	     "${ASN_storage}.20.130.13.1.12" => 'enclosureManagementModuleNexusID',
+	     "${ASN_storage}.20.130.14.1.4"  => 'enclosureManagementModuleConnectionEnclosureName',
+	     "${ASN_storage}.20.130.14.1.5"  => 'enclosureManagementModuleConnectionEnclosureNumber',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $enclosureManagementModuleTable = '1.3.6.1.4.1.674.10893.1.20.130.13';
-            my $enclosureManagementModuleConnectionTable = '1.3.6.1.4.1.674.10893.1.20.130.14';
+	    my $enclosureManagementModuleTable = "${ASN_storage}.20.130.13";
+            my $enclosureManagementModuleConnectionTable = "${ASN_storage}.20.130.14";
 
 	    $result = $snmp_session->get_table(-baseoid => $enclosureManagementModuleTable);
             my $ext = $snmp_session->get_table(-baseoid => $enclosureManagementModuleConnectionTable);
@@ -4723,7 +4723,7 @@ sub check_storage {
     check_physical_disks();
     check_virtual_disks();
     check_cache_battery();
-    check_connectors();
+    check_connectors() if !$opt{idrac};
     check_enclosures();
     check_enclosure_fans();
     check_enclosure_pwr();
