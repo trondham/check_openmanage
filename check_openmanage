@@ -32,7 +32,7 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 	     $E_UNKNOWN $FW_LOCK $USAGE $HELP $LICENSE
 	     $snmp_session $snmp_error $omreport $globalstatus $global
 	     $linebreak $omopt_chassis $omopt_system $blade
-	     $exit_code $snmp
+	     $exit_code $snmp $ASN_chassis $ASN_storage
 	     %check %opt %reverse_exitcode %status2nagios
 	     %snmp_status %snmp_probestatus %probestatus2nagios %sysinfo
 	     %blacklist %nagios_alert_count %count %snmp_enclosure %snmp_controller
@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.10';
+$VERSION = '3.8.0-prealpha';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -215,6 +215,7 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
            'use-get_table'      => \$opt{use_get_table},
 	   'hide-servicetag'    => \$opt{hide_servicetag},
 	   'vdisk-critical'     => \$opt{vdisk_critical},
+	   'idrac'              => \$opt{idrac},
 	  ) or do { print $USAGE; exit $E_UNKNOWN };
 
 # If user requested help
@@ -461,6 +462,12 @@ set_blacklist($opt{blacklist}) if defined $opt{blacklist};
 # If blacklisting is in effect, don't check global health status
 if (scalar keys %blacklist > 0) {
     $global = 0;
+}
+
+# ASN prefix for SNMP OIDs
+if ($snmp) {
+    $ASN_chassis = $opt{idrac} ? '1.3.6.1.4.1.674.10892.5.4' : '1.3.6.1.4.1.674.10892.1';
+    $ASN_storage = $opt{idrac} ? '1.3.6.1.4.1.674.10893.1' : '1.3.6.1.4.1.674.10893.1';
 }
 
 # Take into account new hardware and blades
@@ -1012,7 +1019,7 @@ sub snmp_initialize {
 # servers should have
 #
 sub snmp_check {
-    my $chassisModelName = '1.3.6.1.4.1.674.10892.1.300.10.1.9.1';
+    my $chassisModelName = $opt{idrac} ? '1.3.6.1.4.1.674.10892.5.1.3.12.0' : "${ASN_chassis}.300.10.1.9.1";
     my $result = $snmp_session->get_request(-varbindlist => [$chassisModelName]);
 
     # Typically if remote host isn't responding
@@ -1035,8 +1042,8 @@ sub snmp_check {
 sub snmp_detect_blade {
     # In some setups, the IDs for the blade and interconnect
     # board are mixed up, so we need to check both.
-    my $DellBaseBoardType1 = '1.3.6.1.4.1.674.10892.1.300.80.1.7.1.1';
-    my $DellBaseBoardType2 = '1.3.6.1.4.1.674.10892.1.300.80.1.7.1.2';
+    my $DellBaseBoardType1 = "${ASN_chassis}.300.80.1.7.1.1";
+    my $DellBaseBoardType2 = "${ASN_chassis}.300.80.1.7.1.2";
     my $result1 = $snmp_session->get_request(-varbindlist => [$DellBaseBoardType1]);
     my $result2 = $snmp_session->get_request(-varbindlist => [$DellBaseBoardType2]);
 
@@ -1565,7 +1572,7 @@ sub check_global {
 	#
 	# Checks global status, i.e. both storage and chassis
 	#
-	my $systemStateGlobalSystemStatus = '1.3.6.1.4.1.674.10892.1.200.10.1.2.1';
+	my $systemStateGlobalSystemStatus = "${ASN_chassis}.200.10.1.2.1";
 	my $result = $snmp_session->get_request(-varbindlist => [$systemStateGlobalSystemStatus]);
 	if (!defined $result) {
 	    printf "SNMP ERROR [global]: %s\n", $snmp_error;
@@ -3144,15 +3151,15 @@ sub check_memory {
     if ($snmp) {
 	my %dimm_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.1100.50.1.2.1'  => 'memoryDeviceIndex',
-	     '1.3.6.1.4.1.674.10892.1.1100.50.1.5.1'  => 'memoryDeviceStatus',
-	     '1.3.6.1.4.1.674.10892.1.1100.50.1.8.1'  => 'memoryDeviceLocationName',
-	     '1.3.6.1.4.1.674.10892.1.1100.50.1.14.1' => 'memoryDeviceSize',
-	     '1.3.6.1.4.1.674.10892.1.1100.50.1.20.1' => 'memoryDeviceFailureModes',
+	     "${ASN_chassis}.1100.50.1.2.1"  => 'memoryDeviceIndex',
+	     "${ASN_chassis}.1100.50.1.5.1"  => 'memoryDeviceStatus',
+	     "${ASN_chassis}.1100.50.1.8.1"  => 'memoryDeviceLocationName',
+	     "${ASN_chassis}.1100.50.1.14.1" => 'memoryDeviceSize',
+	     "${ASN_chassis}.1100.50.1.20.1" => 'memoryDeviceFailureModes',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $memoryDeviceTable = '1.3.6.1.4.1.674.10892.1.1100.50.1';
+	    my $memoryDeviceTable = "${ASN_chassis}.1100.50.1";
 	    $result = $snmp_session->get_table(-baseoid => $memoryDeviceTable);
 	}
 	else {
@@ -3271,16 +3278,16 @@ sub check_fans {
     if ($snmp) {
 	my %cool_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.700.12.1.2.1'  => 'coolingDeviceIndex',
-	     '1.3.6.1.4.1.674.10892.1.700.12.1.5.1'  => 'coolingDeviceStatus',
-	     '1.3.6.1.4.1.674.10892.1.700.12.1.6.1'  => 'coolingDeviceReading',
-	     '1.3.6.1.4.1.674.10892.1.700.12.1.8.1'  => 'coolingDeviceLocationName',
-	     '1.3.6.1.4.1.674.10892.1.700.12.1.10.1' => 'coolingDeviceUpperCriticalThreshold',
-	     '1.3.6.1.4.1.674.10892.1.700.12.1.11.1' => 'coolingDeviceUpperNonCriticalThreshold',
+	     "${ASN_chassis}.700.12.1.2.1"  => 'coolingDeviceIndex',
+	     "${ASN_chassis}.700.12.1.5.1"  => 'coolingDeviceStatus',
+	     "${ASN_chassis}.700.12.1.6.1"  => 'coolingDeviceReading',
+	     "${ASN_chassis}.700.12.1.8.1"  => 'coolingDeviceLocationName',
+	     "${ASN_chassis}.700.12.1.10.1" => 'coolingDeviceUpperCriticalThreshold',
+	     "${ASN_chassis}.700.12.1.11.1" => 'coolingDeviceUpperNonCriticalThreshold',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $coolingDeviceTable = '1.3.6.1.4.1.674.10892.1.700.12.1';
+	    my $coolingDeviceTable = "${ASN_chassis}.700.12.1";
 	    $result = $snmp_session->get_table(-baseoid => $coolingDeviceTable);
 	}
 	else {
@@ -3374,15 +3381,15 @@ sub check_powersupplies {
     if ($snmp) {
 	my %ps_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.600.12.1.2.1'  => 'powerSupplyIndex',
-	     '1.3.6.1.4.1.674.10892.1.600.12.1.5.1'  => 'powerSupplyStatus',
-	     '1.3.6.1.4.1.674.10892.1.600.12.1.7.1'  => 'powerSupplyType',
-	     '1.3.6.1.4.1.674.10892.1.600.12.1.11.1' => 'powerSupplySensorState',
-	     '1.3.6.1.4.1.674.10892.1.600.12.1.12.1' => 'powerSupplyConfigurationErrorType',
+	     "${ASN_chassis}.600.12.1.2.1"  => 'powerSupplyIndex',
+	     "${ASN_chassis}.600.12.1.5.1"  => 'powerSupplyStatus',
+	     "${ASN_chassis}.600.12.1.7.1"  => 'powerSupplyType',
+	     "${ASN_chassis}.600.12.1.11.1" => 'powerSupplySensorState',
+	     "${ASN_chassis}.600.12.1.12.1" => 'powerSupplyConfigurationErrorType',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $powerDeviceTable = '1.3.6.1.4.1.674.10892.1.600.12.1';
+	    my $powerDeviceTable = "${ASN_chassis}.600.12.1";
 	    $result = $snmp_session->get_table(-baseoid => $powerDeviceTable);
 	}
 	else {
@@ -3498,22 +3505,22 @@ sub check_temperatures {
     if ($snmp) {
 	my %temp_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.2.1'  => 'temperatureProbeIndex',
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.5.1'  => 'temperatureProbeStatus',
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.6.1'  => 'temperatureProbeReading',
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.7.1'  => 'temperatureProbeType',
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.8.1'  => 'temperatureProbeLocationName',
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.10.1' => 'temperatureProbeUpperCriticalThreshold',
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.11.1' => 'temperatureProbeUpperNonCriticalThreshold',
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.12.1' => 'temperatureProbeLowerNonCriticalThreshold',
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.13.1' => 'temperatureProbeLowerCriticalThreshold',
-	     '1.3.6.1.4.1.674.10892.1.700.20.1.16.1' => 'temperatureProbeDiscreteReading',
+	     "${ASN_chassis}.700.20.1.2.1"  => 'temperatureProbeIndex',
+	     "${ASN_chassis}.700.20.1.5.1"  => 'temperatureProbeStatus',
+	     "${ASN_chassis}.700.20.1.6.1"  => 'temperatureProbeReading',
+	     "${ASN_chassis}.700.20.1.7.1"  => 'temperatureProbeType',
+	     "${ASN_chassis}.700.20.1.8.1"  => 'temperatureProbeLocationName',
+	     "${ASN_chassis}.700.20.1.10.1" => 'temperatureProbeUpperCriticalThreshold',
+	     "${ASN_chassis}.700.20.1.11.1" => 'temperatureProbeUpperNonCriticalThreshold',
+	     "${ASN_chassis}.700.20.1.12.1" => 'temperatureProbeLowerNonCriticalThreshold',
+	     "${ASN_chassis}.700.20.1.13.1" => 'temperatureProbeLowerCriticalThreshold',
+	     "${ASN_chassis}.700.20.1.16.1" => 'temperatureProbeDiscreteReading',
 	    );
 	# this didn't work well for some reason
 	#my $result = $snmp_session->get_entries(-columns => [keys %temp_oid]);
 
 	# Getting values using the table
-	my $temperatureProbeTable = '1.3.6.1.4.1.674.10892.1.700.20';
+	my $temperatureProbeTable = "${ASN_chassis}.700.20";
 	my $result = $snmp_session->get_table(-baseoid => $temperatureProbeTable);
 
 	if (!defined $result) {
@@ -3711,21 +3718,21 @@ sub check_processors {
 
 	my %cpu_oid
 	  = (
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.2.1'  => 'processorDeviceIndex',
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.5.1'  => 'processorDeviceStatus',
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.8.1'  => 'processorDeviceManufacturerName',
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.9.1'  => 'processorDeviceStatusState',
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.10.1' => 'processorDeviceFamily',
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.12.1' => 'processorDeviceCurrentSpeed',
-             '1.3.6.1.4.1.674.10892.1.1100.30.1.23.1' => 'processorDeviceBrandName',
-	     '1.3.6.1.4.1.674.10892.1.1100.32.1.2.1'  => 'processorDeviceStatusIndex',
-	     '1.3.6.1.4.1.674.10892.1.1100.32.1.5.1'  => 'processorDeviceStatusStatus',
-	     '1.3.6.1.4.1.674.10892.1.1100.32.1.6.1'  => 'processorDeviceStatusReading',
+             "${ASN_chassis}.1100.30.1.2.1"  => 'processorDeviceIndex',
+             "${ASN_chassis}.1100.30.1.5.1"  => 'processorDeviceStatus',
+             "${ASN_chassis}.1100.30.1.8.1"  => 'processorDeviceManufacturerName',
+             "${ASN_chassis}.1100.30.1.9.1"  => 'processorDeviceStatusState',
+             "${ASN_chassis}.1100.30.1.10.1" => 'processorDeviceFamily',
+             "${ASN_chassis}.1100.30.1.12.1" => 'processorDeviceCurrentSpeed',
+             "${ASN_chassis}.1100.30.1.23.1" => 'processorDeviceBrandName',
+	     "${ASN_chassis}.1100.32.1.2.1"  => 'processorDeviceStatusIndex',
+	     "${ASN_chassis}.1100.32.1.5.1"  => 'processorDeviceStatusStatus',
+	     "${ASN_chassis}.1100.32.1.6.1"  => 'processorDeviceStatusReading',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $processorDeviceTable = '1.3.6.1.4.1.674.10892.1.1100.30.1';
-	    my $processorDeviceStatusTable = '1.3.6.1.4.1.674.10892.1.1100.32.1';
+	    my $processorDeviceTable = "${ASN_chassis}.1100.30.1";
+	    my $processorDeviceStatusTable = "${ASN_chassis}.1100.32.1";
 
 	    $result = $snmp_session->get_table(-baseoid => $processorDeviceTable);
 	    my $ext = $snmp_session->get_table(-baseoid => $processorDeviceStatusTable);
@@ -3994,14 +4001,14 @@ sub check_volts {
     if ($snmp) {
 	my %volt_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.600.20.1.2.1'  => 'voltageProbeIndex',
-	     '1.3.6.1.4.1.674.10892.1.600.20.1.5.1'  => 'voltageProbeStatus',
-	     '1.3.6.1.4.1.674.10892.1.600.20.1.6.1'  => 'voltageProbeReading',
-	     '1.3.6.1.4.1.674.10892.1.600.20.1.8.1'  => 'voltageProbeLocationName',
-	     '1.3.6.1.4.1.674.10892.1.600.20.1.16.1' => 'voltageProbeDiscreteReading',
+	     "${ASN_chassis}.600.20.1.2.1"  => 'voltageProbeIndex',
+	     "${ASN_chassis}.600.20.1.5.1"  => 'voltageProbeStatus',
+	     "${ASN_chassis}.600.20.1.6.1"  => 'voltageProbeReading',
+	     "${ASN_chassis}.600.20.1.8.1"  => 'voltageProbeLocationName',
+	     "${ASN_chassis}.600.20.1.16.1" => 'voltageProbeDiscreteReading',
 	    );
 
-	my $voltageProbeTable = '1.3.6.1.4.1.674.10892.1.600.20.1';
+	my $voltageProbeTable = "${ASN_chassis}.600.20.1";
         my $result = $snmp_session->get_table(-baseoid => $voltageProbeTable);
 
 	if (!defined $result) {
@@ -4101,14 +4108,14 @@ sub check_batteries {
     if ($snmp) {
 	my %bat_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.600.50.1.2.1' => 'batteryIndex',
-	     '1.3.6.1.4.1.674.10892.1.600.50.1.5.1' => 'batteryStatus',
-	     '1.3.6.1.4.1.674.10892.1.600.50.1.6.1' => 'batteryReading',
-	     '1.3.6.1.4.1.674.10892.1.600.50.1.7.1' => 'batteryLocationName',
+	     "${ASN_chassis}.600.50.1.2.1" => 'batteryIndex',
+	     "${ASN_chassis}.600.50.1.5.1" => 'batteryStatus',
+	     "${ASN_chassis}.600.50.1.6.1" => 'batteryReading',
+	     "${ASN_chassis}.600.50.1.7.1" => 'batteryLocationName',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $batteryTable = '1.3.6.1.4.1.674.10892.1.600.50.1';
+	    my $batteryTable = "${ASN_chassis}.600.50.1";
 	    $result = $snmp_session->get_table(-baseoid => $batteryTable);
 	}
 	else {
@@ -4174,18 +4181,18 @@ sub check_pwrmonitoring {
     if ($snmp) {
 	my %amp_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.600.30.1.2.1'  => 'amperageProbeIndex',
-	     '1.3.6.1.4.1.674.10892.1.600.30.1.5.1'  => 'amperageProbeStatus',
-	     '1.3.6.1.4.1.674.10892.1.600.30.1.6.1'  => 'amperageProbeReading',
-	     '1.3.6.1.4.1.674.10892.1.600.30.1.7.1'  => 'amperageProbeType',
-	     '1.3.6.1.4.1.674.10892.1.600.30.1.8.1'  => 'amperageProbeLocationName',
-	     '1.3.6.1.4.1.674.10892.1.600.30.1.10.1' => 'amperageProbeUpperCriticalThreshold',
-	     '1.3.6.1.4.1.674.10892.1.600.30.1.11.1' => 'amperageProbeUpperNonCriticalThreshold',
-	     '1.3.6.1.4.1.674.10892.1.600.30.1.16.1' => 'amperageProbeDiscreteReading',
+	     "${ASN_chassis}.600.30.1.2.1"  => 'amperageProbeIndex',
+	     "${ASN_chassis}.600.30.1.5.1"  => 'amperageProbeStatus',
+	     "${ASN_chassis}.600.30.1.6.1"  => 'amperageProbeReading',
+	     "${ASN_chassis}.600.30.1.7.1"  => 'amperageProbeType',
+	     "${ASN_chassis}.600.30.1.8.1"  => 'amperageProbeLocationName',
+	     "${ASN_chassis}.600.30.1.10.1" => 'amperageProbeUpperCriticalThreshold',
+	     "${ASN_chassis}.600.30.1.11.1" => 'amperageProbeUpperNonCriticalThreshold',
+	     "${ASN_chassis}.600.30.1.16.1" => 'amperageProbeDiscreteReading',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $amperageProbeTable = '1.3.6.1.4.1.674.10892.1.600.30.1';
+	    my $amperageProbeTable = "${ASN_chassis}.600.30.1";
 	    $result = $snmp_session->get_table(-baseoid => $amperageProbeTable);
 	}
 	else {
@@ -4400,13 +4407,13 @@ sub check_intrusion {
     if ($snmp) {
 	my %int_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.300.70.1.2.1' => 'intrusionIndex',
-	     '1.3.6.1.4.1.674.10892.1.300.70.1.5.1' => 'intrusionStatus',
-	     '1.3.6.1.4.1.674.10892.1.300.70.1.6.1' => 'intrusionReading',
+	     "${ASN_chassis}.300.70.1.2.1" => 'intrusionIndex',
+	     "${ASN_chassis}.300.70.1.5.1" => 'intrusionStatus',
+	     "${ASN_chassis}.300.70.1.6.1" => 'intrusionReading',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $intrusionTable = '1.3.6.1.4.1.674.10892.1.300.70.1';
+	    my $intrusionTable = "${ASN_chassis}.300.70.1";
 	    $result = $snmp_session->get_table(-baseoid => $intrusionTable);
 	}
 	else {
@@ -4477,17 +4484,17 @@ sub check_sdcard {
     if ($snmp) {
 	my %sd_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.1100.112.1.2.1'  => 'sdCardDeviceIndex',
-	     '1.3.6.1.4.1.674.10892.1.1100.112.1.3.1'  => 'sdCardDeviceStatus',
-	     '1.3.6.1.4.1.674.10892.1.1100.112.1.4.1'  => 'sdCardDeviceType',
-	     '1.3.6.1.4.1.674.10892.1.1100.112.1.7.1'  => 'sdCardDeviceLocationName',
-	     '1.3.6.1.4.1.674.10892.1.1100.112.1.8.1'  => 'sdCardDeviceCardPresent',
-	     '1.3.6.1.4.1.674.10892.1.1100.112.1.9.1'  => 'sdCardDeviceCardState',
-	     '1.3.6.1.4.1.674.10892.1.1100.112.1.10.1' => 'sdCardDeviceCardStorageSize',
+	     "${ASN_chassis}.1100.112.1.2.1"  => 'sdCardDeviceIndex',
+	     "${ASN_chassis}.1100.112.1.3.1"  => 'sdCardDeviceStatus',
+	     "${ASN_chassis}.1100.112.1.4.1"  => 'sdCardDeviceType',
+	     "${ASN_chassis}.1100.112.1.7.1"  => 'sdCardDeviceLocationName',
+	     "${ASN_chassis}.1100.112.1.8.1"  => 'sdCardDeviceCardPresent',
+	     "${ASN_chassis}.1100.112.1.9.1"  => 'sdCardDeviceCardState',
+	     "${ASN_chassis}.1100.112.1.10.1" => 'sdCardDeviceCardStorageSize',
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
-	    my $sdCardDeviceTable = '1.3.6.1.4.1.674.10892.1.1100.112.1';
+	    my $sdCardDeviceTable = "${ASN_chassis}.1100.112.1";
 	    $result = $snmp_session->get_table(-baseoid => $sdCardDeviceTable);
 	}
 	else {
@@ -4612,7 +4619,7 @@ sub check_esmlog_health {
     my $health = 'Ok';
 
     if ($snmp) {
-	my $systemStateEventLogStatus = '1.3.6.1.4.1.674.10892.1.200.10.1.41.1';
+	my $systemStateEventLogStatus = "${ASN_chassis}.200.10.1.41.1";
 	my $result = $snmp_session->get_request(-varbindlist => [$systemStateEventLogStatus]);
 	if (!defined $result) {
 	    my $msg = sprintf 'SNMP ERROR [esmhealth]: %s',
@@ -4659,7 +4666,7 @@ sub check_esmlog {
     if ($snmp) {
 	my %esm_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.300.40.1.7.1'  => 'eventLogSeverityStatus',
+	     "${ASN_chassis}.300.40.1.7.1"  => 'eventLogSeverityStatus',
 	    );
 	my $result = $snmp_session->get_entries(-columns => [keys %esm_oid]);
 
@@ -4822,12 +4829,12 @@ sub get_omreport_about {
 sub get_snmp_chassis_info {
     my %chassis_oid
       = (
-	 '1.3.6.1.4.1.674.10892.1.300.10.1.9.1'  => 'chassisModelName',
-	 '1.3.6.1.4.1.674.10892.1.300.10.1.11.1' => 'chassisServiceTagName',
-	 '1.3.6.1.4.1.674.10892.1.300.10.1.48.1' => 'chassisSystemRevisionName',
+	 "${ASN_chassis}.300.10.1.9.1"  => 'chassisModelName',
+	 "${ASN_chassis}.300.10.1.11.1" => 'chassisServiceTagName',
+	 "${ASN_chassis}.300.10.1.48.1" => 'chassisSystemRevisionName',
 	);
 
-    my $chassisInformationTable = '1.3.6.1.4.1.674.10892.1.300.10.1';
+    my $chassisInformationTable = "${ASN_chassis}.300.10.1";
     my $result = $snmp_session->get_table(-baseoid => $chassisInformationTable);
 
     if (defined $result) {
@@ -4858,11 +4865,11 @@ sub get_snmp_chassis_info {
 sub get_snmp_chassis_bios {
     my %bios_oid
       = (
-	 '1.3.6.1.4.1.674.10892.1.300.50.1.7.1.1' => 'systemBIOSReleaseDateName',
-	 '1.3.6.1.4.1.674.10892.1.300.50.1.8.1.1' => 'systemBIOSVersionName',
+	 "${ASN_chassis}.300.50.1.7.1.1" => 'systemBIOSReleaseDateName',
+	 "${ASN_chassis}.300.50.1.8.1.1" => 'systemBIOSVersionName',
 	);
 
-    my $systemBIOSTable = '1.3.6.1.4.1.674.10892.1.300.50.1';
+    my $systemBIOSTable = "${ASN_chassis}.300.50.1";
     my $result = $snmp_session->get_table(-baseoid => $systemBIOSTable);
 
     if (defined $result) {
@@ -4890,11 +4897,11 @@ sub get_snmp_chassis_bios {
 sub get_snmp_system_operatingsystem {
     my %os_oid
       = (
-	 '1.3.6.1.4.1.674.10892.1.400.10.1.6.1' => 'operatingSystemOperatingSystemName',
-	 '1.3.6.1.4.1.674.10892.1.400.10.1.7.1' => 'operatingSystemOperatingSystemVersionName',
+	 "${ASN_chassis}.400.10.1.6.1" => 'operatingSystemOperatingSystemName',
+	 "${ASN_chassis}.400.10.1.7.1" => 'operatingSystemOperatingSystemVersionName',
 	);
 
-    my $operatingSystemTable = '1.3.6.1.4.1.674.10892.1.400.10.1';
+    my $operatingSystemTable = "${ASN_chassis}.400.10.1";
     my $result = $snmp_session->get_table(-baseoid => $operatingSystemTable);
 
     if (defined $result) {
@@ -4920,7 +4927,7 @@ sub get_snmp_system_operatingsystem {
 #
 sub get_snmp_about {
     # systemManagementSoftwareGlobalVersionName
-    my $oid = '1.3.6.1.4.1.674.10892.1.100.10.0';
+    my $oid = "${ASN_chassis}.100.10.0";
     my $result = $snmp_session->get_request(-varbindlist => [$oid]);
 
     if (defined $result) {
@@ -5004,12 +5011,12 @@ sub get_firmware_info {
     if ($snmp) {
 	my %fw_oid
 	  = (
-	     '1.3.6.1.4.1.674.10892.1.300.60.1.7.1'  => 'firmwareType',
-	     '1.3.6.1.4.1.674.10892.1.300.60.1.8.1'  => 'firmwareTypeName',
-	     '1.3.6.1.4.1.674.10892.1.300.60.1.11.1' => 'firmwareVersionName',
+	     "${ASN_chassis}.300.60.1.7.1"  => 'firmwareType',
+	     "${ASN_chassis}.300.60.1.8.1"  => 'firmwareTypeName',
+	     "${ASN_chassis}.300.60.1.11.1" => 'firmwareVersionName',
 	    );
 
-	my $firmwareTable = '1.3.6.1.4.1.674.10892.1.300.60.1';
+	my $firmwareTable = "${ASN_chassis}.300.60.1";
 	my $result = $snmp_session->get_table(-baseoid => $firmwareTable);
 
 	# Some don't have this OID, this is ok
