@@ -1754,6 +1754,38 @@ sub check_controllers {
     }
     return;
 }
+sub idrac_check_controllers {
+    my $name     = undef;
+    my $status   = undef;
+    my @output   = ();
+
+    my %ctrl_oid
+      = (
+	 "${ASN_storage}.20.130.1.1.79"  => 'IDRAC',
+	 "${ASN_storage}.20.130.1.1.37" => 'controllerRollUpStatus',
+	);
+
+    my $result = $snmp_session->get_entries(-columns => [keys %ctrl_oid]);
+
+    if (!defined $result) {
+	report('storage', 'Storage Error! No controllers found', $E_UNKNOWN);
+	return;
+    }
+
+    @output = @{ get_snmp_output($result, \%ctrl_oid) };
+
+  CTRL:
+    foreach my $out (@output) {
+	$name     = $out->{IDRAC} || 'Unknown controller';
+	$status   = get_snmp_status($out->{controllerRollUpStatus});
+	$name =~ s{\s+\z}{}xms; # remove trailing whitespace
+	push @controllers, -1;
+
+	my $msg = sprintf 'Controller [%s] is %s', $name, $status;
+	report('storage', $msg, $status2nagios{$status}, q{});
+    }
+    return;
+}
 
 
 #-----------------------------------------
@@ -2057,6 +2089,45 @@ sub check_physical_disks {
     }
     return;
 }
+sub idrac_check_physical_disks {
+    return if $#controllers == -1;
+
+    my $name     = undef;
+    my $status   = undef;
+    my @output  = ();
+
+    my %pdisk_oid
+      = (
+	 "${ASN_storage}.20.130.4.1.55" => 'IDRAC',
+	 "${ASN_storage}.20.130.4.1.24" => 'arrayDiskComponentStatus',
+	);
+
+    # Increase buffer and get result
+    my $orig = $snmp_session->max_msg_size();
+    $snmp_session->max_msg_size(2 * $orig);
+    my $result = $snmp_session->get_entries(-columns => [keys %pdisk_oid]);
+    $snmp_session->max_msg_size($orig);
+
+    if (!defined $result) {
+	printf "SNMP ERROR [storage / pdisk]: %s.\n", $snmp_session->error;
+	$snmp_session->close;
+	exit $E_UNKNOWN;
+    }
+
+    @output = @{ get_snmp_output($result, \%pdisk_oid) };
+
+
+    # Check physical disks on each of the controllers
+  PDISK:
+    foreach my $out (@output) {
+	$name     = $out->{IDRAC} || 'Unknown disk';
+	$status   = get_snmp_status($out->{arrayDiskComponentStatus});
+
+	my $msg = sprintf '%s is %s', $name, $status;
+	report('storage', $msg, $status2nagios{$status}, q{});
+    }
+    return;
+}
 
 
 #-----------------------------------------
@@ -2201,6 +2272,40 @@ sub check_virtual_disks {
 	    }
 	    report('storage', $msg, $lvl, $nexus);
 	}
+    }
+    return;
+}
+sub idrac_check_virtual_disks {
+    return if $#controllers == -1;
+
+    my $name   = undef;
+    my $status = undef;
+    my @output = ();
+
+    my %vdisk_oid
+      = (
+	 "${ASN_storage}.20.140.1.1.36" => 'IDRAC',
+	 "${ASN_storage}.20.140.1.1.20" => 'virtualDiskComponentStatus',
+	);
+    my $result = $snmp_session->get_entries(-columns => [keys %vdisk_oid]);
+
+    # No logical drives is OK
+    return if !defined $result;
+
+    @output = @{ get_snmp_output($result, \%vdisk_oid) };
+
+    # Check virtual disks on each of the controllers
+  VDISK:
+    foreach my $out (@output) {
+	$name   = $out->{IDRAC} || 'Unknown vdisk';
+	$status = get_snmp_status($out->{virtualDiskComponentStatus});
+
+	my $msg = sprintf q{%s is %s}, $name, $status;
+	my $lvl = $status2nagios{$status};
+	if ($opt{vdisk_critical} && $lvl != $E_OK) {
+	    $lvl = $E_CRITICAL;
+	}
+	report('storage', $msg, $lvl, q{});
     }
     return;
 }
@@ -2373,6 +2478,37 @@ sub check_cache_battery {
 	      $id, $ctrl, $state;
 	    report('storage', $msg, $status2nagios{$status}, $nexus);
 	}
+    }
+    return;
+}
+sub idrac_check_cache_battery {
+    return if $#controllers == -1;
+
+    my $name   = undef;
+    my $status = undef;
+    my @output = ();
+
+    my %bat_oid
+      = (
+	 "${ASN_storage}.20.130.15.1.21" => 'IDRAC',
+	 "${ASN_storage}.20.130.15.1.6"  => 'batteryComponentStatus',
+	);
+    my $result = $snmp_session->get_entries(-columns => [keys %bat_oid]);
+
+    # No cache battery is OK
+    return if !defined $result;
+
+    @output = @{ get_snmp_output($result, \%bat_oid) };
+
+    # Check battery on each of the controllers
+  BATTERY:
+    foreach my $out (@output) {
+	$name   = $out->{IDRAC} || 'Unknown battery';
+	$status = get_snmp_status($out->{batteryComponentStatus});
+
+	my $msg = sprintf '%s is %s',
+	  $name, $status;
+	report('storage', $msg, $status2nagios{$status}, q{});
     }
     return;
 }
@@ -2598,6 +2734,33 @@ sub check_enclosures {
 	      $nexus, $name, $ctrl, $state;
 	}
         report('storage', $msg, $status2nagios{$status}, $nexus);
+    }
+    return;
+}
+sub idrac_check_enclosures {
+    my $name     = undef;
+    my $status   = undef;
+    my @output   = ();
+
+    my %encl_oid
+      = (
+	 "${ASN_storage}.20.130.3.1.48" => 'IDRAC',
+	 "${ASN_storage}.20.130.3.1.23" => 'enclosureRollUpStatus',
+	);
+    my $result = $snmp_session->get_entries(-columns => [keys %encl_oid]);
+
+    # No enclosures is OK
+    return if !defined $result;
+
+    @output = @{ get_snmp_output($result, \%encl_oid) };
+
+  ENCLOSURE:
+    foreach my $out (@output) {
+	$name     = $out->{IDRAC} || 'Unknown enclosure';
+	$status   = get_snmp_status($out->{enclosureRollUpStatus});
+
+	my $msg = sprintf '%s is %s', $name, $status;
+        report('storage', $msg, $status2nagios{$status}, q{});
     }
     return;
 }
@@ -4719,16 +4882,25 @@ sub check_servicetag {
 # Handy function for checking all storage components
 #
 sub check_storage {
-    check_controllers();
-    check_physical_disks();
-    check_virtual_disks();
-    check_cache_battery();
-    check_connectors() if !$opt{idrac};
-    check_enclosures();
-    check_enclosure_fans();
-    check_enclosure_pwr();
-    check_enclosure_temp();
-    check_enclosure_emms();
+    if ($opt{idrac}) {
+	idrac_check_controllers();
+	idrac_check_physical_disks();
+	idrac_check_virtual_disks();
+	idrac_check_cache_battery();
+	idrac_check_enclosures();
+    }
+    else {
+	check_controllers();
+	check_physical_disks();
+	check_virtual_disks();
+	check_cache_battery();
+	check_connectors();
+	check_enclosures();
+	check_enclosure_fans();
+	check_enclosure_pwr();
+	check_enclosure_temp();
+	check_enclosure_emms();
+    }
     return;
 }
 
