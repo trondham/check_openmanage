@@ -169,6 +169,7 @@ END_LICENSE
          'use_get_table'     => 0,        # hack for SNMPv3 on Windows with net-snmp
 	 'hide_servicetag'   => 0,        # hidden servicetag
 	 'vdisk_critical'    => 0,        # make vdisk alerts critical
+	 'idrac'             => 0,        # check against idrac
        );
 
 # Get options
@@ -1030,7 +1031,12 @@ sub snmp_check {
 
     # If OpenManage isn't installed or is not working
     if ($result->{$chassisModelName} =~ m{\A noSuch (Instance|Object) \z}xms) {
-	print "ERROR: (SNMP) OpenManage is not installed or is not working correctly\n";
+	if ($opt{idrac}) {
+	    print "ERROR: (SNMP) Couldn't contact iDRAC via SNMP\n";
+	}
+	else {
+	    print "ERROR: (SNMP) OpenManage is not installed or is not working correctly\n";
+	}
 	exit $E_UNKNOWN;
     }
     return;
@@ -1755,14 +1761,16 @@ sub check_controllers {
     return;
 }
 sub idrac_check_controllers {
-    my $name     = undef;
-    my $status   = undef;
-    my @output   = ();
+    my $number = undef
+    my $name   = undef;
+    my $status = undef;
+    my @output = ();
 
     my %ctrl_oid
       = (
-	 "${ASN_storage}.20.130.1.1.79"  => 'IDRAC',
-	 "${ASN_storage}.20.130.1.1.37" => 'controllerRollUpStatus',
+	 "${ASN_storage}.20.130.1.1.1"  => 'controllerNumber',
+	 "${ASN_storage}.20.130.1.1.2"  => 'controllerName',
+	 "${ASN_storage}.20.130.1.1.38" => 'controllerRollUpStatus',
 	);
 
     my $result = $snmp_session->get_entries(-columns => [keys %ctrl_oid]);
@@ -1776,12 +1784,13 @@ sub idrac_check_controllers {
 
   CTRL:
     foreach my $out (@output) {
-	$name     = $out->{IDRAC} || 'Unknown controller';
-	$status   = get_snmp_status($out->{controllerRollUpStatus});
+	$number = $out->{controllerNumber} || 9999;
+	$name   = $out->{controllerName} || 'Unknown controller';
+	$status = get_snmp_status($out->{controllerRollUpStatus});
 	$name =~ s{\s+\z}{}xms; # remove trailing whitespace
 	push @controllers, -1;
 
-	my $msg = sprintf 'Controller [%s] is %s', $name, $status;
+	my $msg = sprintf 'Controller %d [%s] is %s', $number, $name, $status;
 	report('storage', $msg, $status2nagios{$status}, q{});
     }
     return;
@@ -2122,6 +2131,7 @@ sub idrac_check_physical_disks {
     foreach my $out (@output) {
 	$name     = $out->{IDRAC} || 'Unknown disk';
 	$status   = get_snmp_status($out->{arrayDiskComponentStatus});
+	$count{pdisk}++;
 
 	my $msg = sprintf '%s is %s', $name, $status;
 	report('storage', $msg, $status2nagios{$status}, q{});
@@ -2299,6 +2309,7 @@ sub idrac_check_virtual_disks {
     foreach my $out (@output) {
 	$name   = $out->{IDRAC} || 'Unknown vdisk';
 	$status = get_snmp_status($out->{virtualDiskComponentStatus});
+	$count{vdisk}++;
 
 	my $msg = sprintf q{%s is %s}, $name, $status;
 	my $lvl = $status2nagios{$status};
@@ -5098,6 +5109,12 @@ sub get_snmp_system_operatingsystem {
 # Fetch OMSA version via SNMP, put in sysinfo hash
 #
 sub get_snmp_about {
+    # Not available from iDRAC
+    if ($opt{idrac}) {
+	$sysinfo{om} = 'N/A';
+	return;
+    }
+
     # systemManagementSoftwareGlobalVersionName
     my $oid = "${ASN_chassis}.100.10.0";
     my $result = $snmp_session->get_request(-varbindlist => [$oid]);
@@ -5295,7 +5312,7 @@ if ($check{intrusion})   { check_intrusion();     }
 if ($check{sdcard})      { check_sdcard();        }
 if ($check{alertlog})    { check_alertlog();      }
 if ($check{esmlog})      { check_esmlog();        }
-if ($check{esmhealth})   { check_esmlog_health(); }
+if ($check{esmhealth} and !$opt{idrac})   { check_esmlog_health(); }
 if ($check{servicetag})  { check_servicetag();    }
 
 #---------------------------------------------------------------------
@@ -5337,13 +5354,24 @@ if ($opt{debug}) {
 	print "-----------------------------------------------------------------------------\n";
 	print "   Storage Components                                                        \n";
 	print "=============================================================================\n";
-	print "  STATE  |    ID    |  MESSAGE TEXT                                          \n";
-	print "---------+----------+--------------------------------------------------------\n";
-	foreach (@report_storage) {
-	    my ($msg, $level, $nexus) = @{$_};
-	    print q{ } x (8 - length $reverse_exitcode{$level}) . "$reverse_exitcode{$level} | "
-	      . q{ } x (8 - length $nexus) . "$nexus | $msg\n";
-	    $nagios_alert_count{$reverse_exitcode{$level}}++;
+	if ($opt{idrac}) {
+	    print "  STATE  |  MESSAGE TEXT                                                     \n";
+	    print "---------+-------------------------------------------------------------------\n";
+	    foreach (@report_storage) {
+		my ($msg, $level, $nexus) = @{$_};
+		print q{ } x (8 - length $reverse_exitcode{$level}) . "$reverse_exitcode{$level} | $msg\n";
+		$nagios_alert_count{$reverse_exitcode{$level}}++;
+	    }
+	}
+	else {
+	    print "  STATE  |    ID    |  MESSAGE TEXT                                          \n";
+	    print "---------+----------+--------------------------------------------------------\n";
+	    foreach (@report_storage) {
+		my ($msg, $level, $nexus) = @{$_};
+		print q{ } x (8 - length $reverse_exitcode{$level}) . "$reverse_exitcode{$level} | "
+		  . q{ } x (8 - length $nexus) . "$nexus | $msg\n";
+		$nagios_alert_count{$reverse_exitcode{$level}}++;
+	    }
 	}
     }
     if ($#report_chassis >= 0) {
