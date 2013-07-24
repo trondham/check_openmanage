@@ -32,7 +32,7 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 	     $E_UNKNOWN $FW_LOCK $USAGE $HELP $LICENSE
 	     $snmp_session $snmp_error $omreport $globalstatus $global
 	     $linebreak $omopt_chassis $omopt_system $blade
-	     $exit_code $snmp $ASN_chassis $ASN_storage
+	     $exit_code $snmp $ASN_chassis $ASN_storage $idrac
 	     %check %opt %reverse_exitcode %status2nagios
 	     %snmp_status %snmp_probestatus %probestatus2nagios %sysinfo
 	     %blacklist %nagios_alert_count %count %snmp_enclosure %snmp_controller
@@ -169,7 +169,6 @@ END_LICENSE
          'use_get_table'     => 0,        # hack for SNMPv3 on Windows with net-snmp
 	 'hide_servicetag'   => 0,        # hidden servicetag
 	 'vdisk_critical'    => 0,        # make vdisk alerts critical
-	 'idrac'             => 0,        # check against idrac
        );
 
 # Get options
@@ -216,7 +215,6 @@ GetOptions('b|blacklist=s'      => \@{ $opt{blacklist} },
            'use-get_table'      => \$opt{use_get_table},
 	   'hide-servicetag'    => \$opt{hide_servicetag},
 	   'vdisk-critical'     => \$opt{vdisk_critical},
-	   'idrac'              => \$opt{idrac},
 	  ) or do { print $USAGE; exit $E_UNKNOWN };
 
 # If user requested help
@@ -465,20 +463,21 @@ if (scalar keys %blacklist > 0) {
     $global = 0;
 }
 
-# ASN prefix for SNMP OIDs
-if ($snmp) {
-    $ASN_chassis = $opt{idrac} ? '1.3.6.1.4.1.674.10892.5.4' : '1.3.6.1.4.1.674.10892.1';
-    $ASN_storage = $opt{idrac} ? '1.3.6.1.4.1.674.10892.5.5.1' : '1.3.6.1.4.1.674.10893.1';
-}
-
 # Take into account new hardware and blades
 $omopt_chassis = 'chassis';  # default "chassis" option to omreport
 $omopt_system  = 'system';   # default "system" option to omreport
 $blade         = 0;          # if this is a blade system
+$idrac         = 0;          # if we're running against an iDRAC
 
 # Some initializations and checking before we begin
 if ($snmp) {
     snmp_initialize();    # initialize SNMP
+
+    # detect if we're running against an iDRAC, set ASN prefix accordingly
+    detect_idrac();
+    $ASN_chassis = $idrac ? '1.3.6.1.4.1.674.10892.5.4' : '1.3.6.1.4.1.674.10892.1';
+    $ASN_storage = $idrac ? '1.3.6.1.4.1.674.10892.5.5.1' : '1.3.6.1.4.1.674.10893.1';
+
     snmp_check();         # check that SNMP works
     snmp_detect_blade();  # detect blade via SNMP
 }
@@ -1016,6 +1015,27 @@ sub snmp_initialize {
 }
 
 #
+# Find out if we're running against an iDRAC
+#
+sub detect_idrac {
+    my $OID = '1.3.6.1.4.1.674.10892.2.1.1.2.0';
+    my $result = $snmp_session->get_request(-varbindlist => [$OID]);
+
+    return if !exists $result->{$OID};
+    return if $result->{$OID} =~ m{\A noSuch (Instance|Object) \z}xms;
+
+    if ($result->{$OID} eq 'iDRAC7') {
+	$idrac = 1;
+	return;
+    }
+    else {
+	print "ERROR: Unsupported DRAC type: $result->{$OID}\n";
+	exit $E_UNKNOWN;
+    }
+    return;
+}
+
+#
 # Checking if SNMP works by probing for "chassisModelName", which all
 # servers should have
 #
@@ -1031,7 +1051,7 @@ sub snmp_check {
 
     # If OpenManage isn't installed or is not working
     if ($result->{$chassisModelName} =~ m{\A noSuch (Instance|Object) \z}xms) {
-	if ($opt{idrac}) {
+	if ($idrac) {
 	    print "ERROR: (SNMP) Couldn't contact iDRAC via SNMP\n";
 	}
 	else {
@@ -1049,7 +1069,7 @@ sub snmp_detect_blade {
     # These OIDs doesn't on iDRAC. If this is an iDRAC we
     # automatically assume blade. Only implication is for fans
     # (cooling) check
-    if ($opt{idrac}) {
+    if ($idrac) {
 	$blade = 1;
 	return;
     }
@@ -4901,7 +4921,7 @@ sub check_servicetag {
 # Handy function for checking all storage components
 #
 sub check_storage {
-    if ($opt{idrac}) {
+    if ($idrac) {
 	idrac_check_controllers();
 	idrac_check_physical_disks();
 	idrac_check_virtual_disks();
@@ -5118,7 +5138,7 @@ sub get_snmp_system_operatingsystem {
 #
 sub get_snmp_about {
     # Not available from iDRAC
-    if ($opt{idrac}) {
+    if ($idrac) {
 	$sysinfo{om} = 'N/A';
 	return;
     }
@@ -5320,7 +5340,7 @@ if ($check{intrusion})   { check_intrusion();     }
 if ($check{sdcard})      { check_sdcard();        }
 if ($check{alertlog})    { check_alertlog();      }
 if ($check{esmlog})      { check_esmlog();        }
-if ($check{esmhealth} and !$opt{idrac})   { check_esmlog_health(); }
+if ($check{esmhealth} and !$idrac)   { check_esmlog_health(); }
 if ($check{servicetag})  { check_servicetag();    }
 
 #---------------------------------------------------------------------
@@ -5362,7 +5382,7 @@ if ($opt{debug}) {
 	print "-----------------------------------------------------------------------------\n";
 	print "   Storage Components                                                        \n";
 	print "=============================================================================\n";
-	if ($opt{idrac}) {
+	if ($idrac) {
 	    print "  STATE  |  MESSAGE TEXT                                                     \n";
 	    print "---------+-------------------------------------------------------------------\n";
 	    foreach (@report_storage) {
