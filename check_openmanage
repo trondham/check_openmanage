@@ -1046,6 +1046,14 @@ sub snmp_check {
 # Detecting blade via SNMP
 #
 sub snmp_detect_blade {
+    # These OIDs doesn't on iDRAC. If this is an iDRAC we
+    # automatically assume blade. Only implication is for fans
+    # (cooling) check
+    if ($opt{idrac}) {
+	$blade = 1;
+	return;
+    }
+
     # In some setups, the IDs for the blade and interconnect
     # board are mixed up, so we need to check both.
     my $DellBaseBoardType1 = "${ASN_chassis}.300.80.1.7.1.1";
