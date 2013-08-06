@@ -1,3 +1,8 @@
+3.7.11  2013-08-06
+------------------
+
+* Fixed a regression on systems running with ePN enabled
+
 3.7.10  2013-07-19
 ------------------
 

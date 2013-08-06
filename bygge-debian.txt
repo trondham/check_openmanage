@@ -1,7 +1,7 @@
 # On a debian or ubuntu box
 
 # versjon
-VER=3.7.10
+VER=3.7.11
 
 # get ready
 wget http://folk.uio.no/trondham/software/files/check_openmanage-${VER}.tar.gz
