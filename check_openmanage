@@ -33,7 +33,7 @@ use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
 	     $snmp_session $snmp_error $omreport $globalstatus $global
 	     $linebreak $omopt_chassis $omopt_system $blade
 	     $exit_code $snmp
-	     %check %opt %reverse_exitcode %status2nagios
+	     %check %opt %reverse_exitcode %status2nagios %country
 	     %snmp_status %snmp_probestatus %probestatus2nagios %sysinfo
 	     %blacklist %nagios_alert_count %count %snmp_enclosure %snmp_controller
 	     @perl_warnings @controllers @enclosures @perfdata
@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.10';
+$VERSION = '3.7.11-beta';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -417,7 +417,7 @@ $globalstatus   = $E_OK;  # default global health status is "OK"
     );
 
 # Country and language list for URL generation
-my %country
+%country
   = (
      # EMEA
      at => { c => 'at', l => 'de' },  # Austria
