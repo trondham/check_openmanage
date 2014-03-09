@@ -2098,6 +2098,11 @@ sub check_physical_disks {
 	    --$stack;
 	}
 
+	# Set failed disk as critical (override OMSA)
+	if ($state eq 'Failed') {
+	    $stack = 2;
+	}
+
 	# Create combined status and state
 	my $combo_state = join ', ', @states;
 	my $combo_status = undef;
