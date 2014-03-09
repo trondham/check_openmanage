@@ -49,7 +49,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.12-b2';
+$VERSION = '3.7.12-b3';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -2020,6 +2020,11 @@ sub check_physical_disks {
 	# Special case: Foreign disk
 	if ($state eq 'Foreign' and blacklisted('pdisk_foreign', $nexus)) {
 	    --$stack;
+	}
+
+	# Set failed disk as critical (override OMSA)
+        if ($state eq 'Failed') {
+	    $stack = 2;
 	}
 
 	# Create combined status and state
