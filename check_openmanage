@@ -2085,7 +2085,8 @@ sub check_physical_disks {
 	if (!$cert) {
 	    # Functional non Dell disks get a Non-Critical status
 	    if (($state eq 'Online' or $state eq 'Ready' or $state eq 'Non-RAID')
-		and $status eq 'Non-Critical' and blacklisted('pdisk_cert', $nexus)) {
+		and $status eq 'Non-Critical' and not $fpred
+		and blacklisted('pdisk_cert', $nexus)) {
 		--$stack;
 	    }
 	    else {
