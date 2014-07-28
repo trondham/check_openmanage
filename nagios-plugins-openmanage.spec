@@ -36,7 +36,6 @@ BuildRequires: %{docbookpkg}
 # Rpmbuild doesn't find these perl dependencies
 Requires:      perl(Config::Tiny)
 Requires:      perl(Net::SNMP)
-Requires:      perl(Crypt::Rijndael)
 
 # Owns the nagios plugins directory
 Requires:      nagios-plugins
