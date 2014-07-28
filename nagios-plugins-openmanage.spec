@@ -38,7 +38,11 @@ Requires:      perl(Config::Tiny)
 Requires:      perl(Net::SNMP)
 
 # Owns the nagios plugins directory
+%if 0%{?rhel} <= 5
 Requires:      nagios-plugins
+%else
+Requires:      nagios-common
+%endif
 
 # Make the transition to Fedora/EPEL packages easier for existing
 # users of the non-Fedora/EPEL RPM packages
