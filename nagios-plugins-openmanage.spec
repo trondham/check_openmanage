@@ -38,10 +38,10 @@ Requires:      perl(Config::Tiny)
 Requires:      perl(Net::SNMP)
 
 # Owns the nagios plugins directory
-%if 0%{?rhel} <= 5
-Requires:      nagios-plugins
+%if 0%{?rhel} > 5 || 0%{?fedora} > 18
+Requires: nagios-common
 %else
-Requires:      nagios-common
+Requires: nagios-plugins
 %endif
 
 # Make the transition to Fedora/EPEL packages easier for existing
@@ -64,9 +64,13 @@ outside normal parameters.
 rm -f %{plugin}.exe
 
 %build
+%if 0%{?rhel} > 5 || 0%{?fedora} > 18
 pushd man
 make clean && make
 popd
+%else
+: # use pre-built man-pages on old systems
+%endif
 
 %install
 rm -rf %{buildroot}
@@ -88,6 +92,12 @@ rm -rf %{buildroot}
 %changelog
 * Mon Jul 28 2014 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.12-1
 - Release 3.7.12
+- Conditionalize building man pages for rhel6+ and fedora19+ (others
+  will use pre-built man pages)
+- Conditionalize require nagios-common (rhel6+/fedora19+) or
+  nagios-plugins (others) for owner of the plugins directory
+- Drop perl(Crypt::Rijndael) requirement, as it provides optional and
+  very rarely used functionality
 
 * Tue Aug  6 2013 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.11-1
 - Version 3.7.11
@@ -104,7 +114,7 @@ rm -rf %{buildroot}
 * Thu Dec  6 2012 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.7-1
 - Version 3.7.7
 
-* Wed Jun 28 2012 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.6-1
+* Thu Jun 28 2012 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.6-1
 - Version 3.7.6
 - Added BuildRequires for Docbook XML (manual pages)
 - Changed building of manual pages
@@ -134,7 +144,7 @@ rm -rf %{buildroot}
 * Tue Sep 27 2011 Xavier Bachelot <xavier@bachelot.org> - 3.7.2-2
 - Add a commented configuration file.
 - Add some Requires to have all features out of the box.
-- Add Requires on nagios-plugins for %%{_libdir}/nagios/plugins directory.
+- Add Requires on nagios-plugins for {_libdir}/nagios/plugins directory.
 - Remove some useless command macros.
 - Fix Obsoletes/Provides.
 
@@ -147,7 +157,7 @@ rm -rf %{buildroot}
 * Mon Aug 15 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.7.0-1
 - Version 3.7.0
 
-* Tue Jun 06 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.8-1
+* Mon Jun 06 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.8-1
 - Version 3.6.8
 
 * Thu May 12 2011 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.6.7-1
@@ -189,7 +199,7 @@ rm -rf %{buildroot}
 * Thu Jun 17 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.8-1
 - Version 3.5.8
 
-* Wed Mar 19 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.7-1
+* Fri Mar 19 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.7-1
 - Version 3.5.7
 
 * Tue Feb 23 2010 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.5.6-1
@@ -238,7 +248,7 @@ rm -rf %{buildroot}
 * Wed Jun  3 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.2-1
 - Version 3.4.2
 
-* Mon May 27 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.1-1
+* Wed May 27 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.1-1
 - Version 3.4.1
 
 * Mon May 25 2009 Trond Hasle Amundsen <t.h.amundsen@usit.uio.no> - 3.4.0-1
