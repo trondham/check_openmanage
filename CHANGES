@@ -1,3 +1,9 @@
+3.7.13  2014-08-07
+------------------
+
+* Added %h (hostname) and %e (express service code) to postmsg
+  (patch from Olivier Grange-Labat)
+
 3.7.12  2014-07-28
 ------------------
 

@@ -487,10 +487,16 @@ check_openmanage --htmlinfo de
 	    sequences:
 	  </para>
 	  <para>
+	    <emphasis>%h</emphasis>: Hostname
+	  </para>
+	  <para>
 	    <emphasis>%m</emphasis>: System model
 	  </para>
 	  <para>
 	    <emphasis>%s</emphasis>: Service tag
+	  </para>
+	  <para>
+	    <emphasis>%e</emphasis>: Express service code
 	  </para>
 	  <para>
 	    <emphasis>%b</emphasis>: BIOS version

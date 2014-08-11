@@ -24,8 +24,9 @@
 require 5.006;  # Perl v5.6.0 or newer is required
 use strict;
 use warnings;
-use POSIX qw(isatty ceil);
+use POSIX qw(isatty ceil strtol);
 use Getopt::Long qw(:config no_ignore_case);
+use Sys::Hostname;
 
 # Global (package) variables used throughout the code
 use vars qw( $NAME $VERSION $AUTHOR $CONTACT $E_OK $E_WARNING $E_CRITICAL
@@ -49,7 +50,7 @@ $SIG{__WARN__} = sub { push @perl_warnings, [@_]; };
 
 # Version and similar info
 $NAME    = 'check_openmanage';
-$VERSION = '3.7.12';
+$VERSION = '3.7.13';
 $AUTHOR  = 'Trond H. Amundsen';
 $CONTACT = 't.h.amundsen@usit.uio.no';
 
@@ -401,19 +402,21 @@ $globalstatus   = $E_OK;  # default global health status is "OK"
 # System information gathered
 %sysinfo
   = (
-     'bios'     => 'N/A',  # BIOS version
-     'biosdate' => 'N/A',  # BIOS release date
-     'serial'   => 'N/A',  # serial number (service tag)
-     'model'    => 'N/A',  # system model
-     'rev'      => q{},    # system revision
-     'osname'   => 'N/A',  # OS name
-     'osver'    => 'N/A',  # OS version
-     'om'       => 'N/A',  # OMSA version
-     'bmc'      => 0,      # HAS baseboard management controller (BMC)
-     'rac'      => 0,      # HAS remote access controller (RAC)
-     'rac_name' => 'N/A',  # remote access controller (RAC)
-     'bmc_fw'   => 'N/A',  # BMC firmware
-     'rac_fw'   => 'N/A',  # RAC firmware
+     'hostname'   => 'N/A',  # hostname
+     'bios'       => 'N/A',  # BIOS version
+     'biosdate'   => 'N/A',  # BIOS release date
+     'serial'     => 'N/A',  # serial number (service tag)
+     'express_sc' => 'N/A',  # express service code
+     'model'      => 'N/A',  # system model
+     'rev'        => q{},    # system revision
+     'osname'     => 'N/A',  # OS name
+     'osver'      => 'N/A',  # OS version
+     'om'         => 'N/A',  # OMSA version
+     'bmc'        => 0,      # HAS baseboard management controller (BMC)
+     'rac'        => 0,      # HAS remote access controller (RAC)
+     'rac_name'   => 'N/A',  # remote access controller (RAC)
+     'bmc_fw'     => 'N/A',  # BMC firmware
+     'rac_fw'     => 'N/A',  # RAC firmware
     );
 
 # Country and language list for URL generation
@@ -4754,6 +4757,7 @@ sub get_omreport_chassis_info {
 	    }
 	    if ($key eq 'Chassis Service Tag' or $key eq 'Service Tag') {
 		$sysinfo{serial} = $opt{hide_servicetag} ? 'XXXXXXX' : $val;
+		$sysinfo{express_sc} = POSIX::strtol($sysinfo{serial}, 36);
 	    }
 	    if ($key eq 'System Revision') {
 		$sysinfo{rev} = q{ } . $val;
@@ -4844,6 +4848,7 @@ sub get_snmp_chassis_info {
 	    }
 	    elsif (exists $chassis_oid{$oid} and $chassis_oid{$oid} eq 'chassisServiceTagName') {
 		$sysinfo{serial} = $opt{hide_servicetag} ? 'XXXXXXX' : $result->{$oid};
+		$sysinfo{express_sc} = POSIX::strtol($sysinfo{serial}, 36);
 	    }
 	    elsif (exists $chassis_oid{$oid} and $chassis_oid{$oid} eq 'chassisSystemRevisionName') {
 		$sysinfo{rev} = q{ } . $result->{$oid};
@@ -4972,6 +4977,9 @@ sub get_sysinfo
     if (defined $opt{postmsg} and $opt{postmsg} =~ m/[%][or]/xms) {
 	$snmp ? get_snmp_system_operatingsystem() : get_omreport_system_operatingsystem();
     }
+
+    # Get hostname
+    $sysinfo{hostname} = $snmp ? $opt{hostname} : hostname();
 
     return;
 }
@@ -5409,6 +5417,8 @@ else {
 	}
 	if (defined $post) {
 	    print $linebreak;
+	    $post =~ s{[%]h}{$sysinfo{hostname}}gxms;
+	    $post =~ s{[%]e}{$sysinfo{express_sc}}gxms;
 	    $post =~ s{[%]s}{$sysinfo{serial}}gxms;
 	    $post =~ s{[%]m}{$sysinfo{model}$sysinfo{rev}}gxms;
 	    $post =~ s{[%]b}{$sysinfo{bios}}gxms;
