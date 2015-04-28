@@ -5,7 +5,7 @@
 # Monitor Dell server hardware status using Dell OpenManage Server
 # Administrator, either locally via NRPE, or remotely via SNMP.
 #
-# Copyright (C) 2008-2013 Trond H. Amundsen
+# Copyright (C) 2008-2015 Trond H. Amundsen
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ END_HELP
 # Version and license text
 $LICENSE = <<"END_LICENSE";
 $NAME $VERSION
-Copyright (C) 2008-2013 $AUTHOR
+Copyright (C) 2008-2015 $AUTHOR
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -3364,6 +3364,8 @@ sub check_memory {
 	     "${ASN_chassis}.1100.50.1.8.1"  => 'memoryDeviceLocationName',
 	     "${ASN_chassis}.1100.50.1.14.1" => 'memoryDeviceSize',
 	     "${ASN_chassis}.1100.50.1.20.1" => 'memoryDeviceFailureModes',
+	     "${ASN_chassis}.1100.50.1.27.1" => 'memoryDeviceExtendedSize',
+
 	    );
 	my $result = undef;
 	if ($opt{use_get_table}) {
@@ -3404,7 +3406,9 @@ sub check_memory {
 	    $index    = ($out->{memoryDeviceIndex} || 10000) - 1;
 	    $status   = get_snmp_status($out->{memoryDeviceStatus});
 	    $location = $out->{memoryDeviceLocationName} || 'Unknown location';
-	    $size     = sprintf '%d MB', ($out->{memoryDeviceSize} || 0)/1024;
+	    $size     = defined $out->{memoryDeviceExtendedSize}
+	      ? (sprintf '%d MB', ($out->{memoryDeviceExtendedSize} || 0))
+		: (sprintf '%d MB', ($out->{memoryDeviceSize} || 0)/1024);
 	    $modes    = $out->{memoryDeviceFailureModes} || -9999;
 	    if ($modes > 0) {
 		foreach my $mask (sort keys %failure_mode) {
@@ -5275,7 +5279,8 @@ sub get_firmware_info {
 	 18 => 'iDRAC6',                             # iDRAC6 (not defined in 7.0.0 MIB!)
 	 19 => 'unifiedServerConfigurator',          # Unified Server Configurator
 	 20 => 'lifecycleController',                # Lifecycle Controller
-         21 => 'iDRAC7',                             # iDRAC7 (not defined in 7.0.0 MIB!)
+         21 => 'iDRAC7',                             # iDRAC7
+	 22 => 'iDRAC8',                             # iDRAC8
 	);
 
 
