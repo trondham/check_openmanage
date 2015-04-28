@@ -3,6 +3,7 @@
 
 * Added %h (hostname) and %e (express service code) to postmsg
   (patch from Olivier Grange-Labat)
+* Fixes for OMSA 8.x and 13th gen servers
 
 3.7.12  2014-07-28
 ------------------
