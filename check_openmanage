@@ -4259,8 +4259,9 @@ sub check_pwrmonitoring {
 	    $status   = get_snmp_probestatus($out->{amperageProbeStatus});
 	    $type     = get_hashval($out->{amperageProbeType}, \%amp_type);
 	    $reading  = $type eq 'amperageProbeTypeIsDiscrete'
-	      ? get_hashval($out->{amperageProbeDiscreteReading}, \%amp_discrete)
+	      ? (get_hashval($out->{amperageProbeDiscreteReading}, \%amp_discrete) || 'Unknown reading')
 		: ($out->{amperageProbeReading} || 0);
+	    my $foo = get_hashval($out->{amperageProbeDiscreteReading}, \%amp_discrete);
 	    $location = $out->{amperageProbeLocationName} || 'Unknown location';
 	    $max_crit = $out->{amperageProbeUpperCriticalThreshold} || 0;
 	    $max_warn = $out->{amperageProbeUpperNonCriticalThreshold} || 0;
@@ -4305,7 +4306,7 @@ sub check_pwrmonitoring {
 	# disabled due to non-redundant and/or non-instrumented power
 	# supplies.
         # E.g. R410 with newer BMC firmware and 1 power supply
-	if ($snmp && $status eq 'Unknown' && $reading == 0) {
+	if ($snmp && $type ne 'amperageProbeTypeIsDiscrete' && $status eq 'Unknown' && $reading == 0) {
 	    next AMP;
 	}
 
