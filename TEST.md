@@ -702,32 +702,30 @@ Code | Replaced with
 The full range of the control format for ``--postmsg`` is also
 available in the manual page.
 
-Combination of output options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Combination of output options
 
 You can combine any of these options. A simple example:
 
-.. parsed-literal::
-
-  $ **check_openmanage -s -e**
-  CRITICAL: Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
-  WARNING: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
-  ------ SYSTEM: PowerEdge 1950, SN: JV8KH0J
+```
+$ check_openmanage -s -e
+CRITICAL: Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
+WARNING: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+------ SYSTEM: PowerEdge 1950, SN: JV8KH0J
+```
 
 A more advanced example:
 
-.. parsed-literal::
-
-  $ **check_openmanage -s -i --postmsg 'NOTE: Handled in RT ticket #123456'**
-  CRITICAL: [JV8KH0J] Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
-  WARNING: [JV8KH0J] Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
-  NOTE: Handled in RT ticket #123456
+```
+$ check_openmanage -s -i --postmsg 'NOTE: Handled in RT ticket #123456'
+CRITICAL: [JV8KH0J] Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
+WARNING: [JV8KH0J] Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+NOTE: Handled in RT ticket #123456
+```
 
 Which (combination) of these options you choose to use, if any,
 depends on how you use Nagios and your personal preference.
 
-Clickable links in the alerts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Clickable links in the alerts
 
 Using the ``-I`` or ``--htmlinfo`` option will make the servicetag and model
 name into clickable HTML links in the output. The model name link will
@@ -735,43 +733,38 @@ point to the official Dell documentation for that model, while the
 servicetag link will point to a website containing support info for
 that particular server.
 
-.. image:: check_openmanage-htmlinfo.png
-  :align: center
-  :alt: The --htmlinfo option
+![The --htmlinfo option](http://folk.uio.no/trondham/software/check_openmanage-htmlinfo.png)
 
 This option takes an optional argument, which should be your country
 code (e.g. ``nl``, ``us``, ``fr``) or ``me`` for the middle east. If
 the country code is omitted the servicetag link will still work, but
 it will not be speficic for your country or area. Example for Germany:
 
-.. parsed-literal::
-
-  $ **check_openmanage -H <hostname> -e --htmlinfo de**
-  Logical drive 0 '/dev/sda' [RAID-1, 136.13 GB] needs attention: Degraded
-  ------ SYSTEM: **PowerEdge 1950**, SN: **XXXXXXX**
+```
+$ check_openmanage -H <hostname> -e --htmlinfo de
+Logical drive 0 '/dev/sda' [RAID-1, 136.13 GB] needs attention: Degraded
+------ SYSTEM: **PowerEdge 1950**, SN: **XXXXXXX**
+```
 
 If this option is used together with either the ``-e|--extinfo`` (as
 in the example above) or ``-i|--info`` options, it is particularly
 useful. Whenever an alert occurs, you'll get clickable links to the
 server's documentation and warranty information from Dell.
 
-.. NOTE:: 
-
-   Only the most common country codes is supported at this time. If
-   your country code is not supported, send me an email and I'll add
-   it in the next release.
+Only the most common country codes is supported at this time. If
+your country code is not supported, send me an email and I'll add
+it in the next release.
 
 
-Verbosity when everything is ok
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Verbosity when everything is ok
 
 The default behaviour of the plugin is to output a single line when
 there are no alerts:
 
-.. parsed-literal::
-
-  $ **check_openmanage**
-  OK - System: 'PowerEdge M600', SN: 'XXXXXXX', 24 GB ram (6 dimms), 1 logical drives, 2 physical drives
+```
+$ check_openmanage
+OK - System: 'PowerEdge M600', SN: 'XXXXXXX', 24 GB ram (6 dimms), 1 logical drives, 2 physical drives
+```
 
 The option ``-o`` or ``--ok-info`` takes an integer as argument, and
 lets you control the amount of output given by the plugin in an "OK"
@@ -779,55 +772,52 @@ state. The higher the integer, the more output. The argument is
 cumulative. A value of ``1`` outputs BIOS and firmware info on a
 separate line:
 
-.. parsed-literal::
-
-  $ **check_openmanage -H myhost -o 1**
-  OK - System: 'PowerEdge 2950', SN: 'XXXXXXX', 4 GB ram (4 dimms), 4 logical drives, 47 physical drives
-  ----- BIOS='2.5.0 09/12/2008', DRAC5='1.45', BMC='2.37'
+```
+$ check_openmanage -H myhost -o 1
+OK - System: 'PowerEdge 2950', SN: 'XXXXXXX', 4 GB ram (4 dimms), 4 logical drives, 47 physical drives
+----- BIOS='2.5.0 09/12/2008', DRAC5='1.45', BMC='2.37'
+```
 
 A value of ``2`` also outputs firmware, driver etc. for storage
 controllers and enclosures (including backplane):
 
-.. parsed-literal::
-
-  $ **check_openmanage -o 2**
-  OK - System: 'PowerEdge 2950', SN: 'XXXXXXX', 16 GB ram (8 dimms), 4 logical drives, 47 physical drives
-  ----- BIOS='2.5.0 09/12/2008', DRAC5='1.45', BMC='2.37'
-  ----- Ctrl 0 [PERC 6/i Integrated]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
-  ----- Ctrl 1 [PERC 6/E Adapter]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
-  ----- Ctrl 2 [PERC 6/E Adapter]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
-  ----- Encl 0:0:0 [Backplane]: Fw='1.05'
-  ----- Encl 1:0:0 [MD1000]: Fw='A.04'
-  ----- Encl 2:0:0 [MD1000]: Fw='A.04'
-  ----- Encl 2:1:0 [MD1000]: Fw='A.04'
+```
+$ check_openmanage -o 2
+OK - System: 'PowerEdge 2950', SN: 'XXXXXXX', 16 GB ram (8 dimms), 4 logical drives, 47 physical drives
+----- BIOS='2.5.0 09/12/2008', DRAC5='1.45', BMC='2.37'
+----- Ctrl 0 [PERC 6/i Integrated]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
+----- Ctrl 1 [PERC 6/E Adapter]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
+----- Ctrl 2 [PERC 6/E Adapter]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
+----- Encl 0:0:0 [Backplane]: Fw='1.05'
+----- Encl 1:0:0 [MD1000]: Fw='A.04'
+----- Encl 2:0:0 [MD1000]: Fw='A.04'
+----- Encl 2:1:0 [MD1000]: Fw='A.04'
+```
 
 A value of ``3`` (or above) will also include the OMSA version:
 
-.. parsed-literal::
-
-  $ **check_openmanage -o 3**
-  OK - System: 'PowerEdge 2950', SN: 'XXXXXXX', 16 GB ram (8 dimms), 4 logical drives, 47 physical drives
-  ----- BIOS='2.5.0 09/12/2008', DRAC5='1.45', BMC='2.37'
-  ----- Ctrl 0 [PERC 6/i Integrated]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
-  ----- Ctrl 1 [PERC 6/E Adapter]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
-  ----- Ctrl 2 [PERC 6/E Adapter]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
-  ----- Encl 0:0:0 [Backplane]: Fw='1.05'
-  ----- Encl 1:0:0 [MD1000]: Fw='A.04'
-  ----- Encl 2:0:0 [MD1000]: Fw='A.04'
-  ----- Encl 2:1:0 [MD1000]: Fw='A.04'
-  ----- OpenManage Server Administrator (OMSA) version: '5.5.0'
+```
+$ check_openmanage -o 3
+OK - System: 'PowerEdge 2950', SN: 'XXXXXXX', 16 GB ram (8 dimms), 4 logical drives, 47 physical drives
+----- BIOS='2.5.0 09/12/2008', DRAC5='1.45', BMC='2.37'
+----- Ctrl 0 [PERC 6/i Integrated]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
+----- Ctrl 1 [PERC 6/E Adapter]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
+----- Ctrl 2 [PERC 6/E Adapter]: Fw='6.2.0-0013', Dr='00.00.04.01-RH1'
+----- Encl 0:0:0 [Backplane]: Fw='1.05'
+----- Encl 1:0:0 [MD1000]: Fw='A.04'
+----- Encl 2:0:0 [MD1000]: Fw='A.04'
+----- Encl 2:1:0 [MD1000]: Fw='A.04'
+----- OpenManage Server Administrator (OMSA) version: '5.5.0'
+```
 
 Most would go for the default (value of ``0``), i.e. a single line.
 
-.. WARNING::
-
-   When the plugin is run locally, i.e. via NRPE, the only way for
-   check_openmanage to determine the OMSA version is to run the
-   command "omreport about". This command is very slow, and will
-   effectively double the amount of time check_openmanage takes to
-   run.
-
-   When used via SNMP, this is not an issue.
+> **NOTE**
+> When the plugin is run locally, i.e. via NRPE, the only way for
+> check_openmanage to determine the OMSA version is to run the command
+> "omreport about". This command is very slow, and will effectively
+> double the amount of time check_openmanage takes to run. When used via
+> SNMP, this is not an issue.
 
 
 Show blacklistings in OK output
