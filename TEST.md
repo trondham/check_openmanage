@@ -1088,12 +1088,8 @@ listed in the manual page. Here is the list:
 Component     | Comment
 --------------|--------
 ctrl          | Controller
-ctrl_fw       | Suppress the "special" warning message about
-              | old controller firmware. Use this if you can't
-              | or won't upgrade the firmware.
-ctrl_driver   | Suppress the "special" warning message about old
-              | controller driver.  Particularly useful on systems
-              | where you can't upgrade the driver.
+ctrl_fw       | Suppress the "special" warning message about old controller firmware. Use this if you can't or won't upgrade the firmware.
+ctrl_driver   | Suppress the "special" warning message about old controller driver.  Particularly useful on systems where you can't upgrade the driver.
 
 foo
 
