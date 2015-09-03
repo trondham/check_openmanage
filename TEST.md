@@ -687,6 +687,7 @@ that string. You can control the format with the following interpreted
 sequences:
 
 Code | Replaced with
+-----|--------------
 ``%m`` | System model
 ``%s`` | Service tag
 ``%b`` | BIOS version
