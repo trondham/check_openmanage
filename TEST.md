@@ -1,27 +1,8 @@
-================
-check_openmanage
-================
+#check_openmanage
 
-----------------------------------------------------------------------------------
-Dell™ Server Hardware Monitoring with OpenManage™ and Nagios®
-----------------------------------------------------------------------------------
+**Dell™ Server Hardware Monitoring with OpenManage™ and Nagios®**
 
-.. _Nagios: http://www.nagios.org/
-.. _NagiosExchange: http://exchange.nagios.org/directory/Plugins/Hardware/Server-Hardware/Dell/check_openmanage/details
-.. _MonitoringExchange: https://www.monitoringexchange.org/p/1377
-.. _Freecode: http://freecode.com/projects/check_openmanage
-.. _Nagios: http://www.nagios.org/
-.. _manual page: check_openmanage.8.html
-.. _PowerEdge: http://www.dell.com/poweredge
-.. _PowerVault: http://www.dell.com/powervault
-.. _OpenManage Server Administrator: http://www.delltechcenter.com/page/OpenManage+Systems+Management
-.. _nagios-users@lists.sourceforge.net: https://lists.sourceforge.net/lists/listinfo/nagios-users
-.. _NRPE: http://nagios.sourceforge.net/docs/3_0/addons.html#nrpe
-.. _check_by_ssh: http://nagiosplugins.org/man/check_by_ssh
-
-
-Main features
-=============
+##Main features
 
 **Advanced hardware discovery**
   The plugin will search the monitored server for hardware components
@@ -48,14 +29,18 @@ Main features
 
 
 
-Basic Overview
-==============
+##Basic Overview
 
-check_openmanage is a plugin for Nagios_ which checks the hardware
-health of Dell `PowerEdge`_ (and some `PowerVault`_) servers. It uses
-the Dell `OpenManage Server Administrator`_ (OMSA) software, which
-must be running on the monitored system. check_openmanage can be used
-remotely with SNMP or locally with NRPE_, `check_by_ssh`_ or similar,
+check_openmanage is a plugin for [Nagios](http://www.nagios.org/)
+which checks the hardware health of Dell
+[PowerEdge](http://www.dell.com/poweredge) (and some
+[PowerVault](http://www.dell.com/powervault)) servers. It uses the
+Dell [OpenManage Server
+Administrator](http://www.delltechcenter.com/page/OpenManage+Systems+Management)
+(OMSA) software, which must be running on the monitored
+system. check_openmanage can be used remotely with SNMP or locally
+with [NRPE](http://nagios.sourceforge.net/docs/3_0/addons.html#nrpe),
+[check_by_ssh](http://nagiosplugins.org/man/check_by_ssh) or similar,
 whichever suits your needs and particular taste. The plugin checks the
 health of the storage subsystem, power supplies, memory modules,
 temperature probes etc., and gives an alert if any of the components
@@ -131,11 +116,9 @@ runs successfully on the following Dell PowerEdge models at our site:
 R815, R900, R910, R620, R720.
 
 
-Prerequisites
-=============
+##Prerequisites
 
-Perl interpreter
-----------------
+###Perl interpreter
 
 check_openmanage needs a normal perl interpreter, version 5.6.0 or
 later. The plugin assumes that perl is available as ``/usr/bin/perl``,
@@ -202,8 +185,7 @@ distributions:
   ```
 
 
-Dell Openmanage Server Administrator
-------------------------------------
+###Dell Openmanage Server Administrator
 
 check_openmanage relies heavily on Dell Openmanage Server
 Administrator (OMSA) and will not function if this software is not
@@ -219,8 +201,7 @@ There are also official Dell repositories for Red Hat and SuSE. For
 information about these, look here: http://linux.dell.com/repo/hardware/
 
 
-Intelligent plugin
-==================
+##Intelligent plugin
 
 check_openmanage is an intelligent plugin. It will by itself discover
 which hardware components are present in the server and monitor
@@ -252,8 +233,7 @@ removing checks with the ``--check`` option, check_openmanage will
 also check the global health status for added security.
 
 
-Multiline output
-================
+##Multiline output
 
 Since check_openmanage monitors several things, the plugin's output
 will sometime contain multiple lines. These lines will be separated by
@@ -294,24 +274,16 @@ regular linebreaks, but only the first line is shown in the web
 interface (status.cgi).
 
 
-Getting started
-===============
-
-.. _Nagios documentation: http://nagios.sourceforge.net/docs/3_0/toc.html
-.. _hostgroup: http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#hostgroup
-.. _hosts: http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#host
-.. _servicegroup: http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#servicegroup
-.. _service: http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#service
-.. _command: http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#command
+##Getting started
 
 This is a short HOWTO that describes how to get started with using
-check_openmanage. This HOWTO assumes that the prerequisites_ are met,
+check_openmanage. This HOWTO assumes that the prerequisites are met,
 and that you have a Nagios server up and running. Nagios version 3.x
 is assumed.
 
 The examples below are simple examples with very basic usage of
 check_openmanage. There are many more or less advanced options that
-you might consider useful. Se the Usage_ section for info.
+you might consider useful. Se the Usage section for info.
 
 Also note that the examples below are just that: *examples*. They
 describe one way of doing things, that is simple and
@@ -321,7 +293,7 @@ is ultimately up to you.
 The first thing to consider is by which mechanism you want
 check_openmanage to check your Dell servers. You can run the script
 remotely on the Nagios server, probing the Dell servers via SNMP, or
-you can use NRPE_, check_by_ssh etc. and run the plugin locally on the
+you can use NRPE, check_by_ssh etc. and run the plugin locally on the
 Dell servers. This should be an informed choice, but you can always
 change it later. If you have mostly Linux boxes, you may want to use
 NRPE_ and run the plugin locally. If you have mostly Windows boxes,
@@ -330,13 +302,15 @@ Linux and SNMP for Windows, but you'll have to define different
 commands in your Nagios config for each mechanism.
 
 
-Creating a hostgroup
---------------------
+###Creating a hostgroup
 
-The first thing you want to do is create a hostgroup_ that contains
-your Dell servers, if you haven't already done so. If you have very
-few Dell servers you can skip this step and use hosts_ in the service
-definition instead, but I think hostgroups are always better:
+The first thing you want to do is create a
+[hostgroup](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#hostgroup)
+that contains your Dell servers, if you haven't already done so. If
+you have very few Dell servers you can skip this step and use
+[hosts](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#host)
+in the service definition instead, but I think hostgroups are always
+better:
 
 ```
 # hostgroup for Dell servers
@@ -346,8 +320,7 @@ define hostgroup {
 }
 ```
 
-Defining the hosts
-------------------
+###Defining the hosts
 
 You'll need a host definition for each of the servers. You probably
 already have this in place, but for the sake of completeness it is
@@ -364,13 +337,13 @@ define host {
 }
 ```
 
-Creating a servicegroup
------------------------
+###Creating a servicegroup
 
-Next you want to create a **servicegroup** for this service. This is not
-required, but it makes things easier when you want to inspect your
-Dell servers via Nagios' web interface. Creating a servicegroup is
-simple:
+Next you want to create a
+[servicegroup](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#servicegroup)
+for this service. This is not required, but it makes things easier
+when you want to inspect your Dell servers via Nagios' web
+interface. Creating a servicegroup is simple:
 
 ```
 # Servicegroup for Dell OpenManage
@@ -383,13 +356,11 @@ define servicegroup {
 The servicegroup is used later in the service definition.
 
 
-Remote check via SNMP
----------------------
+###Remote check via SNMP
 
-Defining a command
-~~~~~~~~~~~~~~~~~~
+####Defining a command
 
-The next step is to define a command_ for check_openmanage:
+The next step is to define a [command](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#command) for check_openmanage:
 
 ```
 # Openmanage check via SNMP
@@ -406,8 +377,7 @@ to the **usage** section for info about the different options that alters
 the behaviour of check_openmanage.
 
 
-Defining the service
-~~~~~~~~~~~~~~~~~~~~
+####Defining the service
 
 Finally, you define the service:
 
@@ -426,13 +396,15 @@ define service {
 The ``notes_url`` statement is optional.
 
 
-Local check via NRPE
---------------------
+###Local check via NRPE
 
 If you want to use NRPE_, I assume that you have defined a check_nrpe
 command elsewhere in your config and are ready to use it. Usually, we
-don't define a command_ for check_openmanage when using NRPE_, so we
-go right to the service_ definition:
+don't define a
+[command](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#command)
+for check_openmanage when using NRPE_, so we go right to the
+[service](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#service)
+definition:
 
 ```
 # Dell OMSA status
@@ -466,18 +438,16 @@ to the Usage_ section for info about the different options that alters
 the behaviour of check_openmanage.
 
 
-Usage
-=====
+##Usage
 
-Help output
------------
+###Help output
 
 The option ``-h`` or ``--help`` will give a short usage information,
 that includes the most commonly used options. For more information,
 see the manual page.
 
 ```
-$ **check_openmanage -h**
+$ check_openmanage -h
 Usage: check_openmanage [OPTION]...
 
 GENERAL OPTIONS:
@@ -524,22 +494,20 @@ For more information and advanced options, see the manual page or URL:
 ```
 
 
-Local check
------------
+###Local check
 
 Run locally or via NRPE, check_openmanage will use omreport to display
 info on hardware components, and report the result:
 
 ```
-$ **check_openmanage**
+$ check_openmanage
 OK - System: 'PowerEdge R710', SN: 'XXXXXX', 24 GB ram (6 dimms), 1 logical drives, 2 physical drives
 ```
 
 Any user is allowed to run omreport, so you don't need any sudo
 mechanisms or similar.
 
-Local check on Windows
-~~~~~~~~~~~~~~~~~~~~~~
+####Local check on Windows
 
 .. _`PAR::Packer`: http://search.cpan.org/dist/PAR-Packer/
 .. _this howto: http://sam-pointer.com/2009/03/06/compiling-windows-executables-with-par
@@ -579,11 +547,7 @@ check_command check_nrpe!check_openmanage
 ```
 
 
-Remote check
-------------
-
-.. _HOW TO Configure the Simple Network Management Protocol (SNMP) Service in Windows Server 2003: http://support.microsoft.com/kb/324263
-.. _How to install and configure Windows SNMP agent (2000 -XP): http://www.loriotpro.com/ServiceAndSupport/How_to/InstallWXPAgent_EN.php
+###Remote check
 
 .. NOTE::
 
@@ -603,19 +567,19 @@ that the Nagios server is allowed to communicate with the host over
 SNMP. The ``-H`` or ``--hostname`` option is needed for the
 hostname/IP you want to check.
 
-.. parsed-literal::
-
-  $ **check_openmanage -H myhost**
-  OK - System: 'PowerEdge R710', SN: 'XXXXXXX', 24 GB ram (6 dimms), 1 logical drives, 2 physical drives
+```
+$ check_openmanage -H myhost
+OK - System: 'PowerEdge R710', SN: 'XXXXXXX', 24 GB ram (6 dimms), 1 logical drives, 2 physical drives
+```
 
 You can specify the SNMP community string (for SNMP version 1 and 2c)
 with the ``-C`` or ``--community`` option. Default community is set to
 "public" if the option is not present:
 
-.. parsed-literal::
-
-  $ **check_openmanage -H myhost -C mycommunity**
-  OK - System: 'PowerEdge R710', SN: 'XXXXXXX', 24 GB ram (6 dimms), 1 logical drives, 2 physical drives
+```
+$ check_openmanage -H myhost -C mycommunity
+OK - System: 'PowerEdge R710', SN: 'XXXXXXX', 24 GB ram (6 dimms), 1 logical drives, 2 physical drives
+```
 
 You can also specify SNMP protocol version with the ``-P`` or
 ``--protocol`` option. Default is ``2`` (i.e. SNMP version 2c) if the
@@ -625,13 +589,13 @@ significantly faster than version 1. SNMP version 3 requires
 additional authentication options to be specified. Also note that
 Windows does not support SNMPv3 natively.
 
-For other SNMP options, refer to the usage_ section and the `manual
-page`_..
+For other SNMP options, refer to the usage_ section and the manual
+page.
 
 For details on how to enable SNMP on Windows 2003 server, refer to
 
-* [microsoft.com] `HOW TO Configure the Simple Network Management Protocol (SNMP) Service in Windows Server 2003`_
-* [loriotpro.com] `How to install and configure Windows SNMP agent (2000 -XP)`_
+* HOW TO Configure the Simple Network Management Protocol (SNMP) Service in Windows Server 2003: http://support.microsoft.com/kb/324263
+* How to install and configure Windows SNMP agent (2000 -XP): http://www.loriotpro.com/ServiceAndSupport/How_to/InstallWXPAgent_EN.php
 
 
 .. CAUTION::
@@ -645,113 +609,94 @@ For details on how to enable SNMP on Windows 2003 server, refer to
    hosts, make sure that you have a recent OMSA version running.
 
 
-Output control
---------------
+###Output control
 
 The default behaviour of the plugin is to print all alerts on separate
 lines with no extra fuzz:
 
-.. parsed-literal::
-
-  $ **check_openmanage**
-  Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
-  Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+```
+$ check_openmanage
+Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
+Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+```
 
 There are several options that allows you to alter this, as listed below.
 
 
-Prefix alerts with the service state
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Prefix alerts with the service state
 
 The ``-s`` or ``--state`` option will prefix each alert with the full
 service state:
 
-.. parsed-literal::
+```
+$ check_openmanage -s
+CRITICAL: Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
+WARNING: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+```
 
-  $ **check_openmanage -s**
-  CRITICAL: Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
-  WARNING: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
-
-Prefix alerts with the service state (abbreviated)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Prefix alerts with the service state (abbreviated)
 
 Example output with the ``-S`` or ``--short-state`` option, which does
 the same, except that the service state is abbreviated to only one
 letter, i.e. ``C`` for ``CRITICAL``, ``W`` for ``WARNING`` etc.:
 
-.. parsed-literal::
+```
+$ check_openmanage -S
+C: Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
+W: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+```
 
-  $ **check_openmanage -S**
-  C: Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
-  W: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
-
-Prefix alerts with the service tag
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Prefix alerts with the service tag
 
 The option ``-i`` or ``--info`` will prefix all alerts with the
 service tag:
 
-.. parsed-literal::
+```
+$ check_openmanage -i
+[JV8KH0J] Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
+[JV8KH0J] Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+```
 
-  $ **check_openmanage -i**
-  [JV8KH0J] Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
-  [JV8KH0J] Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
-
-
-System info after the alert(s)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####System info after the alert(s)
 
 The option ``-e`` or ``--extinfo`` will print the server model and
 service tag on a separate line at the end of the alert:
 
-.. parsed-literal::
+```
+$ check_openmanage -e
+Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
+Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+------ SYSTEM: PowerEdge 1950, SN: JV8KH0J
+```
 
-  $ **check_openmanage -e**
-  Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
-  Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
-  ------ SYSTEM: PowerEdge 1950, SN: JV8KH0J
-
-Custom line after the alert(s)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Custom line after the alert(s)
 
 If this isn't exactly what you want, you can also specify your own
 string to be shown on a separate line at the end of the alert, with
 the ``--postmsg`` option:
 
-.. parsed-literal::
-
-  $ **check_openmanage --postmsg 'NOTE: Service tag: %s - Dell support: 555-1234-5678'**
-  Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
-  Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
-  NOTE: Service tag: JV8KH0J - Dell support: 555-1234-5678
+```
+$ check_openmanage --postmsg 'NOTE: Service tag: %s - Dell support: 555-1234-5678'
+Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
+Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+NOTE: Service tag: JV8KH0J - Dell support: 555-1234-5678
+```
 
 The argument is either a string with the message, or a file containing
 that string. You can control the format with the following interpreted
 sequences:
 
-+-------------+-----------------------------------------------------+
-| Code        | Replaced with                                       |
-+=============+=====================================================+
-| ``%m``      | System model                                        |
-+-------------+-----------------------------------------------------+
-| ``%s``      | Service tag                                         |
-+-------------+-----------------------------------------------------+
-| ``%b``      | BIOS version                                        |
-+-------------+-----------------------------------------------------+
-| ``%d``      | BIOS release date                                   |
-+-------------+-----------------------------------------------------+
-| ``%o``      | Operating system name                               |
-+-------------+-----------------------------------------------------+
-| ``%r``      | Operating system release                            |
-+-------------+-----------------------------------------------------+
-| ``%p``      | Number of physical drives                           |
-+-------------+-----------------------------------------------------+
-| ``%l``      | Number of logical drives                            |
-+-------------+-----------------------------------------------------+
-| ``%n``      | Line break                                          |
-+-------------+-----------------------------------------------------+
-| ``%%``      | A literal ``%``                                     |
-+-------------+-----------------------------------------------------+
+Code | Replaced with
+``%m`` | System model
+``%s`` | Service tag
+``%b`` | BIOS version
+``%d`` | BIOS release date
+``%o`` | Operating system name
+``%r`` | Operating system release
+``%p`` | Number of physical drives
+``%l`` | Number of logical drives
+``%n`` | Line break
+``%%`` | A literal ``%``
 
 The full range of the control format for ``--postmsg`` is also
 available in the manual page.
