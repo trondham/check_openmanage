@@ -1427,260 +1427,299 @@ single host. This may lead to unpredictable results.
 
 ####General
 
-**Check control**
+#####Check control
 
-  Any keyword to the ``--check`` parameter are accepted in the
-  configuration file, as "check_KEYWORD". These options take boolean
-  values ("true" or "false"). The following keywords are accepted for
-  check control, listed here with their default values:
+Any keyword to the ``--check`` parameter are accepted in the
+configuration file, as "check_KEYWORD". These options take boolean
+values ("true" or "false"). The following keywords are accepted for
+check control, listed here with their default values:
 
-  * check_storage = true
-  * check_memory = true
-  * check_fans = true
-  * check_power = true
-  * check_temp = true
-  * check_cpu = true
-  * check_voltage = true
-  * check_batteries = true
-  * check_amperage = true
-  * check_intrusion = true
-  * check_sdcard = true
-  * check_esmhealth = true
-  * check_servicetag = true
-  * check_esmlog = false
-  * check_alertlog = false
-  * check_everything = false
+* check_storage = true
+* check_memory = true
+* check_fans = true
+* check_power = true
+* check_temp = true
+* check_cpu = true
+* check_voltage = true
+* check_batteries = true
+* check_amperage = true
+* check_intrusion = true
+* check_sdcard = true
+* check_esmhealth = true
+* check_servicetag = true
+* check_esmlog = false
+* check_alertlog = false
+* check_everything = false
 
-  If used together with the ``--check`` command line option, the
-  command line option will override the configuration file, if there
-  is a conflict.
+If used together with the ``--check`` command line option, the
+command line option will override the configuration file, if there
+is a conflict.
 
-  The option **check_everything** is special and turns on all
-  checks. Setting this option to "true" will effectively negate any
-  other check options. This option corresponds to the ``-a`` or
-  ``--all`` command line option.
+The option **check_everything** is special and turns on all
+checks. Setting this option to "true" will effectively negate any
+other check options. This option corresponds to the ``-a`` or
+``--all`` command line option.
 
-  For more information about check control, see `check control`_.
-  
-**Blacklisting**
+For more information about check control, see `check control`_.
 
-  For blacklisting the keyword **blacklist** is used, and the value is
-  a string that uses the same syntax as the ``-b`` or ``--blacklist``
-  parameter. Example::
+#####Blacklisting
 
-    blacklist = ctrl_fw=all/pdisk=0:0:1
+For blacklisting the keyword **blacklist** is used, and the value is
+a string that uses the same syntax as the ``-b`` or ``--blacklist``
+parameter. Example:
 
-  If used together with the ``-b`` or ``--blacklist`` command line
-  option, the two blacklists from the config file and command line are
-  merged together.
+```
+blacklist = ctrl_fw=all/pdisk=0:0:1
+```
 
-  For more information about blacklisting, including syntax, see
-  `blacklisting`_.
+If used together with the ``-b`` or ``--blacklist`` command line
+option, the two blacklists from the config file and command line are
+merged together.
 
-**Timeout**
+For more information about blacklisting, including syntax, see
+`blacklisting`_.
 
-  The plugin timeout can be configured with the **timeout**
-  keyword. The argument is number of seconds and should be a positive
-  integer. Example::
+#####Timeout
 
-    timeout = 60
+The plugin timeout can be configured with the **timeout**
+keyword. The argument is number of seconds and should be a positive
+integer. Example:
 
-  The corresponding command line option is ``-t`` or ``--timeout``.
+```
+timeout = 60
+```
 
-**Performance data**
+The corresponding command line option is ``-t`` or ``--timeout``.
 
-  Performance data can be turned on in the configuration file with
-  ``performance_data``. Accepted values are boolean (TRUE/FALSE) or
-  either of the keywords "minimal" and "multiline". Example::
+#####Performance data
 
-    performance_data = true
+Performance data can be turned on in the configuration file with
+``performance_data``. Accepted values are boolean (TRUE/FALSE) or
+either of the keywords "minimal" and "multiline". Example::
 
-  The corresponding command line option is ``-p`` or ``--perfdata``.
+```
+performance_data = true
+```
 
-**Legacy Performance data**
+The corresponding command line option is ``-p`` or ``--perfdata``.
 
-  With version 3.7.0, performance data output changed. The new format
-  is not compatible with the old format. Users who wish to postpone
-  switching to the new performance data API may use this option. This
-  option takes a boolean value. Example::
+#####Legacy Performance data
 
-    legacy_performance_data = true
+With version 3.7.0, performance data output changed. The new format
+is not compatible with the old format. Users who wish to postpone
+switching to the new performance data API may use this option. This
+option takes a boolean value. Example::
 
-  The corresponding command line option is ``--legacy-perfdata``.
+```
+legacy_performance_data = true
+```
 
-**Temperature unit**
+The corresponding command line option is ``--legacy-perfdata``.
 
-  The temperature unit used for reporting, performance data etc. can
-  be set with the **temperature_unit** option. Allowed values are ``F``
-  for Fahrenheit, ``C`` for Celsius, ``K`` for Kelvin and ``R`` for
-  Rankine. Example::
+#####Temperature unit
 
-    temperature_unit = F
+The temperature unit used for reporting, performance data etc. can
+be set with the **temperature_unit** option. Allowed values are ``F``
+for Fahrenheit, ``C`` for Celsius, ``K`` for Kelvin and ``R`` for
+Rankine. Example:
 
-  The corresponding command line option is ``--tempunit``. Note that
-  the command line option ``-F`` or ``--fahrenheit`` will override
-  both the command line option and the configuration file option.
+```
+temperature_unit = F
+```
 
-**Temperature limits**
+The corresponding command line option is ``--tempunit``. Note that
+the command line option ``-F`` or ``--fahrenheit`` will override
+both the command line option and the configuration file option.
 
-  Custom temperature limits may be configured with the
-  options **temp_threshold_warning**
-  and **temp_threshold_critical**. These options corresponds to the
-  command line options ``-w`` or ``--warning`` and ``-c`` or
-  ``--critical``, respectively. They take the same arguments as the
-  command line options. Examples::
+#####Temperature limits
 
-    temp_threshold_warning = 0=30/10
-    temp_threshold_critical = 0=35/8
+Custom temperature limits may be configured with the
+options **temp_threshold_warning**
+and **temp_threshold_critical**. These options corresponds to the
+command line options ``-w`` or ``--warning`` and ``-c`` or
+``--critical``, respectively. They take the same arguments as the
+command line options. Examples::
 
-SNMP
-~~~~
+```
+temp_threshold_warning = 0=30/10
+temp_threshold_critical = 0=35/8
+```
+
+
+####SNMP
 
 Several SNMP related options may be set in the configuration file. The
 configuration file may contain the following SNMP options:
 
-**SNMP community string**
+#####SNMP community string
 
-  The SNMP community string can be set with **snmp_community**. Example::
+The SNMP community string can be set with **snmp_community**. Example::
 
-    snmp_community = mycommunity
+```
+snmp_community = mycommunity
+```
 
-  Corresponding command line option: ``-C`` or ``--community``
+Corresponding command line option: ``-C`` or ``--community``
 
-**SNMP protocol version**
+#####SNMP protocol version
 
-  The SNMP protocol version can be set with **snmp_version**. Example::
+The SNMP protocol version can be set with **snmp_version**. Example::
 
-    snmp_version = 2
+```
+snmp_version = 2
+```
 
-  Corresponding command line option: ``-P`` or ``--protocol``
+Corresponding command line option: ``-P`` or ``--protocol``
 
-**SNMP port number**
+#####SNMP port number
 
-  The remote port number used with SNMP can be set with
-  **snmp_port**. Example::
+The remote port number used with SNMP can be set with
+**snmp_port**. Example::
 
-    snmp_port = 161
+```
+snmp_port = 161
+```
 
-  Corresponding command line option: ``--port``
+Corresponding command line option: ``--port``
 
-**Use IPv6 instead of IPv4**
+#####Use IPv6 instead of IPv4
 
-  The option **snmp_use_ipv6** instructs the plugin to use IPv6 instead
-  of IPv4. This option takes a boolean value. Example::
+The option **snmp_use_ipv6** instructs the plugin to use IPv6 instead
+of IPv4. This option takes a boolean value. Example::
 
-    snmp_use_ipv6 = true
+```
+snmp_use_ipv6 = true
+```
 
-  Corresponding command line option: ``-6`` or ``--ipv6``
+Corresponding command line option: ``-6`` or ``--ipv6``
 
-**Use TCP instead of UDP**
+#####Use TCP instead of UDP
 
-  The option **snmp_use_tcp** instructs the plugin to use TCP instead
-  of UDP. This option takes a boolean value. Example::
+The option **snmp_use_tcp** instructs the plugin to use TCP instead
+of UDP. This option takes a boolean value. Example::
 
-    snmp_use_tcp = true
+```
+snmp_use_tcp = true
+```
 
-  Corresponding command line option: ``--tcp``
+Corresponding command line option: ``--tcp``
 
-Output control
-~~~~~~~~~~~~~~
+
+####Output control
 
 These options gives some control over the output given by the plugin.
 
-**Include servicetag in alerts**
+#####Include servicetag in alerts
 
-  The option **output_servicetag** will make the plugin include the
-  servers servicetag (serial number) in every alert. This option takes
-  a boolean value. Example::
+The option **output_servicetag** will make the plugin include the
+servers servicetag (serial number) in every alert. This option takes
+a boolean value. Example::
 
-    output_servicetag = true
+```
+output_servicetag = true
+```
 
-  Corresponding command line option: ``-i`` or ``--info``
+Corresponding command line option: ``-i`` or ``--info``
 
-**Include service state in alerts**
+#####Include service state in alerts
 
-  The option **output_servicestate** will make the plugin include the
-  service state in any alerts. This option takes a boolean
-  value. Example::
+The option **output_servicestate** will make the plugin include the
+service state in any alerts. This option takes a boolean
+value. Example::
 
-    output_servicestate = true
+```
+output_servicestate = true
+```
 
-  Corresponding command line option: ``-s`` or ``--state``
+Corresponding command line option: ``-s`` or ``--state``
 
-**Include abbreviated service state in alerts**
+#####Include abbreviated service state in alerts
 
-  The option **output_servicestate_abbr** will make the plugin include
-  the abbreviated service state in any alerts. This option takes a
-  boolean value. Example::
+The option **output_servicestate_abbr** will make the plugin include
+the abbreviated service state in any alerts. This option takes a
+boolean value. Example::
 
-    output_servicestate_abbr = true
+```
+output_servicestate_abbr = true
+```
 
-  Corresponding command line option: ``-S`` or ``--short-state``
+Corresponding command line option: ``-S`` or ``--short-state``
 
-**Show system info with alerts**
+#####Show system info with alerts
 
-  The option **output_sysinfo** will make the plugin output some system
-  information with alerts. This option takes a boolean value. Example::
+The option **output_sysinfo** will make the plugin output some system
+information with alerts. This option takes a boolean value. Example::
 
-    output_sysinfo = true
+```
+output_sysinfo = true
+```
 
-  Corresponding command line option: ``-e`` or ``--extinfo``
+Corresponding command line option: ``-e`` or ``--extinfo``
 
-**Show blacklistings in OK output**
+#####Show blacklistings in OK output
 
-  The option **output_blacklist** will make the plugin show any
-  blacklistings in the OK output. This option takes a boolean
-  value. Example::
+The option **output_blacklist** will make the plugin show any
+blacklistings in the OK output. This option takes a boolean
+value. Example::
 
-    output_blacklist = true
+```
+output_blacklist = true
+```
 
-  Corresponding command line option: ``-B`` or ``--show-blacklist``
+Corresponding command line option: ``-B`` or ``--show-blacklist``
 
-**Verbosity of OK output**
+#####Verbosity of OK output
 
-  The option **output_ok_verbosity** lets you adjust how much
-  information is shown in the OK output. This option takes a positive
-  integer as parameter. Example::
+The option **output_ok_verbosity** lets you adjust how much
+information is shown in the OK output. This option takes a positive
+integer as parameter. Example::
 
-    output_ok_verbosity = 3
+```
+output_ok_verbosity = 3
+```
 
-  Corresponding command line option: ``-o`` or ``--ok-info``
+Corresponding command line option: ``-o`` or ``--ok-info``
 
-**HTML output**
+#####HTML output
 
-  The output **output_html** makes the plugin produce HTML output. This
-  option takes either a boolean value, or a country or area
-  code. Example::
+The output **output_html** makes the plugin produce HTML output. This
+option takes either a boolean value, or a country or area
+code. Example::
 
-    output_html = de
+```
+output_html = de
+```
 
-  Corresponding command line option: ``-I`` or ``--htmlinfo``
+Corresponding command line option: ``-I`` or ``--htmlinfo``
 
-**Custom line after alerts**
+#####Custom line after alerts
 
-  The option **output_post_message** lets you specify one line of
-  information to be shown after any alerts. This option takes a string
-  as parameter. Examples::
+The option **output_post_message** lets you specify one line of
+information to be shown after any alerts. This option takes a string
+as parameter. Examples::
 
-    output_post_message = OS: %o %r
-    output_post_message = NOTE: Handled in ticket 123456
+```
+output_post_message = OS: %o %r
+output_post_message = NOTE: Handled in ticket 123456
+```
 
-  For more information about codes and formatting, see `Custom line
-  after the alert(s)`_.
+For more information about codes and formatting, see `Custom line
+after the alert(s)`_.
 
-**Hide service tag (serial number)**
+#####Hide service tag (serial number)
 
-  The option **output_hide_servicetag** will hide the serial number in
-  any output from the plugin. This option takes a boolean
-  value. Example::
+The option **output_hide_servicetag** will hide the serial number in
+any output from the plugin. This option takes a boolean
+value. Example::
 
-    output_hide_servicetag = true
+```
+output_hide_servicetag = true
+```
 
-  Corresponding command line option: ``--hide-servicetag``
+Corresponding command line option: ``--hide-servicetag``
 
 
-Alternative to configuration file: Custom object variables
-==========================================================
+##Alternative to configuration file: Custom object variables
 
 *Contributed by Rudolf Kleijwegt*
 
@@ -1689,23 +1728,27 @@ you may want to look into the custom object variables feature of
 Nagios, to achieve a per-host configuration of the plugin. Consider
 the following example host definition::
 
-  define host {
-      use                   generic-host
-      host_name             myhostname
-      alias                 My Alias
-      address               1.2.3.4
-      max_check_attempts    3
-      _openmanage_options   --no-storage
-  }
+```
+define host {
+    use                   generic-host
+    host_name             myhostname
+    alias                 My Alias
+    address               1.2.3.4
+    max_check_attempts    3
+    _openmanage_options   --no-storage
+}
+```
 
 In this example, we are using the ``--no-storage`` option for this
 host only. This is achieved by the following command definition for
 check_openmanage::
 
-  define command {
-      command_name    check_openmanage
-      command_line    $USER1$/check_openmanage -H $HOSTADDRESS$ '$_HOSTOPENMANAGE_OPTIONS$'
-  }
+```
+define command {
+    command_name    check_openmanage
+    command_line    $USER1$/check_openmanage -H $HOSTADDRESS$ '$_HOSTOPENMANAGE_OPTIONS$'
+}
+```
 
 Note the ``$_HOSTOPENMANAGE_OPTIONS$`` macro in the command
 definition. The variable ``_openmanage_options`` in the host
@@ -1717,8 +1760,7 @@ Nagios documentation:
 * http://nagios.sourceforge.net/docs/3_0/customobjectvars.html
 
 
-A note about charging cache batteries
-=====================================
+##A note about charging cache batteries
 
 The Dell RAID controllers usually have a cache battery, which is
 useful in case of a sudden power outage. This battery will on occasion
@@ -1749,778 +1791,31 @@ case where the charge cycle never finishes, the warnings are reported
 by check_openmanage, but with an included note that says that the
 warning is probably harmless.
 
-.. NOTE::
-
-   You can use the blacklist keyword ``bat_charge`` to disable
-   messages about the battery charge cycle.
+> NOTE: You can use the blacklist keyword ``bat_charge`` to disable
+> messages about the battery charge cycle.
 
 If the state never changes, e.g. if the warning persists for days, you
 should act on it. Otherwise, the warnings can be ignored.
 
 
-Performance data
-================
-
-.. _PNP4Nagios: http://www.pnp4nagios.org/
+##Performance data
 
 check_openmanage will output performance data if the ``--perfdata`` or
 ``-p`` option is used. The performance data gathered will vary
 depending on the type and model of the monitored server. An example
-graph using `PNP4Nagios`_ is given below.
+graph using [PNP4Nagios](http://www.pnp4nagios.org/) is given below.
 
-.. image:: pnp_check_openmanage-3.7.1.png
-  :align: center
-  :alt: pnp4nagios
+![pnp4nagios](http://folk.uio.no/trondham/software/pnp_check_openmanage-3.7.1.png)
 
 The template used to generate these graphs are available as
 ``check_openmanage.php`` in the downloadable ZIP archive and tarball.
 
 
-Download
-========
+##Frequently Asked Questions (FAQ)
 
-Latest version
---------------
+###General
 
-.. _check_openmanage: check_openmanage-3.7.12/check_openmanage
-.. _check_openmanage.8: check_openmanage-3.7.12/man/check_openmanage.8
-.. _check_openmanage.conf.5: check_openmanage-3.7.12/man/check_openmanage.conf.5
-.. _check_openmanage.exe: check_openmanage-3.7.12/check_openmanage.exe
-
-.. _check_openmanage-3.7.12.tar.gz: files/check_openmanage-3.7.12.tar.gz
-.. _check_openmanage-3.7.12.zip: files/check_openmanage-3.7.12.zip
-.. _nagios-plugins-openmanage-3.7.12-1.el5.i386.rpm: files/nagios-plugins-openmanage-3.7.12-1.el5.i386.rpm
-.. _nagios-plugins-openmanage-3.7.12-1.el5.x86_64.rpm: files/nagios-plugins-openmanage-3.7.12-1.el5.x86_64.rpm
-.. _nagios-plugins-openmanage-3.7.12-1.el5.src.rpm: files/nagios-plugins-openmanage-3.7.12-1.el5.src.rpm
-.. _check-openmanage_3.7.12-1_all.deb: files/check-openmanage_3.7.12-1_all.deb
-
-.. _nagios-plugins-openmanage-3.7.12-1.el5: https://admin.fedoraproject.org/updates/nagios-plugins-openmanage-3.7.12-1.el5
-.. _nagios-plugins-openmanage-3.7.12-1.el6: https://admin.fedoraproject.org/updates/nagios-plugins-openmanage-3.7.12-1.el6
-.. _nagios-plugins-openmanage-3.7.12-1.fc16: https://admin.fedoraproject.org/updates/nagios-plugins-openmanage-3.7.12-1.fc16
-.. _nagios-plugins-openmanage-3.7.12-1.fc17: https://admin.fedoraproject.org/updates/nagios-plugins-openmanage-3.7.12-1.fc17
-.. _nagios-plugins-openmanage-3.7.12-1.fc18: https://admin.fedoraproject.org/updates/nagios-plugins-openmanage-3.7.12-1.fc18
-
-
-**Packaged**
-
-* Gzipped tarball:
-    - `check_openmanage-3.7.12.tar.gz`_
-    - md5: ``99070a044c70576a71b35c143c35affd``
-
-* Zip archive:
-    - `check_openmanage-3.7.12.zip`_
-    - md5: ``b67e1634d4c6b5292426ed65c3c21acd``
-
-.. # * Binary rpms: **coming soon**
-
-.. #    - RHEL5 (EPEL): `nagios-plugins-openmanage-3.7.12-1.el5`_
-.. #    - RHEL6 (EPEL): `nagios-plugins-openmanage-3.7.12-1.el6`_
-.. #    - Fedora 16: `nagios-plugins-openmanage-3.7.12-1.fc16`_
-.. #    - Fedora 17: `nagios-plugins-openmanage-3.7.12-1.fc17`_
-.. #    - Fedora 18: `nagios-plugins-openmanage-3.7.12-1.fc18`_
-
-  Note that check_openmanage is available in the official Fedora and
-  Fedora EPEL repositories. If installing via yum doesn't suit you,
-  you'll find the RPM packages using the links above.
-
-.. # * Binary rpm file (i386):
-.. #     - `nagios-plugins-openmanage-3.7.12-1.el5.i386.rpm`_
-.. #     - md5: ````
-.. # 
-.. # * Binary rpm file (x86_64):
-.. #     - `nagios-plugins-openmanage-3.7.12-1.el5.x86_64.rpm`_
-.. #     - md5: ````
-.. # 
-.. # * Source rpm file:
-.. #     - `nagios-plugins-openmanage-3.7.12-1.el5.src.rpm`_
-.. #     - md5: ````
-
-* Debian/Ubuntu package:
-    - `check-openmanage_3.7.12-1_all.deb`_
-    - md5: ``f1d9055f4bd0ef3255b2417c38a28cef``
-
-Note that check_openmanage is now included in Fedora and Fedora EPEL
-as **nagios-plugins-openmanage**. It can be installed by normal means
-using yum.
-
-.. # If you wish to download the RPM packages directly you may
-.. # use the links above.
-
-.. IMPORTANT::
-   The Fedora and Red Hat SELinux policy is not yet updated for
-   check_openmanage. Se `SELinux considerations`_ for information
-   about how to run check_openmanage with SELinux in enforcing mode.
-
-The Debian package should work on Debian and Ubuntu. Thanks to Morten
-Werner Forsbring for help with the Debian package.
-
-**Single files**
-
-* The plugin (perl script):
-    - `check_openmanage`_
-    - md5: ``9696bbb3fbc258ffaaa23fff3bd50f97``
-
-* Win32 executable version:
-    - `check_openmanage.exe`_
-    - md5: ``c61a3bb62f3461214a9605323d63db4e``
-
-* Program manual page:
-    - `check_openmanage.8`_
-    - md5: ``06fcbaa4a627818aadb67c0b40896b55``
-
-* Configuration file manual page:
-    - `check_openmanage.conf.5`_
-    - md5: ``dcfc4a78c51f2c405b513d36391bdec2``
-
-* PNP4Nagios template:
-    - *Available in the gzipped tarball and zip archive*
-
-**Git repository**
-
-.. _Gitweb: http://git.uio.no/git/?p=check_openmanage.git;a=summary
-
-check_openmanage is available in a public Git repository. To clone the
-latest version::
-
-  git clone git://git.uio.no/check_openmanage
-
-The Git repository is also available on Gitweb_.
-
-Changelog / Old versions
-------------------------
-
-.. _check_hpasm: http://www.consol.de/opensource/nagios/check-hpasm
-.. _1.0.0: files/check_openmanage-1.0.0.tar.gz
-.. _1.0.1: files/check_openmanage-1.0.1.tar.gz
-.. _1.0.2: files/check_openmanage-1.0.2.tar.gz
-.. _1.0.3: files/check_openmanage-1.0.3.tar.gz
-.. _1.1.0: files/check_openmanage-1.1.0.tar.gz
-.. _1.1.1: files/check_openmanage-1.1.1.tar.gz
-.. _1.1.2: files/check_openmanage-1.1.2.tar.gz
-.. _1.2.1: files/check_openmanage-1.2.1.tar.gz
-.. _2.0.0: files/check_openmanage-2.0.0.tar.gz
-.. _2.0.1: files/check_openmanage-2.0.1.tar.gz
-.. _2.0.2: files/check_openmanage-2.0.2.tar.gz
-.. _2.0.3: files/check_openmanage-2.0.3.tar.gz
-.. _2.0.4: files/check_openmanage-2.0.4.tar.gz
-.. _2.0.5: files/check_openmanage-2.0.5.tar.gz
-.. _2.0.6: files/check_openmanage-2.0.6.tar.gz
-.. _2.0.7: files/check_openmanage-2.0.7.tar.gz
-.. _2.0.8: files/check_openmanage-2.0.8.tar.gz
-.. _2.0.9: files/check_openmanage-2.0.9.tar.gz
-.. _2.1.0: files/check_openmanage-2.1.0.tar.gz
-.. _2.1.1: files/check_openmanage-2.1.1.tar.gz
-.. _3.0.0: files/check_openmanage-3.0.0.tar.gz
-.. _3.0.1: files/check_openmanage-3.0.1.tar.gz
-.. _3.0.2: files/check_openmanage-3.0.2.tar.gz
-.. _3.1.0: files/check_openmanage-3.1.0.tar.gz
-.. _3.1.1: files/check_openmanage-3.1.1.tar.gz
-.. _3.2.0: files/check_openmanage-3.2.0.tar.gz
-.. _3.2.1: files/check_openmanage-3.2.1.tar.gz
-.. _3.2.2: files/check_openmanage-3.2.2.tar.gz
-.. _3.2.3: files/check_openmanage-3.2.3.tar.gz
-.. _3.2.4: files/check_openmanage-3.2.4.tar.gz
-.. _3.2.5: files/check_openmanage-3.2.5.tar.gz
-.. _3.2.6: files/check_openmanage-3.2.6.tar.gz
-.. _3.2.7: files/check_openmanage-3.2.7.tar.gz
-.. _3.3.0: files/check_openmanage-3.3.0.tar.gz
-.. _3.3.1: files/check_openmanage-3.3.1.tar.gz
-.. _3.3.2: files/check_openmanage-3.3.2.tar.gz
-.. _3.4.0: files/check_openmanage-3.4.0.tar.gz
-.. _3.4.1: files/check_openmanage-3.4.1.tar.gz
-.. _3.4.2: files/check_openmanage-3.4.2.tar.gz
-.. _3.4.3: files/check_openmanage-3.4.3.tar.gz
-.. _3.4.4: files/check_openmanage-3.4.4.tar.gz
-.. _3.4.5: files/check_openmanage-3.4.5.tar.gz
-.. _3.4.6: files/check_openmanage-3.4.6.tar.gz
-.. _3.4.7: files/check_openmanage-3.4.7.tar.gz
-.. _3.4.8: files/check_openmanage-3.4.8.tar.gz
-.. _3.4.9: files/check_openmanage-3.4.9.tar.gz
-.. _3.5.0: files/check_openmanage-3.5.0.tar.gz
-.. _3.5.1: files/check_openmanage-3.5.1.tar.gz
-.. _3.5.2: files/check_openmanage-3.5.2.tar.gz
-.. _3.5.3: files/check_openmanage-3.5.3.tar.gz
-.. _3.5.4: files/check_openmanage-3.5.4.tar.gz
-.. _3.5.5: files/check_openmanage-3.5.5.tar.gz
-.. _3.5.6: files/check_openmanage-3.5.6.tar.gz
-.. _3.5.7: files/check_openmanage-3.5.7.tar.gz
-.. _3.5.8: files/check_openmanage-3.5.8.tar.gz
-.. _3.5.9: files/check_openmanage-3.5.9.tar.gz
-.. _3.5.10: files/check_openmanage-3.5.10.tar.gz
-.. _3.6.0: files/check_openmanage-3.6.0.tar.gz
-.. _3.6.1: files/check_openmanage-3.6.1.tar.gz
-.. _3.6.2: files/check_openmanage-3.6.2.tar.gz
-.. _3.6.3: files/check_openmanage-3.6.3.tar.gz
-.. _3.6.4: files/check_openmanage-3.6.4.tar.gz
-.. _3.6.5: files/check_openmanage-3.6.5.tar.gz
-.. _3.6.6: files/check_openmanage-3.6.6.tar.gz
-.. _3.6.7: files/check_openmanage-3.6.7.tar.gz
-.. _3.6.8: files/check_openmanage-3.6.8.tar.gz
-.. _3.7.0: files/check_openmanage-3.7.0.tar.gz
-.. _3.7.1: files/check_openmanage-3.7.1.tar.gz
-.. _3.7.2: files/check_openmanage-3.7.2.tar.gz
-.. _3.7.3: files/check_openmanage-3.7.3.tar.gz
-.. _3.7.4: files/check_openmanage-3.7.4.tar.gz
-.. _3.7.5: files/check_openmanage-3.7.5.tar.gz
-.. _3.7.6: files/check_openmanage-3.7.6.tar.gz
-.. _3.7.7: files/check_openmanage-3.7.7.tar.gz
-.. _3.7.8: files/check_openmanage-3.7.8.tar.gz
-.. _3.7.9: files/check_openmanage-3.7.9.tar.gz
-.. _3.7.10: files/check_openmanage-3.7.10.tar.gz
-.. _3.7.11: files/check_openmanage-3.7.11.tar.gz
-.. _3.7.12: files/check_openmanage-3.7.12.tar.gz
-
-
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| Version   | Date       | Changes                                                                                                                               |
-+===========+============+=======================================================================================================================================+
-| `3.7.12`_ | 2014-07-28 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * **enhancement** Set failed pdisk as critical (override OMSA)                                                                        |
-|           |            | * **bugfix** Fix for blacklisted un-certified pdisks with predictive failure (patch from Maxime De Berraly)                           |
-|           |            | * **bugfix** Fix for pdisk in "Non-RAID" state (patch from Josh Elsasser)                                                             |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.11`_ | 2013-08-06 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * **bugfix** Fixed a regression on systems with ePN enabled                                                                           |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.10`_ | 2013-07-19 | * **Minor feature cnhancements, Minor bugfixes**                                                                                      |
-|           |            | * **enhancement** Added option "--vdisk-critical" which will make any alerts on virtual disks appear as critical                      |
-|           |            | * **bugfix** Dell changed their web site again. The documentation URLs with HTML output have been changed accordingly                 |
-|           |            | * **bugfix** Fixed bug with option "--only servicetag"                                                                                |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.9`_  | 2013-01-07 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * **enhancement** Added a compatibility fix for OMSA 7.2.0, related to minimum controller firmware where output from OMSA has changed |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.8`_  | 2012-12-12 | * **Minor feature enhancements, Minor bugfixes**                                                                                      |
-|           |            | * **bugfix** Fixed a regression regarding un-certified physical disks in "Ready"                                                      |
-|           |            |   state (e.g. hot-spare) when using the blacklisting keyword                                                                          |
-|           |            |   "pdisk_cert"                                                                                                                        |
-|           |            | * **enhancement** Added an option "--snmp-timeout" which allows setting the SNMP                                                      |
-|           |            |   object timeout for the Net::SNMP perl module                                                                                        |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.7`_  | 2012-12-06 | * **Minor feature enhancements, Minor bugfixes**                                                                                      |
-|           |            | * **bugfix** Small fixes in PNP template                                                                                              |
-|           |            | * **bugfix** Fixed handling of functional but uncertified disks (Matthew Kent)                                                        |
-|           |            | * **bugfix** Fixed regression for pdisk cert on old hardware/OMSA                                                                     |
-|           |            | * **bugfix** RPM spec: Fix docbook pkg name for suse                                                                                  |
-|           |            | * **enhancement** Reverse pdisk cert for OMSA 7.1.0 via SNMP, this works around an OMSA SNMP bug                                      |
-|           |            | * **enhancement** Shortened a lot of reporting messages to make things more consistent                                                |
-|           |            | * **enhancement** Rewritten logic on reporting pdisks                                                                                 |
-|           |            | * **enhancement** Added new special case for controller batteries                                                                     |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.6`_  | 2012-06-28 | * **Minor feature enhancements, Minor bugfixes**                                                                                      |
-|           |            | * **enhancement** Support for PCI attached storage (new in OMSA 7.0.0) was added.                                                     |
-|           |            | * **enhancement** Support was added for negative temperature readings and thresholds from temp probes.                                |
-|           |            | * **bugfix** Fix for physical disk check. If a disk was marked as predictive failure, and also had other failure conditions           |
-|           |            |   of a more severe nature, check_openmange only reported the predictive failure state. This has been fixed so that the most severe    |
-|           |            |   failure takes precedence.                                                                                                           |
-|           |            | * **enhancement** The iDRAC6 and iDRAC7 controllers was identified via SNMP using integer values that are not defined in the MIB. This|
-|           |            |   resulted in internal error warnings if the '-o' option was used. The plugin now defines these integer identifiers even though they  |
-|           |            |   are undocumented in the MIB.                                                                                                        |
-|           |            | * **enhancement** The PNP template now contains comments which identifies which plugin version it was built for.                      |
-|           |            | * **enhancement** The manual pages were revised and completely rewritten from perl POD to Docbook XML format.                         |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.5`_  | 2012-04-13 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * **bugfix** A bug was fixed which could lead to perl warnings when either of the options '--tempunit' or '--fahrenheit' was used.    |
-|           |            | * **bugfix** A workaround was added for an SNMP bug in OMSA 7.0.0 related to the "firmwareType" OID for iDRAC6 management cards.      |
-|           |            | * **bugfix** A bug was fixed for a corner case where the temperature probe readings for storage enclosures were empty. Previously,    |
-|           |            |   this could produce perl warnings (internal errors).                                                                                 |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.4`_  | 2012-03-29 | * **Minor feature enhancements, Minor bugfixes**                                                                                      |
-|           |            | * **bugfix** Allow "2c" to be specified as SNMP version via command line and config file option. Patch from Oskar Liljeblad.          |
-|           |            | * **bugfix** Corrected a typo for the '--config' command line option.                                                                 |
-|           |            | * **bugfix** fix warranty info link with '-I' or '--htmlinfo' option wrt. new layout on support.dell.com                              |
-|           |            | * **feature** Added check for 'servicetag', checks whether the servicetag is sane (i.e. not empty, "unknown" or other bogus           |
-|           |            |   value). Thanks to Xavier Bachelot for a patch.                                                                                      |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.3`_  | 2011-10-05 | * **Minor feature enhancements, Minor bugfixes**                                                                                      |
-|           |            | * If the option -I or --htmlinfo was used, the OK output would be printed two times. This has been fixed so the OK output is now      |
-|           |            |   correct for HTML output.                                                                                                            |
-|           |            | * A bug was fixed for config file parsing, if the plugin was used in local mode (i.e. no hostname specified). Reported by David Jones.|
-|           |            | * Distribution now includes an example configuration file, contributed by Xavier Bachelot                                             |
-|           |            | * Various fixes to the RPM spec file contributed by Xavier Bachelot                                                                   |
-|           |            | * RPM name was changed                                                                                                                |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.2`_  | 2011-09-19 | * **Minor feature enhancements, Minor bugfixes**                                                                                      |
-|           |            | * Added a new option '--hide-servicetag' to censor the servicetag in the plugin output. A corresponding config file option            |
-|           |            |   'output_hide_servicetag' was created. Thanks to Sebastian Ahndorf for a patch                                                       |
-|           |            | * SNMP: Fixed bug in amperage probes perfdata output when one or more PSUs has lost power, which could cause garbled graphs           |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.1`_  | 2011-08-22 | * **Minor feature enhancements, Minor bugfixes**                                                                                      |
-|           |            | * Added new blacklisting keyword 'pdisk_foreign' to suppress warnings about foreign physical disks                                    |
-|           |            | * SNMP: Get the controller number right when reporting issues with the controller cache battery                                       |
-|           |            | * Various minor tweaks and bugfixes in the PNP4Nagios template                                                                        |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.7.0`_  | 2011-08-15 | * **Major feature enhancements**                                                                                                      |
-|           |            | * Major overhaul of the perfdata code. This fixes the following:                                                                      |
-|           |            |   - Probes were not sorted correctly                                                                                                  |
-|           |            |   - Voltage data was not included                                                                                                     |
-|           |            | * **WARNING: The new perfdata format is incompatible with existing RRD files etc.** A new option ``--legacy-perfdata``                |
-|           |            |   will make the the plugin output the performance data in the old format                                                              |
-|           |            | * The PNP template check_openmanage.php has been redone to work with the changes in perfdata output from the plugin                   |
-|           |            | * Added support for a configuration file                                                                                              |
-|           |            | * Added manual page for the configuration file                                                                                        |
-|           |            | * If using html output, URLs will now open in a new window                                                                            |
-|           |            | * Added a compatibility fix for OMSA 6.5.0, related to performance data for amperage probes when the plugin is used in local          |
-|           |            |   mode. Thanks to Benedikt Meyer for a patch.                                                                                         |
-|           |            |                                                                                                                                       |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.6.8`_  | 2011-06-07 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * Added workaround for a rare condition in which blade detection fails because the chassis IDs for the blade and                      |
-|           |            |   interconnect board have switched places in the BaseBoardType SNMP table.                                                            |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.6.7`_  | 2011-05-12 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * A regression wrt. non-certified drives were fixed. The plugin failed to identify non-certified physical drives via SNMP.            |
-|           |            | * Added the ability to blacklist non-certified drives with the 'pdisk_cert' blacklisting keyword.                                     |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.6.6`_  | 2011-04-28 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * Fixed typo in help output                                                                                                           |
-|           |            | * SD card check is now included if the parameter '--only chassis' is specified                                                        |
-|           |            | * The plugin will issue a proper warning if a physical drive is uncertified, instead of an unspecified warning. One or more           |
-|           |            |   uncertified drives will make the controller go into a non-critical (warning) state.                                                 |
-|           |            | * Slightly improved reporting of fan status                                                                                           |
-|           |            | * Exit with value 3 (unknown) if printing debug, help or version info. This is considered best practice for Nagios plugins.           |
-|           |            | * Workaround added for logical SAS connectors to external storage enclosures, when using check_openmanage in local mode with OMSA     |
-|           |            |   6.4.0 or later versions. The output from omreport could contain lines that the plugin was unable to parse, which would lead to      |
-|           |            |   internal errors.                                                                                                                    |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.6.5`_  | 2011-02-09 | * **Minor feature enhancements**, **Minor bugfixes**                                                                                  |
-|           |            | * Fix counting of components when blacklisting is used. Components should be counted even if blacklisted                              |
-|           |            | * Added some unsupported vdisk types to the list. The OMSA MIB identifies these, but lists them as unsupported                        |
-|           |            | * Added option '-B' or '--show-blacklist' to show any blacklistings in the OK output                                                  |
-|           |            | * Fixed a bug for checking voltage probes, if the reading is missing via SNMP                                                         |
-|           |            | * Fixed a regression bug for a power monitoring corner case                                                                           |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.6.4`_  | 2011-01-04 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * Added more robustness wrt. values from OMSA obtained via SNMP, to                                                                   |
-|           |            |   avoid internal errors where non-important values are missing.                                                                       |
-|           |            | * The RPM files are changed to be compliant with Fedora/EPEL guidelines. The new RPM file "nagios-plugins-check-openmanage"           |
-|           |            |   obsoletes the previous one "check_openmanage".                                                                                      |
-|           |            |                                                                                                                                       |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.6.3`_  | 2010-12-13 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * A few compatibility fixes for OMSA 6.4.0 were added                                                                                 |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.6.2`_  | 2010-11-25 | * **Minor feature enhancements**, **Minor bugfixes**                                                                                  |
-|           |            | * Added support for IPv6 when checking via SNMP. IPv6 can be turned on                                                                |
-|           |            |   with the option ``-6`` or ``--ipv6``. The default is IPv4 if the option                                                             |
-|           |            |   is not present.                                                                                                                     |
-|           |            | * Added support for TCP when checking vis SNMP. The option ``--tcp`` can                                                              |
-|           |            |   be used to turn on TCP. The default transport protocol is UDP if the                                                                |
-|           |            |   option is not present.                                                                                                              |
-|           |            | * The mode of operation (local or SNMP) is shown in the debug                                                                         |
-|           |            |   output. If SNMP is used, the debug output will also show the SNMP                                                                   |
-|           |            |   protocol version, IP version and transport protocol (UDP or TCP).                                                                   |
-|           |            | * Amperage probe status via SNMP is of type "probe status", not                                                                       |
-|           |            |   regular status. This has been fixed.                                                                                                |
-|           |            | * Massive overall robustness improvements to handle OMSA bugs where                                                                   |
-|           |            |   some information from OMSA is missing.                                                                                              |
-|           |            | * Memory module enumeration via SNMP changed somewhat to reflect                                                                      |
-|           |            |   enumeration provided by omreport. This ensures that the plugin's                                                                    |
-|           |            |   output is identical in SNMP or local mode wrt. dimms IDs.                                                                           |
-|           |            | * Fan enumeration via SNMP changed somewhat to reflect enumeration                                                                    |
-|           |            |   provided by omreport. This ensures that the plugin's output is                                                                      |
-|           |            |   identical in SNMP or local mode wrt. fan IDs.                                                                                       |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.6.1`_  | 2010-11-02 | * **Minor feature enhancements**, **Minor bugfixes**                                                                                  |
-|           |            | * Included new check for SD cards. Newer servers such as the R710 can                                                                 |
-|           |            |   have SD cards installed, these should be monitored. The SD card                                                                     |
-|           |            |   check is on by default. A new blacklisting keyword "``sd``" has been                                                                |
-|           |            |   added. The SD card check can be turned off with "``--check sdcard=0``".                                                             |
-|           |            | * Handle special cases where power monitoring capability is disabled                                                                  |
-|           |            |   due to non-redundant and/or non-instrumented power supplies.                                                                        |
-|           |            | * For physical disks probed via SNMP, check that values for vendor,                                                                   |
-|           |            |   product ID and capacity is available before attempting to display                                                                   |
-|           |            |   those values.                                                                                                                       |
-|           |            | * If a physical disk is in sufficiently bad condition, the vendor                                                                     |
-|           |            |   field reported by OMSA may be empty. The plugin now handles this                                                                    |
-|           |            |   situation without throwing an internal error.                                                                                       |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.6.0`_  | 2010-08-30 | * **Major feature enhancements**, **Minor bugfixes**                                                                                  |
-|           |            | * Storage is no longer allowed to be absent. If the plugin doesn't                                                                    |
-|           |            |   find a storage controller, it will give an alert. For diskless                                                                      |
-|           |            |   systems or servers without a Dell controller that OMSA recognizes                                                                   |
-|           |            |   you will now have to specify "``--no-storage``" or "``--check storage=0``"                                                          |
-|           |            |   to work around this.                                                                                                                |
-|           |            | * Added an option "``--no-storage``", which is equivalent to the general                                                              |
-|           |            |   option "``--check storage=0``".                                                                                                     |
-|           |            | * Report the system revision (if applicable) wherever the model name                                                                  |
-|           |            |   is printed. E.g. "PowerEdge 2950 III" instead of "PowerEdge 2950".                                                                  |
-|           |            | * Small change in search path for omreport: The new location for OMSA                                                                 |
-|           |            |   6.2.0 and later on Linux will be attempted first.                                                                                   |
-|           |            | * Small bugfix for the "``--check``" parameter, if the argument is a                                                                  |
-|           |            |   filename. The file could not contain a linebreak, this has been                                                                     |
-|           |            |   fixed.                                                                                                                              |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.10`_ | 2010-07-14 | * **Minor feature enhancements**, **Minor bugfixes**                                                                                  |
-|           |            | * If a physical disk is a hot spare, display this information in the                                                                  |
-|           |            |   debug output                                                                                                                        |
-|           |            | * Report the bus protocol (e.g. SAS, SATA) and media type (e.g. HDD,                                                                  |
-|           |            |   SDD) for physical disks in the debug output, if applicable                                                                          |
-|           |            | * Minor fix for 100GB physical disks, write "100GB" instead of "99GB"                                                                 |
-|           |            | * SNMP: Use new features of OMSA 6.3.0 to display occupied and total                                                                  |
-|           |            |   slots in storage enclosures, if applicable. This information is not                                                                 |
-|           |            |   available with omreport and check_openmanage will not display this                                                                  |
-|           |            |   info in local mode.                                                                                                                 |
-|           |            | * SNMP: Added new processor IDs from the OMSA 6.3.0 MIBs                                                                              |
-|           |            | * SNMP: Use connection tables in a proper way to determine controller                                                                 |
-|           |            |   and enclosure IDs, for use with physical disks and enclosure                                                                        |
-|           |            |   components (fan, temp sensors etc.). This fixes a long standing bug                                                                 |
-|           |            |   for servers with more than one controller, if checked via SNMP.                                                                     |
-|           |            | * SNMP: Use the nexus ID as last resort to find the controller for                                                                    |
-|           |            |   physical disks. Workaround for older, broken OMSA versions.                                                                         |
-|           |            | * SNMP: Identify enclosures (e.g. '2:0:0') properly so that the                                                                       |
-|           |            |   reporting with SNMP corresponds to the same report with omreport.                                                                   |
-|           |            | * SNMP: added a couple of workarounds for pre-historic OMSA versions                                                                  |
-|           |            |                                                                                                                                       |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.9`_  | 2010-06-30 | * **Minor feature enhancements**, **Minor bugfixes**                                                                                  |
-|           |            | * More fine-grained reporting of temperature warnings for enclosure                                                                   |
-|           |            |   temperature probes.                                                                                                                 |
-|           |            | * Max/min temperature limits for enclosure temp probes are reported in                                                                |
-|           |            |   the debug output                                                                                                                    |
-|           |            | * Report enclosure temperature probes that are "Inactive" as ok                                                                       |
-|           |            | * Don't try to print out the reading of enclosure                                                                                     |
-|           |            |   temperature probes if the reading doesn't exist or is not an integer                                                                |
-|           |            | * Report enclosure EMMs that are "Not Installed" as ok, instead of                                                                    |
-|           |            |   critical                                                                                                                            |
-|           |            | * Corrected typo in the PNP4Nagios template                                                                                           |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.8`_  | 2010-06-17 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * Remove reporting of which controller a logical drive is "attached"                                                                  |
-|           |            |   to, since this information can't be reliably extracted via SNMP.                                                                    |
-|           |            | * avoid collecting Lun ID via SNMP for virtual disks, we don't use it                                                                 |
-|           |            | * report total memory and number of dimms in the ok output                                                                            |
-|           |            | * difference in reporting if amperage probes have discrete readings                                                                   |
-|           |            | * workaround for broken amperage probes                                                                                               |
-|           |            | * added workaround for bad temperature probes that yields no reading                                                                  |
-|           |            |   in SNMP mode                                                                                                                        |
-|           |            | * get OMSA version via SNMP slightly more efficiently                                                                                 |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.7`_  | 2010-03-19 | * **Minor feature enhancements**, **Minor bugfixes**                                                                                  |
-|           |            | * Added robustness for received SNMP values that are not defined in the MIB. Instead of throwing a perl warning when this happens, the|
-|           |            |   plugin will not report the undefined value.                                                                                         |
-|           |            | * Defined "Replacing" as a defined state for physical disks in SNMP mode, even though this state is not defined in the MIB. It is     |
-|           |            |   reported as such by omreport.                                                                                                       |
-|           |            | * Physical disk brand/model is now reported when the state of the disk is "Rebuilding" or "Replacing".                                |
-|           |            | * The state of a physical disk is reported in parentheses when predictive failure is detected. It is useful to know if a disk is      |
-|           |            |   online, offline, spare or even failed when predictive failure is reported.                                                          |
-|           |            | * Handling of physical disk predictive failure has been improved overall.                                                             |
-|           |            | * Refactoring of the perfdata code. In conformance with the plugin development guidelines, the UOM (unit of measure) previously       |
-|           |            |   reported in the perfdata output has been removed.                                                                                   |
-|           |            | * The -p or --perfdata option now takes an optional agrument "minimal", which triggers shorter names for the perfomance data          |
-|           |            |   labels. This shortens the output and is a workaround for systems where the amount of output exceeds the 1024 char limit of NRPE.    |
-|           |            | * The PNP4Nagios template has been updated. Users of check_openmanage and PNP4Nagios are advised to upgrade. This version of          |
-|           |            |   check_openmanage needs the new template.                                                                                            |
-|           |            | * Lots of other small improvements and updates.                                                                                       |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.6`_  | 2010-02-23 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * New option ``--use-get_table`` is added as a workaround for SNMPv3 on                                                               |
-|           |            |   Windows using net-snmp. This option will make check_openmanage use                                                                  |
-|           |            |   the Net::SNMP function get_table() instead of get_entries() to                                                                      |
-|           |            |   collect information via SNMP.                                                                                                       |
-|           |            | * Include a blacklisting option ``ctrl_pdisk`` which takes the                                                                        |
-|           |            |   controller number as argument. This blacklisting option only works                                                                  |
-|           |            |   with omreport and is a workaround for broken disk firmwares that                                                                    |
-|           |            |   contain illegal XML characters. These characters makes openmanage                                                                   |
-|           |            |   barf and exit with an error. Thanks to Bas Couwenberg for a patch.                                                                  |
-|           |            | * If the blacklisting keyword "all" is supplied for a component type,                                                                 |
-|           |            |   that component type is not checked at all, i.e. the commands are                                                                    |
-|           |            |   never executed. This will make check_openmanage execute faster if                                                                   |
-|           |            |   blacklisting is heavily used.                                                                                                       |
-|           |            | * Option ``--htmlinfo`` now has a shorter equivalent ``-I``                                                                           |
-|           |            | * The option ``--short-state`` now has a shorter equivalent ``-S``                                                                    |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.5`_  | 2010-01-22 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * Fixed an SNMP bug where the plugin didn't handle OID indexes that                                                                   |
-|           |            |   were not sequential. Thanks to Gianluca Varenni for reporting.                                                                      |
-|           |            | * Fixed an SNMP bug when checking old hardware such as the PE 2650 and                                                                |
-|           |            |   PE 750. The controller id for physical drives were collected and                                                                    |
-|           |            |   displayed incorrectly. This release uses an additional OID to fetch                                                                 |
-|           |            |   this info, which would otherwise be unavailable. Thanks to Gianluca                                                                 |
-|           |            |   Varenni for reporting this bug.                                                                                                     |
-|           |            | * Should use %snmp_probestatus, not %snmp_status when checking the                                                                    |
-|           |            |   status of voltage probes. Thanks to Ken McKinlay for a patch.                                                                       |
-|           |            | * Fix when identifying blades via SNMP with very old OMSA                                                                             |
-|           |            |   versions. Patch from Ken McKinlay.                                                                                                  |
-|           |            | * Better way of finding the ID of physical drives via SNMP                                                                            |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.4`_  | 2010-01-13 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * Added support for storport driver version for controllers, only                                                                     |
-|           |            |   applicable on servers running Windows.  A new blacklisting keyword                                                                  |
-|           |            |   for suppressing storport driver messages was added.                                                                                 |
-|           |            | * The "all" keyword in blacklisting is now case insensitive.                                                                          |
-|           |            | * More fine-grained reporting in the rare case where a controller                                                                     |
-|           |            |   battery fails during learning and charging states.                                                                                  |
-|           |            | * New improved way of reporting perl warnings during execution of the                                                                 |
-|           |            |   plugin.                                                                                                                             |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.3`_  | 2009-12-17 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * Fix for path to omreport on Linux with OMSA 6.2.0                                                                                   |
-|           |            | * A couple of other small fixes                                                                                                       |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.2`_  | 2009-11-17 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * Fix for undefined device name for logical drives (thanks to Pontus                                                                  |
-|           |            |   Fuchs for a patch)                                                                                                                  |
-|           |            | * Fixed a bug in the PNP4Nagios template, that prevented the template                                                                 |
-|           |            |   from working with PNP4Nagios 0.6. Thanks to the PNP4Nagios team for                                                                 |
-|           |            |   the fix.                                                                                                                            |
-|           |            | * Other small fixes                                                                                                                   |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.1`_  | 2009-10-22 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * CPU type, family etc. are now reported in case of a CPU failure (and in the debug output)                                           |
-|           |            | * The debug output now reports Openmanage version and plugin version                                                                  |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.5.0`_  | 2009-10-13 | * **Major feature enhancements**                                                                                                      |
-|           |            | * New option ``-a`` or ``--all`` turns on checking of everything                                                                      |
-|           |            | * The manual page (POD info) is removed from the script and is now in                                                                 |
-|           |            |   a separate file, to make check_openmanage fully ePN compatible                                                                      |
-|           |            | * ePN is no longer disabled by default, check_openmanage no longer has                                                                |
-|           |            |   an opinion on whether it should run under ePN or not                                                                                |
-|           |            | * The ``-m`` or ``--man`` option is no longer available                                                                               |
-|           |            | * The option ``-v`` or ``--verbose`` is renamed to ``-d`` or ``--debug``,                                                             |
-|           |            |   which makes more sense wrt. its usage                                                                                               |
-|           |            | * The ``-g`` or ``--global`` option is removed. Checking the global health                                                            |
-|           |            |   status is now default if applicable                                                                                                 |
-|           |            | * Checking intrusion detection is now turned on by default                                                                            |
-|           |            | * The obsolete option ``--snmp`` is removed                                                                                           |
-|           |            | * The option ``--state`` now has a shorter equivalent ``-s``                                                                          |
-|           |            | * The basename stuff and options ``--only-critical`` and                                                                              |
-|           |            |   ``--only-warning`` are now replaced by an option ``--only``                                                                         |
-|           |            | * If plugin is run by Nagios, redirect stderr to stdout, useful for detecting errors within the plugin                                |
-|           |            | * Added option ``--omreport``, that lets the user specify the full path                                                               |
-|           |            |   to the omreport binary                                                                                                              |
-|           |            | * Added non-8bit-legacy default search paths for omreport.exe for                                                                     |
-|           |            |   Windows boxen                                                                                                                       |
-|           |            | * Minor changes to the plugin output, for consistency                                                                                 |
-|           |            | * New blacklisting keyword ``bat_charge`` disables warning messages                                                                   |
-|           |            |   related to controller cache battery charging. Thanks to Robert                                                                      |
-|           |            |   Heinzmann for a patch.                                                                                                              |
-|           |            | * For blacklisting, the component ID kan now be "ALL", in which all                                                                   |
-|           |            |   components of that type is blacklisted.                                                                                             |
-|           |            | * Man page is moved to section 8                                                                                                      |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.9`_  | 2009-08-07 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * Fixed a bug that could cause errors and weird results when checking cooling devices (fans) via SNMP. Thanks to Ken McKinlay         |
-|           |            |   for spotting this bug and reporting it.                                                                                             |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.8`_  | 2009-07-31 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * For failed physical drives, check_openmanage will now output the drive's vendor, model and size in GB or TB.                        |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.7`_  | 2009-07-24 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * The ``-s|--snmp`` option was redundant and no longer does anything. SNMP is triggered automatically if the ``-H|--hostname``        |
-|           |            |   option is present. The ``-s|--snmp`` option is kept for compatibility, but has no effect.                                           |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.6`_  | 2009-07-07 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * Added support for performance data (temperatures) from attached                                                                     |
-|           |            |   storage enclosures such as the MD1000                                                                                               |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.5`_  | 2009-06-22 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * Fixed a regression in the ``--htmlinfo`` option when it is not supplied with an argument                                            |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.4`_  | 2009-06-22 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * New option ``--htmlinfo`` adds clickable HTML links in the plugin's output                                                          |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.3`_  | 2009-06-11 | * **Minor bugfixes**                                                                                                                  |
-|           |            | * Fixed a regression bug in CPU and power supply reporting that only affects verbose output                                           |
-|           |            | * If blacklisting is used, the global health check (via the ``--global`` option) is now negated. Checking the global health doesn't   |
-|           |            |   make sense when one or more components is blacklisted. Thanks to Rene Beaulieu for reporting                                        |
-|           |            |   this bug                                                                                                                            |
-|           |            | * The PNP4Nagios template is now included in the tarball and zip archive                                                              |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.2`_  | 2009-06-03 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * Improved memory error reporting, when using omreport                                                                                |
-|           |            | * Collect performance data from pwrmonitoring (amperage probes) that were previously ignored when using omreport                      |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.1`_  | 2009-05-25 | * **Minor feature enhancements**                                                                                                      |
-|           |            | * Improved memory error reporting, when using SNMP                                                                                    |
-|           |            | * Other small ehnancements                                                                                                            |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.4.0`_  | 2009-05-25 | * **Major feature enhancements**                                                                                                      |
-|           |            | * The plugin is now compatible with the Nagios embedded Perl interpreter (ePN) *in theory*. However, the plugin will not *not* use ePN|
-|           |            |   by default. We don't want any "accidents".                                                                                          |
-|           |            | * License is now GPLv3, previously only specified as "GPL"                                                                            |
-|           |            | * New options ``--only-critical`` and ``--only-warning``. With these                                                                  |
-|           |            |   options the plugin will only print critical or warning alerts,                                                                      |
-|           |            |   respectively.                                                                                                                       |
-|           |            | * Bugfixes and speed enhancements in the storage section, when checking enclosure components via omreport                             |
-|           |            | * The ``-o|--okinfo`` option is now less verbose and more to the point                                                                |
-|           |            | * Lots of code refactoring for readability, maintainability and robustness                                                            |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.3.2`_  | 2009-05-05 | * Fixed a bug in the storage section, when checking controllers. This is an obscure bug that only manifests itself in the odd case    |
-|           |            |   where a server has multiple controllers, and one of the controllers are missing some of the OIDs, in which case these OIDs will be  |
-|           |            |   missing for the other controllers as well. The change is minor and only includes using get_table() instead of get_entries() to      |
-|           |            |   collect the SNMP result. Thanks to Stephan Bovet for reporting this bug.                                                            |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.3.1`_  | 2009-04-28 | * The ``--perfdata`` option can now optionally take an argument "multiline", which makes the plugin produce multiline performance data|
-|           |            |   output in a Nagios 3.x way. Not really needed, but the plugin output is prettier.                                                   |
-|           |            | * Added comment within the 10 first lines to disable the nagios embedded perl (ePN) interpreter by default for Nagios 3.x             |
-|           |            | * Improvements in the performance data output. Units are now included                                                                 |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.3.0`_  | 2009-04-07 | * **Feature Release**                                                                                                                 |
-|           |            | * Added ``--global`` option, which turns on checking of everything. If used with SNMP, the global system health status is also probed,|
-|           |            |   to protect the user against bugs in the plugin. If used with omreport, the overall chassis health is used.                          |
-|           |            | * Support for SNMP version 3                                                                                                          |
-|           |            | * New check added: *esmhealth*. This checks the overall health of the ESM log, i.e. the fill grade. More than 80% means a warning     |
-|           |            |   message                                                                                                                             |
-|           |            | * Fixed alert log reporting to use the same format as for the ESM log                                                                 |
-|           |            | * Output messages are now sorted by severity                                                                                          |
-|           |            | * Minor changes in how out-of-date controller firmware/driver is reported                                                             |
-|           |            | * Code refactoring and cleanup                                                                                                        |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.2.7`_  | 2009-03-29 | * Use "``omreport about``" to collect OMSA version. Slightly faster than "``omreport system version``". This should give a small      |
-|           |            |   speedup in certain configurations                                                                                                   |
-|           |            | * Fixed typo in output when a logical drive is rebuilding. Thanks to Andreas Olsson for reporting                                     |
-|           |            | * Improved reporting of ESM log content                                                                                               |
-|           |            | * Added omreport.sh as alternate omreport path                                                                                        |
-|           |            | * Lots of other small fixes and enhancements                                                                                          |
-|           |            |                                                                                                                                       |
-|           |            | Plus: A few changes to make the plugin work with old PowerEdge models (e.g. 2550, 2450) and/or old OMSA versions (e.g. version 4.5):  |
-|           |            |                                                                                                                                       |
-|           |            | * Use the chassisModelName OID to determine if SNMP works (instead of BaseboardType)                                                  |
-|           |            | * No longer require a response when checking baseboard type via SNMP. If there is no response, we assume that we're not dealing       |
-|           |            |   with a blade server                                                                                                                 |
-|           |            |                                                                                                                                       |
-|           |            | *Thanks to Christian McHugh for help with testing and debugging this stuff*                                                           |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.2.6`_  | 2009-03-05 | * Use ``omreport system operatingsystem`` to collect OS info, instead of ``omreport system version`` which is incredibly slow.        |
-|           |            |   This should speed things up in certain configurations.                                                                              |
-|           |            | * A few speedups, don't collect information that isn't needed                                                                         |
-|           |            | * Man page fixes                                                                                                                      |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.2.5`_  | 2009-02-24 | * New option ``--linebreak`` to specify the separator between line in case of multiline output                                        |
-|           |            | * Added support for 64bit Windows. Thanks to Patrick Hemmen for a patch                                                               |
-|           |            | * [Patrick Hemmen] Added ``install.bat`` for Windows installation                                                                     |
-|           |            | * [Patrick Hemmen] Improvements on ``install.sh``. Will now install in ``/usr/lib64`` for x86_64                                      |
-|           |            | * RPMs are now architecture dependent, because of different libdir                                                                    |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.2.4`_  | 2009-02-17 | * New option ``-o|--ok-info`` to display extra information when everything is ok. The plugin can now display storage firmware         |
-|           |            |   and driver info, DRAC and BMC firmware, and OMSA version                                                                            |
-|           |            | * Support for setting custom minimum temperature thresholds via the ``-c|--critical`` and ``-w|--warning`` options                    |
-|           |            | * Better and more detailed temperature error reporting                                                                                |
-|           |            | * Bugfix in the amperage report (including performance data). The plugin now takes into account the correct unit and measurement      |
-|           |            |   for amperage probes (other than watts)                                                                                              |
-|           |            | * New option ``--port`` lets the user specify the remote SNMP port number                                                             |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.2.3`_  | 2009-02-09 | * Regression fix: Use the older *Processor Device* SNMP OIDs for older PowerEdge models, that don't have the new                      |
-|           |            |   *Processor Device Status* OIDs. Thanks to Nicole Hähnel for reporting this bug.                                                     |
-|           |            | * Default output (when there are no alerts) now shows RAC firmware, BMC firmware, info about controllers and enclosures               |
-|           |            |   (firmware, driver).                                                                                                                 |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.2.2`_  | 2009-02-03 | * Regression fix: Ignore unoccupied CPU slots with SNMP probing. This fixes a bug introduced in versjon 3.2.1, which would output     |
-|           |            |   something like this if one or more CPU slots were empty: ``CPU 1 needs attention ()``                                               |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.2.1`_  | 2009-02-03 | * Use *Processor Device Status Table* OIDs instead of *Processor Device Table* when checking CPUs via SNMP                            |
-|           |            | * Bugfix: don't report throttled CPUs as warnings when checking via SNMP (same as for checking locally)                               |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.2.0`_  | 2009-01-27 | * **Feature release**                                                                                                                 |
-|           |            | * New options ``--state`` and ``--short-state`` for displaying service state along with the alert                                     |
-|           |            | * Lots of small fixes for code readability and maintainability                                                                        |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.1.1`_  | 2009-01-12 | * Support for running natively on Windows (using omreport.exe). Thanks to Peter Jestico for a patch.                                  |
-|           |            | * Support for compiled Windows version, i.e. ``check_openmanage.exe`` is now a legal script name.                                     |
-|           |            | * Exit with error if script basename is illegal/unknown                                                                               |
-|           |            | * Various small fixes                                                                                                                 |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.1.0`_  | 2008-12-26 | * **Feature Release: Alternate basenames**                                                                                            |
-|           |            | * Use of alternate basenames for checking only one class of components                                                                |
-|           |            | * Added support for checking the ESM log via SNMP                                                                                     |
-|           |            | * Code refactoring for robustness and maintainability                                                                                 |
-|           |            | * Numerous small fixes and enhancements                                                                                               |
-|           |            | * Added install script in distribution tarball                                                                                        |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.0.2`_  | 2008-12-20 | * The script no longer aborts if it can't get system information via SNMP. Give a warning instead, as this is not a critical error    |
-|           |            | * Increased robustness when checking controllers                                                                                      |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.0.1`_  | 2008-12-11 | * Man page fix in the 'check' section. Thanks to Ansgar Dahlen for reporting this.                                                    |
-|           |            | * Allow invalid command error from 'omreport chassis pwrmonitoring'                                                                   |
-|           |            | * Various small fixes                                                                                                                 |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `3.0.0`_  | 2008-12-04 | * **Major release**                                                                                                                   |
-|           |            | * Use unique IDs for storage components with regard to blacklisting, which means that the blacklisting API has changed                |
-|           |            | * Added checks for storage components: connectors (channels), enclosures, enclosure fans, enclosure power supplies, enclosure         |
-|           |            |   temperature probes and enclosure management modules (EMMs)                                                                          |
-|           |            | * Improved verbose output                                                                                                             |
-|           |            | * New option ``-t|--timeout`` for setting the plugin timeout                                                                          |
-|           |            | * New option ``-w|--warning`` for setting custom temperature warning thresholds                                                       |
-|           |            | * New option ``-c|--critical`` for setting custom temperature critical thresholds                                                     |
-|           |            | * Option ``--check`` can no longer be specified in its short form (``-c``)                                                            |
-|           |            | * Code cleanup and improvements                                                                                                       |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.1.1`_  | 2008-11-24 | * The workaround for the OMSA bug introduced in OMSA 5.5.0 didn't take multiple controllers into account. This has been fixed.        |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.1.0`_  | 2008-11-19 | * **Feature Release: output control**                                                                                                 |
-|           |            | * New option ``-i|--info`` prefixes all alerts with the service tag                                                                   |
-|           |            | * New option ``-e|--extinfo`` gives and extra line of output in case of an alert (model and service tag)                              |
-|           |            | * New option ``--postmsg`` lets the user specify a post message string, with info such as model, service tag etc.                     |
-|           |            | * Options ``-b|--blacklist`` and ``-c|--check`` can now be specified multiple times (actually quite useful)                           |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.9`_  | 2008-11-17 | * Slightly improved output for alerts on logical drives (vdisks)                                                                      |
-|           |            | * Now shows a rebuilding physical disk as a warning, as this is usually accompanied by a degraded vdisk. Previous versions            |
-|           |            |   didn't show this at all (omreport classifies it as "OK").                                                                           |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.8`_  | 2008-11-14 | * Slightly improved output for charging controller batteries                                                                          |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.7`_  | 2008-11-12 | * Bugfix for reporting physical drives with predictive failure (both via NRPE and SNMP)                                               |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.6`_  | 2008-10-30 | * Fix bug in option handling (ambiguous options)                                                                                      |
-|           |            | * Slightly improved output if checking the storage subsystem is turned off                                                            |
-|           |            | * Don't complain if there are no logical drives. This is OK. Thanks to Jamie Henderson for reporting this                             |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.5`_  | 2008-10-29 | * Fix bug in SNMP status level table                                                                                                  |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.4`_  | 2008-10-29 | * Added workaround for a BUG introduced in OpenManage 5.5.0. OM sometimes adds a newline in the controller driver version name,       |
-|           |            |   which leads to problems parsing the output. Thanks to Hiren Patel for bringing this to my attention.                                |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.3`_  | 2008-10-28 | * (snmp) Improved handling of cases where OM is not working properly                                                                  |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.2`_  | 2008-10-27 | * Fixed issue where controller number for physical disks can't be established via SNMP (now identifies as controller no. -1)          |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.1`_  | 2008-10-23 | * Correctly identifies and reports error condition in which OpenManage has stopped working (it happens)                               |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `2.0.0`_  | 2008-10-23 | * **Major release: SNMP support**                                                                                                     |
-|           |            | * Same options for checking, blacklisting etc. supported with SNMP                                                                    |
-|           |            | * Same output with SNMP as with NRPE                                                                                                  |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `1.2.1`_  | 2008-09-25 | * Collects performance data if the option ``-p`` | ``--perfdata`` is supplied. The following data is collected:                       |
-|           |            |    - Temperatures in Celcius                                                                                                          |
-|           |            |    - Fan speeds in rpm                                                                                                                |
-|           |            |    - Power consumption in Watts (on systems that support it)                                                                          |
-|           |            | * New blacklisting directives ``ctrl_fw`` and ``ctrl_driver`` added. Suppresses the "special" warning messages concerning             |
-|           |            |   outdated controller firmware and driver. Useful if you can't or won't upgrade.                                                      |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `1.1.2`_  | 2008-08-06 | * Bugfix release. Fix getting system model and serial number for newer blades                                                         |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `1.1.1`_  | 2008-08-06 | * Three new checks added:                                                                                                             |
-|           |            |    - System battery probes (typical CMOS battery). Newer poweredge models have these                                                  |
-|           |            |    - Power consumption monitoring (if the server supports it)                                                                         |
-|           |            |    - ESM log, with same functionality as the alert log check. Disabled by default.                                                    |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `1.1.0`_  | 2008-08-04 | * Internal refactoring: use ssv-formatted output from openmanage, resulting in slightly faster execution and increased robustness.    |
-|           |            | * If ``/usr/bin/omreport`` doesn't exist, try ``/opt/dell/srvadmin/oma/bin/omreport``.                                                |
-|           |            | * Allow for no instrumented/redundant power supplies. Needed on low-end poweredge models and blades.                                  |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `1.0.3`_  | 2008-07-25 | * Openmanage reports non-critical warning about throttled CPUs on new hardware models. Most og us use ondemand CPU frequency          |
-|           |            |   scaling (with throttled CPUs as a result). This specific non-critical warning (CPU Throttled) is ignored from now on.               |
-|           |            | * Remove superfluous Celcius sign when reporting temperatures.                                                                        |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-| `1.0.1`_  | 2008-07-18 | * When everything is OK, check_openmanage now outputs the same info                                                                   |
-|           |            |   as Gerhard Lausser's excellent `check_hpasm`_ plugin does for HP servers::                                                          |
-|           |            |                                                                                                                                       |
-|           |            |     OK - System: 'poweredge 2850', S/N: 'XXXXXXX', ROM: 'A06 10/03/2006', hardware working fine, 2 logical drives, 4 physical drives  |
-+-----------+------------+---------------------------------------------------------------------------------------------------------------------------------------+
-
-
-Frequently Asked Questions (FAQ)
-================================
-
-.. _check_dell_openmanage: http://exchange.nagios.org/directory/Plugins/Hardware/Server-Hardware/Dell/check_dell_openmanage/details
-.. _HPC Community's "official" plugin: http://exchange.nagios.org/directory/Plugins/Hardware/Server-Hardware/Dell/Dell-OpenManage-Nagios-Plugin/details
-
-General
--------
-
-Why did you make check_openmanage?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Why did you make check_openmanage?
 
 I wanted a monitoring tool for our Dell servers that was as good as
 Gerhard Lausser's `check_hpasm`_ plugin is for HP servers. None of the
@@ -2530,8 +1825,7 @@ with the community, and I've never regretted this
 decision. Constructive feedback from users have improved this plugin
 immensely.
 
-How does check_openmanage compare to other Dell plugins?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####How does check_openmanage compare to other Dell plugins?
 
 Like most Nagios plugins that check the hardware health of Dell
 servers, check_openmanage uses OpenManage Server Administrator (OMSA)
@@ -2541,8 +1835,7 @@ subsystems and return the status code, while check_openmanage also
 tries to figure out exactly what is wrong and report it in a detailed
 and concise manner.
 
-Why both 32bit and 64bit RPM packages?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Why both 32bit and 64bit RPM packages?
 
 This is a perl script, which is architecture independent by itself, so
 one would think that the RPM arch would be "noarch". However, since
@@ -2551,40 +1844,37 @@ Nagios plugins under ``/usr/lib`` for 32bit and ``/usr/lib64`` for
 64bit platforms, I wanted to apply this to check_openmanage as
 well. This is the *only* difference between the two RPM packages.
 
-I don't like check_openmanage, are there other Dell plugins that you would recommend?
+####I don't like check_openmanage, are there other Dell plugins that you would recommend?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are many plugins out there. The ones I would recommend are Jason
-Ellison's excellent `check_dell_openmanage`_ plugin and `HPC
-Community's "official" plugin`_. They are both SNMP only, and are
-simpler then check_openmanage in the sense that they don't check as
-many OIDs and don't use as many features of OMSA. That way, they are
-less dependent on recent OMSA versions, have faster execution time,
-and are probably also less error prone.
+Ellison's excellent
+[check_dell_openmanage](http://exchange.nagios.org/directory/Plugins/Hardware/Server-Hardware/Dell/check_dell_openmanage/details)
+plugin and [HPC Community's "official"
+plugin](http://exchange.nagios.org/directory/Plugins/Hardware/Server-Hardware/Dell/Dell-OpenManage-Nagios-Plugin/details). They
+are both SNMP only, and are simpler then check_openmanage in the sense
+that they don't check as many OIDs and don't use as many features of
+OMSA. That way, they are less dependent on recent OMSA versions, have
+faster execution time, and are probably also less error prone.
 
-Is there a compiled executable for Windows that can be used with NSClient++?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Is there a compiled executable for Windows that can be used with NSClient++?
 
 Yes. See the paragraph about `local check on windows`_
 
-Is VMware ESXi supported?
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _OMSA 6.4 documentation intro: http://support.dell.com/support/edocs/software/svradmin/6.4/en/UG/HTML/intro.htm
+####Is VMware ESXi supported?
 
 Unfortunately, no. OMSA for ESXi has serious limitations that impacts
-monitoring with check_openmanage. The following quote is from the `OMSA
-6.4 documentation intro`_:
+monitoring with check_openmanage. The following quote is from the [OMSA
+6.4 documentation intro](http://support.dell.com/support/edocs/software/svradmin/6.4/en/UG/HTML/intro.htm):
 
-  NOTE: While ESXi supports SNMP traps, it does not support hardware
-  inventory through SNMP.
+> NOTE: While ESXi supports SNMP traps, it does not support hardware
+> inventory through SNMP.
 
 For ESXi you can't use check_openmanage. Options for monitoring ESXi
 include setting up an SNMP trap receiver on the Nagios server, and
 configuring it as the trap destination on the ESXi hosts.
 
-Is check_openmanage ePN compatible?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Is check_openmanage ePN compatible?
 
 ("ePN" is the Nagios' embedded perl interpreter. Many people turn this
 off by default, as it often does more damage than good.)
@@ -2594,53 +1884,32 @@ with or without ePN. If your Nagios server has ePN turned on, and for
 some reason you want to disable ePN for this plugin, add the following
 line among the first 10 lines of the script::
 
-  # nagios: -epn
+```
+# nagios: -epn
+```
 
 If you are running Nagios 2.x, you should specify ``perl <script>`` in
 your Nagios config if you have ePN enabled and want to disable it for
 this plugin.
 
 
-How to get notified of new releases?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####How can I contact you if I have problems, bug reports, feature requests etc.?
 
-.. _check_openmanage project on Freecode: http://freecode.com/projects/check_openmanage
-
-There isn't an email list or similar, but new releases are announced
-on Freecode and NagiosExchange. The easiest way to be notified of new
-releases is to subscribe to the `check_openmanage project on
-Freecode`_. You'll need a Freecode account, getting one is easy.
+You can contact me via email (see the manual page). Depending on the
+time of day etc., you can also reach me on the IRC, as ``trondham`` on
+the ``#nagios`` channel on Freenode.
 
 
-How can I contact you if I have problems, bug reports, feature requests etc.?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+###OpenManage (OMSA)
 
-You can contact me via email (see the top of the document), but I
-prefer that you use the Nagios users mailing list for discussions
-about check_openmanage:
-
-  `nagios-users@lists.sourceforge.net`_
-
-I won't be angry or upset if you email me directly, but in general
-it's better to discuss problems in a public forum.
-
-Depending on the time of day etc., you can also reach me on the
-IRC, as ``trondham`` on the ``#nagios`` channel on Freenode.
-
-
-OpenManage (OMSA)
------------------
-
-Which version of OMSA is OK?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Which version of OMSA is OK?
 
 Check_openmanage is tested with OMSA versions 5.3 and later. All these
 should be OK to use. Note that some versions don't play well with
 Windows and SNMP. For the best results, use the newest release
 available.
 
-Why do I get weird results from check_openmanage on my old server and/or old OMSA version?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Why do I get weird results from check_openmanage on my old server and/or old OMSA version?
 
 Upgrade your Openmanage (OMSA) version. Check_openmanage is developed
 with OMSA versions 5.3 and later. You should always try to use
@@ -2651,50 +1920,43 @@ Some really old servers (5.generation and older, e.g. 2550, 2450)
 can't run newer OMSA than 4.5. Hence, these old servers are not
 supported by check_openmanage.
 
-How can I find out which version of OMSA my server is running?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####How can I find out which version of OMSA my server is running?
 
 This can be done in many ways. Log in to your server and type the
 command ``omreport about`` (or ``omreport.exe about`` on Windows):
 
-.. parsed-literal::
+```
+$ omreport about
 
-  $ **omreport about**
-  
-  Product name : Server Administrator
-  Version      : 6.1.0
-  Copyright    : Copyright (C) Dell Inc. 1995-2009. All rights reserved.
-  Company      : Dell Inc.
-    
+Product name : Server Administrator
+Version      : 6.1.0
+Copyright    : Copyright (C) Dell Inc. 1995-2009. All rights reserved.
+Company      : Dell Inc.
+```  
 
 You can also use check_openmanage to display the OMSA version, with
 the ``-d`` or ``--debug`` option:
 
-.. parsed-literal::
+```
+$ check_openmanage -H myhost -d | head -n 3
+ System:      PowerEdge M600
+ ServiceTag:  88CBS3J                  OMSA version:    **6.1.0**
+ BIOS/date:   2.1.4 08/15/2008         Plugin version:  3.5.5
+```
 
-  $ **check_openmanage -H myhost -d | head -n 3**
-   System:      PowerEdge M600
-   ServiceTag:  88CBS3J                  OMSA version:    **6.1.0**
-   BIOS/date:   2.1.4 08/15/2008         Plugin version:  3.5.5
 
-
-
-My boss won't let me upgrade OMSA
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####My boss won't let me upgrade OMSA
 
 Your boss is a moron. Also, that wasn't technically a question.
 
-Our security policy doesn't allow OMSA upgrades
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Our security policy doesn't allow OMSA upgrades
 
 Your security policy is broken. That wasn't a question either.
 
 
-Common Errors
--------------
+###Common Errors
 
-ERROR: Dell OpenManage Server Administrator (OMSA) is not installed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####ERROR: Dell OpenManage Server Administrator (OMSA) is not installed
 
 This error normally indicates that OpenManage is not installed on the
 host. However, it may be that OpenManage is installed in a location
@@ -2702,27 +1964,29 @@ other than the default. In this case, the omreport binary is not in
 the search path of check_openmanage. You can work around this by using
 the ``--omreport`` option, like this::
 
-  check_openmanage --omreport /usr/local/bin/omreport
+```
+check_openmanage --omreport /usr/local/bin/omreport
+```
 
 The above should be configured in ``nrpe.cfg`` if you're using
 NRPE. If you're using the .exe file for Windows with NSClient++, you
 should configure this in the file ``nsc.ini`` on the host. Example::
 
-  check_openmanage.exe --omreport P:\dellopenmanage\oma\bin\omreport.exe
+```
+check_openmanage.exe --omreport P:\dellopenmanage\oma\bin\omreport.exe
+```
 
 If the omreport or omreport.exe binary is installed in a place where
 you think that check_openmanage should look by default, send me a
 note.
 
-ERROR: You need perl module Net::SNMP to run check_openmanage in SNMP mode
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####ERROR: You need perl module Net::SNMP to run check_openmanage in SNMP mode
 
 The perl module ``Net::SNMP`` is not installed, or not available to
 the perl interpreter. This module is required for SNMP. See the
 prerequisites_ section.
 
-SNMP CRITICAL: No response from remote host '10.1.2.3'
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####SNMP CRITICAL: No response from remote host '10.1.2.3'
 
 This error indicates that the SNMP daemon is not running or not
 responding. There is no reply from the monitored server on port 161
@@ -2734,8 +1998,7 @@ match. If this is the case, inspect the SNMP settings on the server
 and verify that the community name matches the ``-C`` option given to
 the plugin.
 
-ERROR: (SNMP) OpenManage is not installed or is not working correctly
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####ERROR: (SNMP) OpenManage is not installed or is not working correctly
 
 This error indicates that the SNMP service is responding, but
 OpenManage OIDs are not present. To be specific, check_openmanage
@@ -2748,14 +2011,15 @@ OpenManage OIDs. The SNMP part of OpenManage may not be installed or
 running. For Linux, the ``snmpd.conf`` file should have the
 following::
 
-  smuxpeer .1.3.6.1.4.1.674.10892.1
+```
+smuxpeer .1.3.6.1.4.1.674.10892.1
+```
 
 This should be added by OpenManage at install time. The simple
 solution may be to reinstall OpenManage and look for errors during
 installation.
 
-SNMP CRITICAL: Received genError(5) error-status at error-index 1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####SNMP CRITICAL: Received genError(5) error-status at error-index 1
 
 Some OpenManage versions perform poorly on Windows, especially
 versions 5.4.0 and earlier. If you get this error on a Windows host,
@@ -2764,8 +2028,7 @@ check the OpenManage version and consider upgrading.
 This error is from the Net::SNMP perl module.
 
 
-PLUGIN TIMEOUT: check_openmanage timed out after 30 seconds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####PLUGIN TIMEOUT: check_openmanage timed out after 30 seconds
 
 If your server is under very heavy load, it may take some time for
 check_openmanage to finish, especially if you run the plugin locally
@@ -2777,8 +2040,7 @@ locally. Checking via SNMP is even faster.
 Be aware that NRPE has it's own timeout, also adjustable.
 
 
-INTERNAL ERROR: blah blah
-~~~~~~~~~~~~~~~~~~~~~~~~~
+####INTERNAL ERROR: blah blah
 
 The plugin will output any perl warnings that occur during execution
 as internal errors with unknown state. If you get one or more internal
@@ -2786,15 +2048,14 @@ errors like this, you may have hit a bug in the plugin. Please contact
 me if you get internal errors.
 
 
-UNKNOWN: Problem running 'omreport foo bar'
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####UNKNOWN: Problem running 'omreport foo bar'
 
-::
-
-  UNKNOWN: Problem running 'omreport chassis fans': Error! No fan probes found on this system.
-  UNKNOWN: Problem running 'omreport chassis temps': Error! No temperature probes found on this system.
-  UNKNOWN: Problem running 'omreport chassis volts': Error! No voltage probes found on this system.
-  [...etc...]
+```
+UNKNOWN: Problem running 'omreport chassis fans': Error! No fan probes found on this system.
+UNKNOWN: Problem running 'omreport chassis temps': Error! No temperature probes found on this system.
+UNKNOWN: Problem running 'omreport chassis volts': Error! No voltage probes found on this system.
+[...etc...]
+```
 
 These are general errors that can have different causes. OMSA,
 especially old versions, are known to have bugs that cause the
@@ -2836,13 +2097,14 @@ semaphores. There are three workarounds for this problem:
    running the plugin. This can be achieved like this (example for the
    user "nrpe")::
 
-     ipcrm $(ipcs -s | awk '/nrpe/ {print "-s ",$2}')
+   ```
+   ipcrm $(ipcs -s | awk '/nrpe/ {print "-s ",$2}')
+   ```
 
    This approach is a last resort. The commands above can be run
    manually whenever the issue appears, or periodically by crond.
 
-Storage Error! No controllers found
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Storage Error! No controllers found
 
 From version 3.6.0 of the plugin, storage is no longer allowed to be
 absent. The reason for this is that there have been several issues
@@ -2861,73 +2123,33 @@ categories, you should specify either **--no-storage** or **--check
 storage=0** to prevent check_openmanage to check the storage system in
 the first place::
 
-  check_openmanage --no-storage [other options...]
-  check_openmanage --check storage=0 [other options...]
+```
+check_openmanage --no-storage [other options...]
+check_openmanage --check storage=0 [other options...]
+```
 
 If the server in question has storage that should be monitored, you'll
 have to check OMSA, particularly which components of it are installed.
 
 
-.. # Problem running 'omreport chassis pwrmonitoring': Error: Current probes not found
-.. # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. # 
-.. # There are two known causes for this error:
-.. # 
-.. # 1. There is a bug in OMSA 5.4.0 that will cause this error on some
-.. #    hardware. If you're running OMSA 5.4.0 and get this error, consider
-.. #    upgrading to 5.5.0 or later.
-.. # 
-.. # 2. On newer hardware (such as the R710) you will get this error if the
-.. #    BIOS setting for Power Management is set to "Maximum
-.. #    Performance". To avoid this error, set the power management setting
-.. #    to "Active Power Controller", which is the factory setting.
-.. # 
-.. # If you get this error and your system doesn't fall into one of these
-.. # categories, let me know.
-
-
-Reporting bugs, proposing new features etc.
-===========================================
+##Reporting bugs, proposing new features etc.
 
 .. _University of Oslo: http://www.uio.no/english/
 
 Please let me know if you are experiencing bugs, have feature
 requests, or suggestions on how to improve check_openmanage. We use
-this plugin in production at the `University of Oslo`_, on many Dell
+this plugin in production at the [University of Oslo](http://www.uio.no/english/), on many Dell
 servers of different models, but we don't use all the different
 features of the plugin. While the plugin is bug-free for us, it might
 not be for you, so let me know if you have problems.
 
-Please send bug reports or feature requests to the Nagios users
-mailing list. I read postings to this list frequently:
-
-  `nagios-users@lists.sourceforge.net`_
-
-You can also email me directly, but then other users won't benefit
-from the discussion. Unless you have security issues or other concerns
-are preventing you from using the mailing list, it is better to
-discuss problems in a public forum.
+Please send bug reports or feature requests to me directly, as the old
+nagios-user mailing list is dead.
 
 Depending on the time of day etc., you can also reach me on the
 IRC, on the ``#nagios`` channel on Freenode.
 
 
-Disclaimer
-==========
+##Disclaimer
 
 This is free software. Use at your own risk.
-
-
-Useful Links
-============
-
-.. _Dell OpenManage Server Administrator Version 6.2: http://support.euro.dell.com/support/edocs/software/svradmin/6.2/
-.. _Dell OpenManage Server Administrator Version 6.3: http://support.euro.dell.com/support/edocs/software/svradmin/6.3/
-.. _Dell OpenManage Server Administrator Version 6.4: http://support.euro.dell.com/support/edocs/software/svradmin/6.4/
-.. _Dell OpenManage Server Administrator Version 6.5: http://support.euro.dell.com/support/edocs/software/svradmin/6.5/
-
-* Documentation: `Dell OpenManage Server Administrator Version 6.2`_
-* Documentation: `Dell OpenManage Server Administrator Version 6.3`_
-* Documentation: `Dell OpenManage Server Administrator Version 6.4`_
-* Documentation: `Dell OpenManage Server Administrator Version 6.5`_
-
