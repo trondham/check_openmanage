@@ -149,8 +149,10 @@ distributions. Installing ``Net::SNMP`` is quite easy:
 
 * For RHEL6 and CentOS 6 the best way is to use Fedora EPEL:
 
-      yum --nogpgcheck install http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
-      yum install perl-Net-SNMP
+  ```
+  yum --nogpgcheck install http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
+  yum install perl-Net-SNMP
+  ```
 
 * For RHEL5 and CentOS 5 the best way is to use Fedora EPEL:
 
@@ -161,19 +163,21 @@ distributions. Installing ``Net::SNMP`` is quite easy:
 
 * For Fedora:
 
-  ```bash
+  ```
   yum install perl-Net-SNMP
   ```
 
-* For SuSE::
+* For SuSE:
 
-  ```sh
+  ```
   rug install perl-Net-SNMP
   ```
 
-* For Debian and Ubuntu::
+* For Debian and Ubuntu:
 
-    aptitude install libnet-snmp-perl
+  ```
+  aptitude install libnet-snmp-perl
+  ```
 
 To use the `configuration file`_, you'll also need the perl module
 ``Config::Tiny``. This perl module is available for most Linux
@@ -181,16 +185,21 @@ distributions:
 
 * For RHEL, CentOS and Fedora::
 
-    yum install perl-Config-Tiny
+  ```
+  yum install perl-Config-Tiny
+  ```
 
 * For SuSE::
 
-    rug install perl-Config-Tiny
+  ```
+  rug install perl-Config-Tiny
+  ```
 
 * For Debian and Ubuntu::
 
-    aptitude install libconfig-tiny-perl
-
+  ```
+  aptitude install libconfig-tiny-perl
+  ```
 
 
 Dell Openmanage Server Administrator
@@ -203,10 +212,8 @@ http://support.dell.com/, select "Drivers and downloads", select your
 server model, and download the package called "Openmanage Server
 Administrator Managed Node" under "Systems Management".
 
-.. IMPORTANT::
-
-   check_openmanage is tested with OMSA version 5.3 or later. Older
-   versions **may** work, but no guarantees. YMMV.
+check_openmanage is tested with OMSA version 5.3 or later. Older
+versions **may** work, but no guarantees. YMMV.
 
 There are also official Dell repositories for Red Hat and SuSE. For
 information about these, look here: http://linux.dell.com/repo/hardware/
@@ -235,10 +242,6 @@ The following components are allowed to be missing on all servers:
 * Intrusion detection sensor
 * Removable flash media (SD cards)
 
-.. NOTE::
-   As of version 3.6.0, storage controllers are no longer allowed to
-   be missing.
-
 In addition, the following components are allowed to be missing if the
 server is identified as a blade system:
 
@@ -259,26 +262,32 @@ NRPE etc. If run from a console which has a TTY, i.e. if you log in
 via SSH or similar and run check_openmanage manually, the linebreaks
 will be regular linebreaks.
 
-Nagios 3.x allows the following option in ``cgi.cfg``::
+Nagios 3.x allows the following option in ``cgi.cfg``:
 
-  # ESCAPE HTML TAGS
-  # This option determines whether HTML tags in host and service
-  # status output is escaped in the web interface.  If enabled,
-  # your plugin output will not be able to contain clickable links.
-  
-  escape_html_tags=1
+```
+# ESCAPE HTML TAGS
+# This option determines whether HTML tags in host and service
+# status output is escaped in the web interface.  If enabled,
+# your plugin output will not be able to contain clickable links.
+
+escape_html_tags=1
+```
 
 The default, as seen above in the sample ``cgi.cfg`` from the
 distribution, is that HTML tags are escaped. My advice is to turn this
 off. If not, you will see literal HTML linebreaks in the Nagios
-console, i.e. like this::
+console, i.e. like this:
 
-  Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost<br/>Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+```
+Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost<br/>Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+```
 
-instead of this::
+instead of this:
 
-  Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
-  Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+```
+Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
+Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+```
 
 With Nagios 3.x, plugins are allowed to output multiple lines with
 regular linebreaks, but only the first line is shown in the web
@@ -295,21 +304,19 @@ Getting started
 .. _service: http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#service
 .. _command: http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#command
 
-.. ATTENTION::
+This is a short HOWTO that describes how to get started with using
+check_openmanage. This HOWTO assumes that the prerequisites_ are met,
+and that you have a Nagios server up and running. Nagios version 3.x
+is assumed.
 
-   This is a short HOWTO that describes how to get started with using
-   check_openmanage. This HOWTO assumes that the prerequisites_ are
-   met, and that you have a Nagios server up and running. Nagios
-   version 3.x is assumed.
+The examples below are simple examples with very basic usage of
+check_openmanage. There are many more or less advanced options that
+you might consider useful. Se the Usage_ section for info.
 
-   The examples below are simple examples with very basic usage of
-   check_openmanage. There are many more or less advanced options that
-   you might consider useful. Se the Usage_ section for info.
-
-   Also note that the examples below are just that: *examples*. They
-   describe one way of doing things, that is simple and
-   straightforward. There are many other ways of configuring Nagios,
-   this is ultimately up to you.
+Also note that the examples below are just that: *examples*. They
+describe one way of doing things, that is simple and
+straightforward. There are many other ways of configuring Nagios, this
+is ultimately up to you.
 
 The first thing to consider is by which mechanism you want
 check_openmanage to check your Dell servers. You can run the script
@@ -329,46 +336,51 @@ Creating a hostgroup
 The first thing you want to do is create a hostgroup_ that contains
 your Dell servers, if you haven't already done so. If you have very
 few Dell servers you can skip this step and use hosts_ in the service
-definition instead, but I think hostgroups are always better::
+definition instead, but I think hostgroups are always better:
 
-  # hostgroup for Dell servers
-  define hostgroup {
-      hostgroup_name  dell-servers
-      alias           Dell Servers
-  }
+```
+# hostgroup for Dell servers
+define hostgroup {
+    hostgroup_name  dell-servers
+    alias           Dell Servers
+}
+```
 
 Defining the hosts
 ------------------
 
 You'll need a host definition for each of the servers. You probably
 already have this in place, but for the sake of completeness it is
-included in this mini-howto::
+included in this mini-howto:
 
-  define host {
-      host_name       my-server1.foo.org
-      alias           my-server1
-      address         192.168.10.12
-      use             generic-host
-      hostgroups      dell-servers
-      contact_groups  example@foo.org
-  }
-
+```
+define host {
+    host_name       my-server1.foo.org
+    alias           my-server1
+    address         192.168.10.12
+    use             generic-host
+    hostgroups      dell-servers
+    contact_groups  example@foo.org
+}
+```
 
 Creating a servicegroup
 -----------------------
 
-Next you want to create a servicegroup_ for this service. This is not
+Next you want to create a **servicegroup** for this service. This is not
 required, but it makes things easier when you want to inspect your
 Dell servers via Nagios' web interface. Creating a servicegroup is
-simple::
+simple:
 
-  # Servicegroup for Dell OpenManage
-  define servicegroup {
-      servicegroup_name         dell-openmanage
-      alias                     Dell server health status
-  }
+```
+# Servicegroup for Dell OpenManage
+define servicegroup {
+    servicegroup_name         dell-openmanage
+    alias                     Dell server health status
+}
+```
 
-The servicegroup_ is used later in the service definition.
+The servicegroup is used later in the service definition.
 
 
 Remote check via SNMP
@@ -377,35 +389,39 @@ Remote check via SNMP
 Defining a command
 ~~~~~~~~~~~~~~~~~~
 
-The next step is to define a command_ for check_openmanage::
+The next step is to define a command_ for check_openmanage:
 
-  # Openmanage check via SNMP
-  define command {
-      command_name    check_openmanage
-      command_line    /path/to/check_openmanage -H $HOSTADDRESS$
-  }
+```
+# Openmanage check via SNMP
+define command {
+    command_name    check_openmanage
+    command_line    /path/to/check_openmanage -H $HOSTADDRESS$
+}
+```
 
 (Replace ``/path/to`` with the actual path leading up to the plugin).
 
 Note that is is a very basic example of check_openmanage usage. Refer
-to the usage_ section for info about the different options that alters
+to the **usage** section for info about the different options that alters
 the behaviour of check_openmanage.
 
 
 Defining the service
 ~~~~~~~~~~~~~~~~~~~~
 
-Finally, you define the service_::
+Finally, you define the service:
 
-  # Dell OMSA status
-  define service {
-      use                       generic-service
-      hostgroup_name            dell-servers
-      servicegroups             dell-openmanage
-      service_description       Dell OMSA
-      check_command             check_openmanage
-      notes_url                 http://folk.uio.no/trondham/software/check_openmanage.html
-  }
+```
+# Dell OMSA status
+define service {
+    use                       generic-service
+    hostgroup_name            dell-servers
+    servicegroups             dell-openmanage
+    service_description       Dell OMSA
+    check_command             check_openmanage
+    notes_url                 http://folk.uio.no/trondham/software/check_openmanage.html
+}
+```
 
 The ``notes_url`` statement is optional.
 
@@ -416,26 +432,31 @@ Local check via NRPE
 If you want to use NRPE_, I assume that you have defined a check_nrpe
 command elsewhere in your config and are ready to use it. Usually, we
 don't define a command_ for check_openmanage when using NRPE_, so we
-go right to the service_ definition::
+go right to the service_ definition:
 
-  # Dell OMSA status
-  define service {
-      use                       generic-service
-      hostgroup_name            dell-servers,!evil-dell-servers
-      servicegroups             dell-openmanage
-      service_description       Dell OMSA
-      check_command             check_nrpe!check_openmanage
-      notes_url                 http://folk.uio.no/trondham/software/check_openmanage.html
-  }
+```
+# Dell OMSA status
+define service {
+    use                       generic-service
+    hostgroup_name            dell-servers,!evil-dell-servers
+    servicegroups             dell-openmanage
+    service_description       Dell OMSA
+    check_command             check_nrpe!check_openmanage
+    notes_url                 http://folk.uio.no/trondham/software/check_openmanage.html
+}
+```
 
 In this example we have opted to check the hostgroup "dell-servers",
 while ignoring the hostgroup "evil-dell-servers" (which contains Dell
-servers that can't run OMSA). Refer to the `Nagios documentation`_ to
+servers that can't run OMSA). Refer to the [Nagios
+documentation](http://nagios.sourceforge.net/docs/3_0/toc.html) to
 read up on hostgroups.
 
-The NRPE_ config has the following::
+The NRPE_ config has the following:
 
-  command[check_openmanage]=/path/to/check_openmanage
+```
+command[check_openmanage]=/path/to/check_openmanage
+```
 
 (Replace ``/path/to`` with the actual path leading up to the plugin,
 or a correct macro such as ``$USER1$``.)
@@ -453,54 +474,54 @@ Help output
 
 The option ``-h`` or ``--help`` will give a short usage information,
 that includes the most commonly used options. For more information,
-see the `manual page`_.
+see the manual page.
 
-.. parsed-literal::
+```
+$ **check_openmanage -h**
+Usage: check_openmanage [OPTION]...
 
-  $ **check_openmanage -h**
-  Usage: check_openmanage [OPTION]...
-  
-  GENERAL OPTIONS:
-  
-     -f, --config         Specify configuration file
-     -p, --perfdata       Output performance data [default=no]
-     -t, --timeout        Plugin timeout in seconds [default=30]
-     -c, --critical       Custom temperature critical limits
-     -w, --warning        Custom temperature warning limits
-     -F, --fahrenheit     Use Fahrenheit as temperature unit
-     -d, --debug          Debug output, reports everything
-     -h, --help           Display this help text
-     -V, --version        Display version info
-  
-  SNMP OPTIONS:
-  
-     -H, --hostname       Hostname or IP (required for SNMP)
-     -C, --community      SNMP community string [default=public]
-     -P, --protocol       SNMP protocol version [default=2]
-     --port               SNMP port number [default=161]
-     -6, --ipv6           Use IPv6 instead of IPv4 [default=no]
-     --tcp                Use TCP instead of UDP [default=no]
-  
-  OUTPUT OPTIONS:
-  
-     -i, --info           Prefix any alerts with the service tag
-     -e, --extinfo        Append system info to alerts
-     -s, --state          Prefix alerts with alert state
-     -S, --short-state    Prefix alerts with alert state abbreviated
-     -o, --okinfo         Verbosity when check result is OK
-     -B, --show-blacklist Show blacklistings in OK output
-     -I, --htmlinfo       HTML output with clickable links
-  
-  CHECK CONTROL AND BLACKLISTING:
-  
-     -a, --all            Check everything, even log content
-     -b, --blacklist      Blacklist missing and/or failed components
-     --only               Only check a certain component or alert type
-     --check              Fine-tune which components are checked
-     --no-storage         Don't check storage
-  
-  For more information and advanced options, see the manual page or URL:
-    http://folk.uio.no/trondham/software/check_openmanage.html
+GENERAL OPTIONS:
+
+   -f, --config         Specify configuration file
+   -p, --perfdata       Output performance data [default=no]
+   -t, --timeout        Plugin timeout in seconds [default=30]
+   -c, --critical       Custom temperature critical limits
+   -w, --warning        Custom temperature warning limits
+   -F, --fahrenheit     Use Fahrenheit as temperature unit
+   -d, --debug          Debug output, reports everything
+   -h, --help           Display this help text
+   -V, --version        Display version info
+
+SNMP OPTIONS:
+
+   -H, --hostname       Hostname or IP (required for SNMP)
+   -C, --community      SNMP community string [default=public]
+   -P, --protocol       SNMP protocol version [default=2]
+   --port               SNMP port number [default=161]
+   -6, --ipv6           Use IPv6 instead of IPv4 [default=no]
+   --tcp                Use TCP instead of UDP [default=no]
+
+OUTPUT OPTIONS:
+
+   -i, --info           Prefix any alerts with the service tag
+   -e, --extinfo        Append system info to alerts
+   -s, --state          Prefix alerts with alert state
+   -S, --short-state    Prefix alerts with alert state abbreviated
+   -o, --okinfo         Verbosity when check result is OK
+   -B, --show-blacklist Show blacklistings in OK output
+   -I, --htmlinfo       HTML output with clickable links
+
+CHECK CONTROL AND BLACKLISTING:
+
+   -a, --all            Check everything, even log content
+   -b, --blacklist      Blacklist missing and/or failed components
+   --only               Only check a certain component or alert type
+   --check              Fine-tune which components are checked
+   --no-storage         Don't check storage
+
+For more information and advanced options, see the manual page or URL:
+  http://folk.uio.no/trondham/software/check_openmanage.html
+```
 
 
 Local check
@@ -509,10 +530,10 @@ Local check
 Run locally or via NRPE, check_openmanage will use omreport to display
 info on hardware components, and report the result:
 
-.. parsed-literal::
-
-  $ **check_openmanage**
-  OK - System: 'PowerEdge R710', SN: 'XXXXXX', 24 GB ram (6 dimms), 1 logical drives, 2 physical drives
+```
+$ **check_openmanage**
+OK - System: 'PowerEdge R710', SN: 'XXXXXX', 24 GB ram (6 dimms), 1 logical drives, 2 physical drives
+```
 
 Any user is allowed to run omreport, so you don't need any sudo
 mechanisms or similar.
@@ -520,7 +541,6 @@ mechanisms or similar.
 Local check on Windows
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. _Strawberry Perl: http://strawberryperl.com/
 .. _`PAR::Packer`: http://search.cpan.org/dist/PAR-Packer/
 .. _this howto: http://sam-pointer.com/2009/03/06/compiling-windows-executables-with-par
 .. _NSClient++: http://exchange.nagios.org/directory/Addons/Monitoring-Agents/NSClient%2B%2B/details
@@ -528,31 +548,35 @@ Local check on Windows
 If SNMP just isn't your cup of tea, you can use check_openmanage
 natively on Windows by either
 
-* Install a Windows Perl interpreter, e.g. `Strawberry Perl`_ and use
+* Install a Windows Perl interpreter, e.g. [Strawberry Perl](http://strawberryperl.com/) and use
   the plugin as a normal perl script, or
 
 * Use the file ``check_openmanage.exe``, which is included in the ZIP
   achive and gzipped tarball.
 
 The file ``check_openmanage.exe`` is a Win32 executable binary
-produced with Microsoft Visual Studio 2010, `Strawberry Perl`_ and the
-perl module `PAR::Packer`_. See also `this howto`_.
+produced with Microsoft Visual Studio 2010, Strawberry Perl and the
+perl module PAR::Packer. See also [this
+howto](http://sam-pointer.com/2009/03/06/compiling-windows-executables-with-par).
 
 The Win32 executable can be utilized via the **[External Scripts]**
 tag, but before you do that you also have to
 add **CheckExternalScripts.dll** under **[modules]** at the top of
-the **NSC.ini** file.  Like so::
+the **NSC.ini** file.  Like so:
 
-  [modules]
-  CheckExternalScripts.dll
-  
-  [External Scripts]
-  check_openmanage="C:\Program Files\NSClient++\plugins\check_openmanage.exe"
+```
+[modules]
+CheckExternalScripts.dll
 
-Then restart the nsc service. Call the plugin from Nagios as::
+[External Scripts]
+check_openmanage="C:\Program Files\NSClient++\plugins\check_openmanage.exe"
+```
 
-  check_command check_nrpe!check_openmanage
+Then restart the nsc service. Call the plugin from Nagios as:
 
+```
+check_command check_nrpe!check_openmanage
+```
 
 
 Remote check
