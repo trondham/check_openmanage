@@ -94,7 +94,7 @@ present in all servers. For example, all servers should have at least
 one temperature probe, but not all servers have logical drives
 (depends on the type and configuration of the controller).
 
-![Screenshot](http://folk.uio.no/trondham/software/screenshot-check_openmanage01.png)
+![Screenshot](http://folk.uio.no/trondham/software/screenshot-check_openmanage01.jpg)
 
 ![Screenshot](http://folk.uio.no/trondham/software/check_openmanage-example1.png)
 
@@ -110,7 +110,7 @@ to fine-tune which components are checked in the first
 place. Blacklisting_ and `check control`_ are described later in this
 document.
 
-![Screenshot](http://folk.uio.no/trondham/software/screenshot-check_openmanage02.png)
+![Screenshot](http://folk.uio.no/trondham/software/screenshot-check_openmanage02.jpg)
 
 check_openmanage has been testet on a variety of Dell servers running
 RHEL3, RHEL4, RHEL5, RHEL6, VMware ESX and various Windows releases
