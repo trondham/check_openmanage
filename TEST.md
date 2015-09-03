@@ -1090,135 +1090,116 @@ Component     | Comment
 ctrl          | Controller
 ctrl_fw       | Suppress the "special" warning message about old controller firmware. Use this if you can't or won't upgrade the firmware.
 ctrl_driver   | Suppress the "special" warning message about old controller driver.  Particularly useful on systems where you can't upgrade the driver.
-
-foo
-
-+---------------+-------------------------------------------------------------+
-| ctrl_stdr     | Suppress the "special" warning message about old            |
-|               | Windows storport driver.                                    |
-+---------------+-------------------------------------------------------------+
-| pdisk         | Physical disk.                                              |
-+---------------+-------------------------------------------------------------+
-| pdisk_cert    | Ignore warnings for non-certified physical drives           |
-+---------------+-------------------------------------------------------------+
-| pdisk_foreign | Ignore warnings for foreign physical drives                 |
-+---------------+-------------------------------------------------------------+
-| vdisk         | Logical drive (virtual disk)                                |
-+---------------+-------------------------------------------------------------+
-| bat           | Controller cache battery                                    |
-+---------------+-------------------------------------------------------------+
-| bat_charge    | Ignore warnings related to the controller cache battery     |
-|               | charging cycle, which happens approximately every 40 days   |
-|               | on Dell servers. Note that using this blacklist keyword     |
-|               | makes check_openmanage ignore non-critical cache battery    |
-|               | errors.                                                     |
-+---------------+-------------------------------------------------------------+
-| conn          | Connector (channel)                                         |
-+---------------+-------------------------------------------------------------+
-| encl          | Enclosure                                                   |
-+---------------+-------------------------------------------------------------+
-| encl_fan      | Enclosure fan                                               |
-+---------------+-------------------------------------------------------------+
-| encl_ps       | Enclosure power supply                                      |
-+---------------+-------------------------------------------------------------+
-| encl_temp     | Enclosure temperature probe                                 |
-+---------------+-------------------------------------------------------------+
-| encl_emm      | Enclosure management module (EMM)                           |
-+---------------+-------------------------------------------------------------+
-| dimm          | Memory module                                               |
-+---------------+-------------------------------------------------------------+
-| fan           | Fan (Cooling device)                                        |
-+---------------+-------------------------------------------------------------+
-| ps            | Powersupply                                                 |
-+---------------+-------------------------------------------------------------+
-| temp          | Temperature sensor                                          |
-+---------------+-------------------------------------------------------------+
-| cpu           | Processor (CPU)                                             |
-+---------------+-------------------------------------------------------------+
-| volt          | Voltage probe                                               |
-+---------------+-------------------------------------------------------------+
-| bp            | System battery                                              |
-+---------------+-------------------------------------------------------------+
-| amp           | Amperage probe (power consumption monitoring)               |
-+---------------+-------------------------------------------------------------+
-| intr          | Intrusion sensor                                            |
-+---------------+-------------------------------------------------------------+
-| sd            | Removable flash media (SD card)                             |
-+---------------+-------------------------------------------------------------+
+ctrl_stdr     | Suppress the "special" warning message about old Windows storport driver.
+pdisk         | Physical disk.
+pdisk_cert    | Ignore warnings for non-certified physical drives
+pdisk_foreign | Ignore warnings for foreign physical drives
+vdisk         | Logical drive (virtual disk)
+bat           | Controller cache battery
+bat_charge    | Ignore warnings related to the controller cache battery charging cycle, which happens approximately every 40 days on Dell servers. Note that using this blacklist keyword makes check_openmanage ignore non-critical cache battery errors.
+conn          | Connector (channel)
+encl          | Enclosure
+encl_fan      | Enclosure fan
+encl_ps       | Enclosure power supply
+encl_temp     | Enclosure temperature probe
+encl_emm      | Enclosure management module (EMM)
+dimm          | Memory module
+fan           | Fan (Cooling device)
+ps            | Powersupply
+temp          | Temperature sensor
+cpu           | Processor (CPU)
+volt          | Voltage probe
+bp            | System battery
+amp           | Amperage probe (power consumption monitoring)
+intr          | Intrusion sensor
+sd            | Removable flash media (SD card)
 
 
-The component IDs are listed in the `debug output`_:
+The component IDs are listed in the debug output:
 
-.. parsed-literal::
-
-  $ **check_openmanage -H myhost -d**
-     System:      poweredge 2850
-     ServiceTag:  XXXXXXX                  OMSA version:    6.1.0
-     BIOS/date:   A06 10/03/2006           Plugin version:  3.5.4
-  -----------------------------------------------------------------------------
-     Storage Components                                                        
-  =============================================================================
-     LVL   |    ID    |  STATE                                                 
-  ---------+----------+--------------------------------------------------------
-        OK |        0 | Controller 0 [PERC 4e/Di] is Ready
-  CRITICAL |    0:0:0 | Physical disk 0:0 [Maxtor ATLAS15K2_146SCA, 146GB] on controller 0 needs attention: Failed
-        OK |    0:0:1 | Physical disk 0:1 [146GB] on controller 0 is Online
-  [...etc...]
+```
+$ check_openmanage -H myhost -d
+   System:      poweredge 2850
+   ServiceTag:  XXXXXXX                  OMSA version:    6.1.0
+   BIOS/date:   A06 10/03/2006           Plugin version:  3.5.4
+-----------------------------------------------------------------------------
+   Storage Components                                                        
+=============================================================================
+   LVL   |    ID    |  STATE                                                 
+---------+----------+--------------------------------------------------------
+      OK |        0 | Controller 0 [PERC 4e/Di] is Ready
+CRITICAL |    0:0:0 | Physical disk 0:0 [Maxtor ATLAS15K2_146SCA, 146GB] on controller 0 needs attention: Failed
+      OK |    0:0:1 | Physical disk 0:1 [146GB] on controller 0 is Online
+[...etc...]
+```
 
 If we in the above example wished to blacklist the failed disk, we
-would use the following as input to the ``-b|--blacklist`` option::
+would use the following as input to the ``-b|--blacklist`` option:
 
-  pdisk=0:0:0
+```
+pdisk=0:0:0
+```
 
 Now the failed disk is not checked at all, and Nagios is happy.
 
 You can also use ``all`` instead of the component IDs. For example, if
 you want to ignore old drivers for all controllers:
 
-.. parsed-literal::
+```
+$ check_openmanage -b ctrl_driver=all
+```
 
-  $ **check_openmanage -b ctrl_driver=all**
 
-
-Check control
--------------
+###Check control
 
 check_openmanage lets you fine-tune which components you want to check
 via the ``--check`` option. By default almost everything is checked (as
-listed in the `basic overview`_).
+listed in the basic overview).
 
-The syntax for the ``--check`` option is as follows::
+The syntax for the ``--check`` option is as follows:
 
-  component1=<0|1>,component2=<0|1>,...
+```
+component1=<0|1>,component2=<0|1>,...
+```
 
 A value of ``0`` will turn checking off for the specified component,
-while a value of ``1`` will turn checking on. Example::
+while a value of ``1`` will turn checking on. Example:
 
-  $ check_openmanage --check storage=0,esmlog=1
+```
+$ check_openmanage --check storage=0,esmlog=1
+```
 
 In the above example, we turn off checking of the storage subsystem,
 and adds checking of the ESM log content. You can specify the
 ``--check`` option multiple times. The following example will have the
-same effect as the one above::
+same effect as the one above:
 
-  $ check_openmanage --check storage=0 --check esmlog=1
+```
+$ check_openmanage --check storage=0 --check esmlog=1
+```
 
 The argument to the ``--check`` option can also be a file containing
 the actual arguments. If we for example make a file
-``/etc/check_openmanage.check`` that contains the following::
+``/etc/check_openmanage.check`` that contains the following:
 
-  storage=0,esmlog=1
+```
+storage=0,esmlog=1
+```
 
 The following example will then have the same effect as the other
-examples in this paragraph::
+examples in this paragraph:
 
-  $ check_openmanage --check /etc/check_openmanage.check
+```
+$ check_openmanage --check /etc/check_openmanage.check
+```
 
 If the specified file (here ``/etc/check_openmanage.check``) doesn't
 exist, it is simply ignored. You can also mix "check files" and actual
-arguments::
+arguments:
 
-  $ check_openmanage  --check /etc/check_openmanage.check --check power=0
+```
+$ check_openmanage  --check /etc/check_openmanage.check --check power=0
+```
 
 This option is versatile for a reason. If, for example, you're running
 check_openmanage locally via NRPE, and want to have the same command
@@ -1231,143 +1212,116 @@ for the ``--only`` option described below, except for "critical" and
 "warning". The full list is also given in the `manual page`_.
 
 
-Only check one component type or alert type
--------------------------------------------
+###Only check one component type or alert type
 
 You can use the option ``--only`` to specify what type of component is
 desired. If this option is used, only that type of component is
 checked. Example:
 
-.. parsed-literal::
-
-  $ **check_openmanage --only voltage**
-  VOLTAGE OK - 14 voltage probes checked
+```
+$ check_openmanage --only voltage
+VOLTAGE OK - 14 voltage probes checked
+```
 
 The following keywords are accepted by the ``--only`` option:
 
-+----------------------------------+-----------------------------------+
-| Keyword                          | Effect                            |
-+==================================+===================================+
-|   critical                       | Only output critical alerts. It is|
-|                                  | possible to use the ``--check``   |
-|                                  | option together with this option  |
-|                                  | to adjust checks.                 |
-+----------------------------------+-----------------------------------+
-|   warning                        | Only output warning alerts. It is |
-|                                  | possible to use the ``--check``   |
-|                                  | option together with this option  |
-|                                  | to adjust checks.                 |
-+----------------------------------+-----------------------------------+
-|   chassis                        | Only check chassis components,    |
-|                                  | i.e. everything but storage and   |
-|                                  | log content.                      |
-+----------------------------------+-----------------------------------+
-|   storage                        | Only check storage components     |
-+----------------------------------+-----------------------------------+
-|   memory                         | Only check memory modules         |
-+----------------------------------+-----------------------------------+
-|   fans                           | Only check fans                   |
-+----------------------------------+-----------------------------------+
-|   power                          | Only check power supplies         |
-+----------------------------------+-----------------------------------+
-|   temp                           | Only check temperatures           |
-+----------------------------------+-----------------------------------+
-|   cpu                            | Only check processors             |
-+----------------------------------+-----------------------------------+
-|   voltage                        | Only check voltage probes         |
-+----------------------------------+-----------------------------------+
-|   batteries                      | Only check batteries              |
-+----------------------------------+-----------------------------------+
-|   amperage                       | Only check power usage            |
-+----------------------------------+-----------------------------------+
-|   intrusion                      | Only check chassis intrusion      |
-+----------------------------------+-----------------------------------+
-|   sdcard                         | Only check removable flash media  |
-+----------------------------------+-----------------------------------+
-|   servicetag                     |  Only check for sane service tag  |
-+----------------------------------+-----------------------------------+
-|   esmhealth                      | Only check ESM log health         |
-+----------------------------------+-----------------------------------+
-|   esmlog                         | Only check ESM log content        |
-+----------------------------------+-----------------------------------+
-|   alertlog                       | Only check alertlog content       |
-+----------------------------------+-----------------------------------+
+Keyword    | Effect
+-----------|-------
+critical   | Only output critical alerts. It is possible to use the ``--check`` option together with this option to adjust checks.
+warning    | Only output warning alerts. It is possible to use the ``--check`` option together with this option to adjust checks.
+chassis    | Only check chassis components, i.e. everything but storage and log content.
+storage    | Only check storage components
+memory     | Only check memory modules
+fans       | Only check fans
+power      | Only check power supplies
+temp       | Only check temperatures
+cpu        | Only check processors
+voltage    | Only check voltage probes
+batteries  | Only check batteries
+amperage   | Only check power usage
+intrusion  | Only check chassis intrusion
+sdcard     | Only check removable flash media
+servicetag | Only check for sane service tag
+esmhealth  | Only check ESM log health
+esmlog     | Only check ESM log content
+alertlog   | Only check alertlog content
 
 A couple of other examples:
 
-.. parsed-literal::
+```
+$ check_openmanage --only storage -H myhost
+STORAGE OK - 4 physical drives, 2 logical drives
 
-  $ **check_openmanage --only storage -H myhost**
-  STORAGE OK - 4 physical drives, 2 logical drives
-  
-  $ **check_openmanage --only fans -H myhost**
-  FANS OK - 6 fan probes checked
-  
-  $ **check_openmanage --only memory -H myhost**
-  MEMORY OK - 6 memory modules, 24576 MB total memory
+$ check_openmanage --only fans -H myhost
+FANS OK - 6 fan probes checked
+
+$ check_openmanage --only memory -H myhost
+MEMORY OK - 6 memory modules, 24576 MB total memory
+```
 
 
-
-Check everything
-----------------
+###Check everything
 
 Use the option ``-a`` or ``--all`` to turn on checking of everything,
 even log content:
 
-.. parsed-literal::
+```
+$ check_openmanage -a
+ESM log content: 3 critical, 0 non-critical, 4 ok
+```
 
-  $ **check_openmanage -a**
-  ESM log content: 3 critical, 0 non-critical, 4 ok
-
-
-SELinux considerations
-======================
+##SELinux considerations
 
 If you plan on using the plugin on a system with SELinux in enforcing
 mode, you need to set a proper file context (label) on the
 plugin. Which label to choose depends on how you plan to use the
 plugin, via SNMP or locally via NRPE or similar.
 
-SNMP check
-----------
+###SNMP check
 
-With SNMP, the following label should suffice::
+With SNMP, the following label should suffice:
 
-  nagios_services_plugin_exec_t
+```
+nagios_services_plugin_exec_t
+```
 
-To set this file context permanently, execute the following commands::
+To set this file context permanently, execute the following commands:
 
-  semanage fcontext -a -t nagios_services_plugin_exec_t '/usr/lib(64)?/nagios/plugins/check_openmanage'
-  restorecon -v /usr/lib*/nagios/plugins/check_openmanage
+```
+semanage fcontext -a -t nagios_services_plugin_exec_t '/usr/lib(64)?/nagios/plugins/check_openmanage'
+restorecon -v /usr/lib*/nagios/plugins/check_openmanage
+```
 
-Local check
------------
+###Local check
 
 If using a local check via NRPE or similar, the plugin
 executes **omreport** which is part of Dell OMSA, which in turn is a
 unconfined service. Because of this, the plugin also needs to run
-unconfined, i.e. using the following label::
+unconfined, i.e. using the following label:
 
-  nagios_unconfined_plugin_exec_t
+```
+nagios_unconfined_plugin_exec_t
+```
 
-To set this file context permanently, execute the following commands::
+To set this file context permanently, execute the following commands:
 
-  semanage fcontext -a -t nagios_unconfined_plugin_exec_t '/usr/lib(64)?/nagios/plugins/check_openmanage'
-  restorecon -v /usr/lib*/nagios/plugins/check_openmanage
+```
+semanage fcontext -a -t nagios_unconfined_plugin_exec_t '/usr/lib(64)?/nagios/plugins/check_openmanage'
+restorecon -v /usr/lib*/nagios/plugins/check_openmanage
+```
 
 
-Configuration file
-==================
+##Configuration file
 
-.. IMPORTANT::
-
-   This section describes a feature that is present in version 3.7.0
-   and later versions.
+> IMPORTANT: This section describes a feature that is present in
+> version 3.7.0 and later versions.
 
 The plugin takes an optional configuration file. To specify a
-configuration file, use the ``-f`` or ``--config`` option::
+configuration file, use the ``-f`` or ``--config`` option:
 
-  check_openmanage -f /etc/check_openmanage.conf
+```
+check_openmanage -f /etc/check_openmanage.conf
+```
 
 If the ``-f`` or ``--config`` option is specified, the plugin requires
 the perl module ``Config::Tiny`` and will output an error if that
@@ -1378,17 +1332,18 @@ its strengths are mostly present when using SNMP. It allows setting
 different options, such as blacklisting, on single hosts or groups of
 hosts using glob patterns.
 
-File format
------------
+###File format
 
 The file has an ini-style syntax and consists of sections and
 parameters. A section begins with the name of the section in square
 brackets and continues until the next section begins. An example of
-section with two keywords and parameters::
+section with two keywords and parameters:
 
-  [section]
-      key1 = boolean
-      key2 = string
+```
+[section]
+    key1 = boolean
+    key2 = string
+```
 
 The data types used are string (no quotes needed) and bool (with
 values of "TRUE/FALSE"). For boolean values, "1", "on" and "true"
@@ -1396,14 +1351,16 @@ are equivalent, likewise for "0", "off" and "false". They are also
 case insensitive.
 
 The root section or global section has no section name in brackets,
-example::
+example:
 
-  key1 = false
-  key2 = foo
-  
-  [section]
-      key1 = true
-      key2 = bar
+```
+key1 = false
+key2 = foo
+
+[section]
+    key1 = true
+    key2 = bar
+```
 
 The values set in a bracket section will override those set in the
 root section, in case of conflicts.
@@ -1414,23 +1371,24 @@ are blank lines.
 The configuration file must be a regular file. Owner and group does
 not matter, but the Nagios user must have read access.
 
-Sections and ordering
----------------------
+###Sections and ordering
 
 The section name should correspond to the hostname, i.e. the value
 passed to the ``-H`` or ``--hostname`` parameter. The section name
 itself can be either an exact match to the hostname, or a glob
-pattern, as this example shows::
+pattern, as this example shows:
 
-  key1 = true
-  key2 = foo
-  
-  [192.168.1.2]
-      key1 = true
-  
-  [192.168.*]
-      key1 = false
-      key2 = bar
+```
+key1 = true
+key2 = foo
+
+[192.168.1.2]
+    key1 = true
+
+[192.168.*]
+    key1 = false
+    key2 = bar
+```
 
 The sections are read in order of significance. The root section is
 read first. Then any sections with glob patterns that match the
@@ -1448,28 +1406,26 @@ matches "192.168.*" will have **key1 = false** and **key2 = bar**. All
 other hosts will have **key1 = true** and **key2 = foo**.
 
 Normal shell globbing may be used for the section names. This is
-limited to ``*``, ``?`` and ``[]``. Some examples::
+limited to ``*``, ``?`` and ``[]``. Some examples:
 
-  [192.168.*]
-      # matches e.g. 192.168.10.20
-  
-  [192.168.10[34].1]
-      # matches 192.168.103.1 and 192.168.104.1
-  
-  [login?.example.com]
-      # mathces e.g. login1.example.com
+```
+[192.168.*]
+    # matches e.g. 192.168.10.20
 
-.. CAUTION::
+[192.168.10[34].1]
+    # matches 192.168.103.1 and 192.168.104.1
 
-   Be careful not to have more than one glob pattern section match any
-   single host. This may lead to unpredictable results.
+[login?.example.com]
+    # mathces e.g. login1.example.com
+```
+
+Be careful not to have more than one glob pattern section match any
+single host. This may lead to unpredictable results.
 
 
-Configuration
--------------
+###Configuration
 
-General
-~~~~~~~
+####General
 
 **Check control**
 
