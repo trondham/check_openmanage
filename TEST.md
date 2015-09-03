@@ -4,26 +4,31 @@
 
 ##Main features
 
-**Advanced hardware discovery**
+* **Advanced hardware discovery**
+
   The plugin will search the monitored server for hardware components
   and monitor them. No need to tune the plugin to match different
   server models etc.
 
-**Blade detection**
+* **Blade detection**
+
   The plugin will identify blade servers as such and will not report
   fans and power supplies to be "missing" on blade systems.
 
-**Remote or local check**
+* **Remote or local check**
+
   The plugin can check the system remotely via SNMP, or locally by
   using omreport commands.
 
-**Performance data**
+* **Performance data**
+
   The plugin can give `performance data`_ with the ``-p`` or
   ``--perfdata`` switch. Performance data collected include
   temperatures, fan speeds and power usage (on servers that support
   it).
 
-**Highly customizable**
+* **Highly customizable**
+
   A multitude of options lets the user tailor the plugin to meet his
   or her specific needs.
 
@@ -1939,7 +1944,7 @@ the ``-d`` or ``--debug`` option:
 ```
 $ check_openmanage -H myhost -d | head -n 3
  System:      PowerEdge M600
- ServiceTag:  88CBS3J                  OMSA version:    **6.1.0**
+ ServiceTag:  88CBS3J                  OMSA version:    6.1.0
  BIOS/date:   2.1.4 08/15/2008         Plugin version:  3.5.5
 ```
 
