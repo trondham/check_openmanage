@@ -1845,7 +1845,6 @@ Nagios plugins under ``/usr/lib`` for 32bit and ``/usr/lib64`` for
 well. This is the *only* difference between the two RPM packages.
 
 ####I don't like check_openmanage, are there other Dell plugins that you would recommend?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are many plugins out there. The ones I would recommend are Jason
 Ellison's excellent
