@@ -1,70 +1,10 @@
-.. dette dokumentet bruker overskriftsnivå i rekkefølgen
-.. === --- ~~~ """ ...
-.. Konverteres til HTML med:
-.. rst2html --cloak-email-addresses --stylesheet-path=rst.css --link-stylesheet check_openmanage.rst > check_openmanage.html
-
-.. meta::
-   :keywords: dell, poweredge, nagios, monitoring, openmanage, omsa, snmp, nrpe, linux, windows
-
 ================
 check_openmanage
 ================
 
-.. |TM| unicode:: 0x2122 .. trademark sign
-.. |R|  unicode:: 0x00AE .. registered sign
-.. |date| date::
-
-.. raw:: html
-
-   <div id="downloadbox">
-     <div id="version">
-       <span>Latest version: <b>3.7.12</b></span>
-       <span id="releasedate">Released Mon Jul 28 2014</span>
-     </div>
-     <div id="downloadnow">
-       <a href="#download">Download</a>
-     </div>
-   </div>
-   <div id="headerWrap">
-     <div class="header">
-       <span>hardware monitoring</span>
-       <ul>
-         <li><a href="http://folk.uio.no/trondham/software/check_openmanage.html">check_openmanage</a></li>
-         <li><a href="http://folk.uio.no/trondham/software/check_dell_bladechassis.html">check_dell_bladechassis</a></li>
-         <li><a href="http://folk.uio.no/trondham/software/check_hp_bladechassis.html">check_hp_bladechassis</a></li>
-       </ul>
-     </div>
-     <div class="header">
-       <span>misc. plugins</span>
-       <ul>
-         <li><a href="http://folk.uio.no/trondham/software/check_linux_bonding.html">check_linux_bonding</a></li>
-         <li><a href="http://folk.uio.no/trondham/software/check_serviceguard.html">check_serviceguard</a></li>
-       </ul>
-     </div>
-   </div>
-   <div id="imagelinkWrap">
-     <div class="imagelink">
-       <a href="http://exchange.nagios.org/directory/Plugins/Hardware/Server-Hardware/Dell/check_openmanage/details"><img src="gfx/hpsplash3.png"></a>
-     </div>
-     <div class="imagelink">
-       <a href="https://www.monitoringexchange.org/p/1377"><img src="gfx/monx.png"></a>
-     </div>
-     <div class="imagelink">
-       <a href="http://freecode.com/projects/check_openmanage"><img src="gfx/fm_logo.png"></a>
-     </div>
-   </div>
-
-
 ----------------------------------------------------------------------------------
-Dell\ |TM| Server Hardware Monitoring with OpenManage\ |TM| and Nagios\ |R|
+Dell™ Server Hardware Monitoring with OpenManage™ and Nagios®
 ----------------------------------------------------------------------------------
-
-:Author: Trond Hasle Amundsen
-:Contact: t.h.amundsen@usit.uio.no
-:Date: |date|
-
-.. contents:: Contents:
-.. section-numbering::
 
 .. _Nagios: http://www.nagios.org/
 .. _NagiosExchange: http://exchange.nagios.org/directory/Plugins/Hardware/Server-Hardware/Dell/check_openmanage/details
@@ -111,8 +51,6 @@ Main features
 Basic Overview
 ==============
 
-* check_openmanage on `NagiosExchange`_ | `MonitoringExchange`_ | `Freecode`_
-
 check_openmanage is a plugin for Nagios_ which checks the hardware
 health of Dell `PowerEdge`_ (and some `PowerVault`_) servers. It uses
 the Dell `OpenManage Server Administrator`_ (OMSA) software, which
@@ -123,9 +61,7 @@ health of the storage subsystem, power supplies, memory modules,
 temperature probes etc., and gives an alert if any of the components
 are faulty or operate outside normal parameters.
 
-.. image:: check_openmanage01.png
-  :align: center
-  :alt: Nagios and check_openmanage
+![Nagios and check_openmanage](http://folk.uio.no/trondham/software/check_openmanage01.png)
 
 **Storage components checked:**
 
@@ -159,9 +95,7 @@ are faulty or operate outside normal parameters.
 * ESM Log content (default disabled)
 * Alert Log content (default disabled, not SNMP)
 
-.. .. image:: screenshot-check_openmanage03.png
-..   :align: center
-..   :alt: screenshot
+![Screenshot](http://folk.uio.no/trondham/software/screenshot-check_openmanage03.png)
 
 check_openmanage will identify blades and will not report "missing"
 power supplies, cooling fans etc. on blades. It will also accept that
@@ -170,13 +104,9 @@ present in all servers. For example, all servers should have at least
 one temperature probe, but not all servers have logical drives
 (depends on the type and configuration of the controller).
 
-.. .. image:: screenshot-check_openmanage01.jpg
-..   :align: center
-..   :alt: screenshot
+![Screenshot](http://folk.uio.no/trondham/software/screenshot-check_openmanage01.png)
 
-.. image:: check_openmanage-example1.png
-  :align: center
-  :alt: screenshot
+![Screenshot](http://folk.uio.no/trondham/software/check_openmanage-example1.png)
 
 This nagios plugin is designed to be used by either NRPE_ or with
 SNMP. It is written in perl. In NRPE mode, it uses omreport to display
@@ -190,9 +120,7 @@ to fine-tune which components are checked in the first
 place. Blacklisting_ and `check control`_ are described later in this
 document.
 
-.. .. image:: screenshot-check_openmanage02.jpg
-..   :align: center
-..   :alt: screenshot
+![Screenshot](http://folk.uio.no/trondham/software/screenshot-check_openmanage02.png)
 
 check_openmanage has been testet on a variety of Dell servers running
 RHEL3, RHEL4, RHEL5, RHEL6, VMware ESX and various Windows releases
@@ -209,8 +137,6 @@ Prerequisites
 Perl interpreter
 ----------------
 
-.. _EPEL: http://fedoraproject.org/wiki/EPEL
-
 check_openmanage needs a normal perl interpreter, version 5.6.0 or
 later. The plugin assumes that perl is available as ``/usr/bin/perl``,
 but you can easily change this as you wish by editing the first line
@@ -221,23 +147,29 @@ server (or the server running the queries). This module is not part of
 perl itself, but is available in all modern Linux
 distributions. Installing ``Net::SNMP`` is quite easy:
 
-* For RHEL6 and CentOS 6 the best way is to use EPEL_::
+* For RHEL6 and CentOS 6 the best way is to use Fedora EPEL:
 
-    yum --nogpgcheck install http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
-    yum install perl-Net-SNMP
+      yum --nogpgcheck install http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
+      yum install perl-Net-SNMP
 
-* For RHEL5 and CentOS 5 the best way is to use EPEL_::
+* For RHEL5 and CentOS 5 the best way is to use Fedora EPEL:
 
-    yum --nogpgcheck install http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
-    yum install perl-Net-SNMP
+  ```
+  yum --nogpgcheck install http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+  yum install perl-Net-SNMP
+  ```
 
-* For Fedora::
+* For Fedora:
 
-    yum install perl-Net-SNMP
+  ```bash
+  yum install perl-Net-SNMP
+  ```
 
 * For SuSE::
 
-    rug install perl-Net-SNMP
+  ```sh
+  rug install perl-Net-SNMP
+  ```
 
 * For Debian and Ubuntu::
 
