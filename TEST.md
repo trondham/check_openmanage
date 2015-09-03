@@ -820,39 +820,35 @@ Most would go for the default (value of ``0``), i.e. a single line.
 > SNMP, this is not an issue.
 
 
-Show blacklistings in OK output
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Show blacklistings in OK output
 
 When blacklistings are used to mask faulty components, it is easy to
 forget which components and on which servers. If the ``-B`` or
 ``--show-blacklist`` option is used, any blacklistings will be
 displayed on a separate line in the OK output:
 
-.. parsed-literal::
-
-  $ **check_openmanage -H dell-server01 -b ctrl_driver=all -b pdisk=1:0:0:1 -B**
-  OK - System: 'PowerEdge R610 II', SN: 'G7YCX4J', 16 GB ram (4 dimms), 1 logical drives, 2 physical drives
-  ----- BLACKLISTED: pdisk=1:0:0:1/ctrl_driver=all
+```
+$ check_openmanage -H dell-server01 -b ctrl_driver=all -b pdisk=1:0:0:1 -B
+OK - System: 'PowerEdge R610 II', SN: 'G7YCX4J', 16 GB ram (4 dimms), 1 logical drives, 2 physical drives
+----- BLACKLISTED: pdisk=1:0:0:1/ctrl_driver=all
+```
 
 If no blacklisting is used, this option has no effect.
 
 
-Hide the servicetag (serial number)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+####Hide the servicetag (serial number)
 
 If you for some reason wish to hide the servicetag in the output,
 e.g. if your customers have Nagios access but you don't want them to
 view the complete hardware history, you can use the option
 ``--hide-servicetag``:
 
-.. parsed-literal::
+```
+$ check_openmanage -H dell-server02 --hide-servicetag
+OK - System: 'PowerEdge R710 II', SN: 'XXXXXXX', 96 GB ram (12 dimms), 2 logical drives, 26 physical drives
+```
 
-  $ **check_openmanage -H dell-server02 --hide-servicetag**
-  OK - System: 'PowerEdge R710 II', SN: 'XXXXXXX', 96 GB ram (12 dimms), 2 logical drives, 26 physical drives
-
-
-Debug output
-------------
+###Debug output
 
 If given option ``-d`` or ``--debug``, check_openmanage will
 output messages about all the checked components, along with their
@@ -861,153 +857,148 @@ identifier is used whenever you want to blacklist a component,
 i.e. prevent it from being checked. Blacklisting_ is discussed
 later. An example debug output is given below.
 
-::
-
-     System:      PowerEdge R710           OMSA version:    6.5.0
-     ServiceTag:  XXXXXXX                  Plugin version:  3.7.4
-     BIOS/date:   3.0.0 01/31/2011         Checking mode:   SNMPv2c UDP/IPv4
-  -----------------------------------------------------------------------------
-     Storage Components                                                        
-  =============================================================================
-    STATE  |    ID    |  MESSAGE TEXT                                          
-  ---------+----------+--------------------------------------------------------
-        OK |        0 | Controller 0 [PERC 6/i Integrated] is Ready
-        OK |  0:0:0:0 | Physical Disk 0:0:0 [SAS-HDD 73GB] on ctrl 0 is Online
-        OK |  0:0:0:1 | Physical Disk 0:0:1 [SAS-HDD 73GB] on ctrl 0 is Online
-        OK |  0:0:0:2 | Physical Disk 0:0:2 [SAS-HDD 300GB] on ctrl 0 is Online
-        OK |  0:0:0:3 | Physical Disk 0:0:3 [SAS-HDD 300GB] on ctrl 0 is Online
-        OK |  0:1:0:4 | Physical Disk 1:0:4 [SAS-HDD 300GB] on ctrl 0 is Online
-        OK |      0:0 | Logical Drive '/dev/sda' [RAID-1, 67.75 GB] is Ready
-        OK |      0:1 | Logical Drive '/dev/sdb' [RAID-5, 557.75 GB] is Ready
-        OK |      0:0 | Cache Battery 0 in controller 0 is Ready
-        OK |      0:0 | Connector 0 [SAS] on controller 0 is Ready
-        OK |      0:1 | Connector 1 [SAS] on controller 0 is Ready
-        OK |    0:0:0 | Enclosure 0:0:0 [Backplane] on controller 0 is Ready
-        OK |    0:1:0 | Enclosure 0:1:0 [Backplane] on controller 0 is Ready
-  -----------------------------------------------------------------------------
-     Chassis Components                                                        
-  =============================================================================
-    STATE  |  ID  |  MESSAGE TEXT                                              
-  ---------+------+------------------------------------------------------------
-        OK |    0 | Memory module 0 [DIMM_A1, 4096 MB] is Ok
-        OK |    1 | Memory module 1 [DIMM_A2, 4096 MB] is Ok
-        OK |    2 | Memory module 2 [DIMM_A3, 4096 MB] is Ok
-        OK |    3 | Memory module 3 [DIMM_A4, 4096 MB] is Ok
-        OK |    4 | Memory module 4 [DIMM_A5, 4096 MB] is Ok
-        OK |    5 | Memory module 5 [DIMM_A6, 4096 MB] is Ok
-        OK |    6 | Memory module 6 [DIMM_A7, 4096 MB] is Ok
-        OK |    7 | Memory module 7 [DIMM_A8, 4096 MB] is Ok
-        OK |    8 | Memory module 8 [DIMM_A9, 4096 MB] is Ok
-        OK |    9 | Memory module 9 [DIMM_B1, 4096 MB] is Ok
-        OK |   10 | Memory module 10 [DIMM_B2, 4096 MB] is Ok
-        OK |   11 | Memory module 11 [DIMM_B3, 4096 MB] is Ok
-        OK |   12 | Memory module 12 [DIMM_B4, 4096 MB] is Ok
-        OK |   13 | Memory module 13 [DIMM_B5, 4096 MB] is Ok
-        OK |   14 | Memory module 14 [DIMM_B6, 4096 MB] is Ok
-        OK |   15 | Memory module 15 [DIMM_B7, 4096 MB] is Ok
-        OK |   16 | Memory module 16 [DIMM_B8, 4096 MB] is Ok
-        OK |   17 | Memory module 17 [DIMM_B9, 4096 MB] is Ok
-        OK |    0 | Chassis fan 0 [System Board FAN 1 RPM] reading: 3600 RPM
-        OK |    1 | Chassis fan 1 [System Board FAN 2 RPM] reading: 3600 RPM
-        OK |    2 | Chassis fan 2 [System Board FAN 3 RPM] reading: 3600 RPM
-        OK |    3 | Chassis fan 3 [System Board FAN 4 RPM] reading: 3600 RPM
-        OK |    4 | Chassis fan 4 [System Board FAN 5 RPM] reading: 3600 RPM
-        OK |    0 | Power Supply 0 [AC]: Presence detected
-        OK |    1 | Power Supply 1 [AC]: Presence detected
-        OK |    0 | Temperature Probe 0 [System Board Ambient Temp] reads 17 C (min=8/3, max=42/47)
-        OK |    0 | Processor 0 [Intel Xeon L5520 2.27GHz] is Present
-        OK |    1 | Processor 1 [Intel Xeon L5520 2.27GHz] is Present
-        OK |    0 | Voltage sensor 0 [CPU1 VCORE PG] is Good
-        OK |    1 | Voltage sensor 1 [CPU2 VCORE PG] is Good
-        OK |    2 | Voltage sensor 2 [CPU2 0.75 VTT CPU2 PG] is Good
-        OK |    3 | Voltage sensor 3 [CPU1 0.75 VTT CPU1 PG] is Good
-        OK |    4 | Voltage sensor 4 [System Board 1.5V PG] is Good
-        OK |    5 | Voltage sensor 5 [System Board 1.8V PG] is Good
-        OK |    6 | Voltage sensor 6 [System Board 3.3V PG] is Good
-        OK |    7 | Voltage sensor 7 [System Board 5V PG] is Good
-        OK |    8 | Voltage sensor 8 [CPU2 MEM PG] is Good
-        OK |    9 | Voltage sensor 9 [CPU1 MEM PG] is Good
-        OK |   10 | Voltage sensor 10 [CPU2 VTT PG] is Good
-        OK |   11 | Voltage sensor 11 [CPU1 VTT PG] is Good
-        OK |   12 | Voltage sensor 12 [System Board 0.9V PG] is Good
-        OK |   13 | Voltage sensor 13 [CPU2 1.8 PLL  PG] is Good
-        OK |   14 | Voltage sensor 14 [CPU1 1.8 PLL PG] is Good
-        OK |   15 | Voltage sensor 15 [System Board 8.0 V PG] is Good
-        OK |   16 | Voltage sensor 16 [System Board 1.1 V PG] is Good
-        OK |   17 | Voltage sensor 17 [System Board 1.0 LOM PG] is Good
-        OK |   18 | Voltage sensor 18 [System Board 1.0 AUX PG] is Good
-        OK |   19 | Voltage sensor 19 [System Board 1.05 V PG] is Good
-        OK |   20 | Voltage sensor 20 [PS 1 Voltage] is 228.000 V
-        OK |   21 | Voltage sensor 21 [PS 2 Voltage] is 240.000 V
-        OK |    0 | Battery probe 0 [System Board CMOS Battery] is Presence Detected
-        OK |    0 | Amperage probe 0 [PS 1 Current] reads 0.4 A
-        OK |    1 | Amperage probe 1 [PS 2 Current] reads 0.4 A
-        OK |    2 | Amperage probe 2 [System Board System Level] reads 175 W
-        OK |    0 | Chassis intrusion 0 detection: Ok (Not Breached)
-        OK |    0 | SD Card 0 [vFlash] is Absent
-  -----------------------------------------------------------------------------
-     Other messages                                                            
-  =============================================================================
-    STATE  |  MESSAGE TEXT                                                     
-  ---------+-------------------------------------------------------------------
-        OK | ESM log health is Ok (less than 80% full)
-        OK | Chassis Service Tag is sane
+```
+   System:      PowerEdge R710           OMSA version:    6.5.0
+   ServiceTag:  XXXXXXX                  Plugin version:  3.7.4
+   BIOS/date:   3.0.0 01/31/2011         Checking mode:   SNMPv2c UDP/IPv4
+-----------------------------------------------------------------------------
+   Storage Components                                                        
+=============================================================================
+  STATE  |    ID    |  MESSAGE TEXT                                          
+---------+----------+--------------------------------------------------------
+      OK |        0 | Controller 0 [PERC 6/i Integrated] is Ready
+      OK |  0:0:0:0 | Physical Disk 0:0:0 [SAS-HDD 73GB] on ctrl 0 is Online
+      OK |  0:0:0:1 | Physical Disk 0:0:1 [SAS-HDD 73GB] on ctrl 0 is Online
+      OK |  0:0:0:2 | Physical Disk 0:0:2 [SAS-HDD 300GB] on ctrl 0 is Online
+      OK |  0:0:0:3 | Physical Disk 0:0:3 [SAS-HDD 300GB] on ctrl 0 is Online
+      OK |  0:1:0:4 | Physical Disk 1:0:4 [SAS-HDD 300GB] on ctrl 0 is Online
+      OK |      0:0 | Logical Drive '/dev/sda' [RAID-1, 67.75 GB] is Ready
+      OK |      0:1 | Logical Drive '/dev/sdb' [RAID-5, 557.75 GB] is Ready
+      OK |      0:0 | Cache Battery 0 in controller 0 is Ready
+      OK |      0:0 | Connector 0 [SAS] on controller 0 is Ready
+      OK |      0:1 | Connector 1 [SAS] on controller 0 is Ready
+      OK |    0:0:0 | Enclosure 0:0:0 [Backplane] on controller 0 is Ready
+      OK |    0:1:0 | Enclosure 0:1:0 [Backplane] on controller 0 is Ready
+-----------------------------------------------------------------------------
+   Chassis Components                                                        
+=============================================================================
+  STATE  |  ID  |  MESSAGE TEXT                                              
+---------+------+------------------------------------------------------------
+      OK |    0 | Memory module 0 [DIMM_A1, 4096 MB] is Ok
+      OK |    1 | Memory module 1 [DIMM_A2, 4096 MB] is Ok
+      OK |    2 | Memory module 2 [DIMM_A3, 4096 MB] is Ok
+      OK |    3 | Memory module 3 [DIMM_A4, 4096 MB] is Ok
+      OK |    4 | Memory module 4 [DIMM_A5, 4096 MB] is Ok
+      OK |    5 | Memory module 5 [DIMM_A6, 4096 MB] is Ok
+      OK |    6 | Memory module 6 [DIMM_A7, 4096 MB] is Ok
+      OK |    7 | Memory module 7 [DIMM_A8, 4096 MB] is Ok
+      OK |    8 | Memory module 8 [DIMM_A9, 4096 MB] is Ok
+      OK |    9 | Memory module 9 [DIMM_B1, 4096 MB] is Ok
+      OK |   10 | Memory module 10 [DIMM_B2, 4096 MB] is Ok
+      OK |   11 | Memory module 11 [DIMM_B3, 4096 MB] is Ok
+      OK |   12 | Memory module 12 [DIMM_B4, 4096 MB] is Ok
+      OK |   13 | Memory module 13 [DIMM_B5, 4096 MB] is Ok
+      OK |   14 | Memory module 14 [DIMM_B6, 4096 MB] is Ok
+      OK |   15 | Memory module 15 [DIMM_B7, 4096 MB] is Ok
+      OK |   16 | Memory module 16 [DIMM_B8, 4096 MB] is Ok
+      OK |   17 | Memory module 17 [DIMM_B9, 4096 MB] is Ok
+      OK |    0 | Chassis fan 0 [System Board FAN 1 RPM] reading: 3600 RPM
+      OK |    1 | Chassis fan 1 [System Board FAN 2 RPM] reading: 3600 RPM
+      OK |    2 | Chassis fan 2 [System Board FAN 3 RPM] reading: 3600 RPM
+      OK |    3 | Chassis fan 3 [System Board FAN 4 RPM] reading: 3600 RPM
+      OK |    4 | Chassis fan 4 [System Board FAN 5 RPM] reading: 3600 RPM
+      OK |    0 | Power Supply 0 [AC]: Presence detected
+      OK |    1 | Power Supply 1 [AC]: Presence detected
+      OK |    0 | Temperature Probe 0 [System Board Ambient Temp] reads 17 C (min=8/3, max=42/47)
+      OK |    0 | Processor 0 [Intel Xeon L5520 2.27GHz] is Present
+      OK |    1 | Processor 1 [Intel Xeon L5520 2.27GHz] is Present
+      OK |    0 | Voltage sensor 0 [CPU1 VCORE PG] is Good
+      OK |    1 | Voltage sensor 1 [CPU2 VCORE PG] is Good
+      OK |    2 | Voltage sensor 2 [CPU2 0.75 VTT CPU2 PG] is Good
+      OK |    3 | Voltage sensor 3 [CPU1 0.75 VTT CPU1 PG] is Good
+      OK |    4 | Voltage sensor 4 [System Board 1.5V PG] is Good
+      OK |    5 | Voltage sensor 5 [System Board 1.8V PG] is Good
+      OK |    6 | Voltage sensor 6 [System Board 3.3V PG] is Good
+      OK |    7 | Voltage sensor 7 [System Board 5V PG] is Good
+      OK |    8 | Voltage sensor 8 [CPU2 MEM PG] is Good
+      OK |    9 | Voltage sensor 9 [CPU1 MEM PG] is Good
+      OK |   10 | Voltage sensor 10 [CPU2 VTT PG] is Good
+      OK |   11 | Voltage sensor 11 [CPU1 VTT PG] is Good
+      OK |   12 | Voltage sensor 12 [System Board 0.9V PG] is Good
+      OK |   13 | Voltage sensor 13 [CPU2 1.8 PLL  PG] is Good
+      OK |   14 | Voltage sensor 14 [CPU1 1.8 PLL PG] is Good
+      OK |   15 | Voltage sensor 15 [System Board 8.0 V PG] is Good
+      OK |   16 | Voltage sensor 16 [System Board 1.1 V PG] is Good
+      OK |   17 | Voltage sensor 17 [System Board 1.0 LOM PG] is Good
+      OK |   18 | Voltage sensor 18 [System Board 1.0 AUX PG] is Good
+      OK |   19 | Voltage sensor 19 [System Board 1.05 V PG] is Good
+      OK |   20 | Voltage sensor 20 [PS 1 Voltage] is 228.000 V
+      OK |   21 | Voltage sensor 21 [PS 2 Voltage] is 240.000 V
+      OK |    0 | Battery probe 0 [System Board CMOS Battery] is Presence Detected
+      OK |    0 | Amperage probe 0 [PS 1 Current] reads 0.4 A
+      OK |    1 | Amperage probe 1 [PS 2 Current] reads 0.4 A
+      OK |    2 | Amperage probe 2 [System Board System Level] reads 175 W
+      OK |    0 | Chassis intrusion 0 detection: Ok (Not Breached)
+      OK |    0 | SD Card 0 [vFlash] is Absent
+-----------------------------------------------------------------------------
+   Other messages                                                            
+=============================================================================
+  STATE  |  MESSAGE TEXT                                                     
+---------+-------------------------------------------------------------------
+      OK | ESM log health is Ok (less than 80% full)
+      OK | Chassis Service Tag is sane
+```
 
 The debug output will vary from model to model and server to
 server. Among other things, it depends on what components exist in the
 server in the first place. The above example shows a PowerEdge R710
 server with an attached MD1220 shelf.
 
-.. WARNING::
-
-   The option ``-d`` or ``--debug`` is intended for diagnostics and
-   debugging purposes only. Do not use this option from within Nagios,
-   i.e. in your Nagios config.
+> **WARNING:** The option ``-d`` or ``--debug`` is intended for
+> diagnostics and debugging purposes only. Do not use this option from
+> within Nagios, i.e. in your Nagios config.
 
 
-Custom temperature thresholds
------------------------------
+###Custom temperature thresholds
 
-.. image:: temp_omsa.png
-  :align: center
-  :alt: OMSA temperature thresholds
+![OMSA temperature thresholds](http://folk.uio.no/trondham/software/temp_omsa.png)
 
 Openmanage (OMSA) has its own temperature thresholds. You can easily
 view these with ``omreport``:
 
-.. parsed-literal::
+```
+# omreport chassis temps
+Temperature Probes Information
 
-  myhost # **omreport chassis temps**
-  Temperature Probes Information
-  
-  ------------------------------------
-  Main System Chassis Temperatures: Ok
-  ------------------------------------
-  
-  Index                     : 0
-  Status                    : Ok
-  Probe Name                : System Board Ambient Temp
-  Reading                   : 17.0 C
-  Minimum Warning Threshold : 8.0 C
-  Maximum Warning Threshold : 42.0 C
-  Minimum Failure Threshold : 3.0 C
-  Maximum Failure Threshold : 47.0 C
+------------------------------------
+Main System Chassis Temperatures: Ok
+------------------------------------
+
+Index                     : 0
+Status                    : Ok
+Probe Name                : System Board Ambient Temp
+Reading                   : 17.0 C
+Minimum Warning Threshold : 8.0 C
+Maximum Warning Threshold : 42.0 C
+Minimum Failure Threshold : 3.0 C
+Maximum Failure Threshold : 47.0 C
+```
 
 Check_openmanage will also output the OMSA thresholds when run in
 debug mode, example:
 
-.. parsed-literal::
-
-  $ **check_openmanage -H myhost --only temp -d**
-     System:      PowerEdge R710 II        OMSA version:    6.4.0
-     ServiceTag:  XXXXXXX                  Plugin version:  3.6.5
-     BIOS/date:   2.1.15 09/02/2010        Checking mode:   SNMPv2 UDP/IPv4
-  -----------------------------------------------------------------------------
-     Chassis Components                                                        
-  =============================================================================
-    STATE  |  ID  |  MESSAGE TEXT                                              
-  ---------+------+------------------------------------------------------------
-        OK |    0 | Temperature Probe 0 [System Board Ambient Temp] reads 20 C (min=8/3, max=42/47)
+```
+$ check_openmanage -H myhost --only temp -d
+   System:      PowerEdge R710 II        OMSA version:    6.4.0
+   ServiceTag:  XXXXXXX                  Plugin version:  3.6.5
+   BIOS/date:   2.1.15 09/02/2010        Checking mode:   SNMPv2 UDP/IPv4
+-----------------------------------------------------------------------------
+   Chassis Components                                                        
+=============================================================================
+  STATE  |  ID  |  MESSAGE TEXT                                              
+---------+------+------------------------------------------------------------
+      OK |    0 | Temperature Probe 0 [System Board Ambient Temp] reads 20 C (min=8/3, max=42/47)
+```
 
 As you can see the thresholds are given inside the parentheses at the
 end of the line. Check_openmanage will treat these values as absolute,
@@ -1015,22 +1006,19 @@ i.e. if the temperature is beyond these limits, the plugin will issue
 an alert.
 
 
-Narrowing the field
-~~~~~~~~~~~~~~~~~~~
+####Narrowing the field
 
-.. image:: temp_plugin.png
-  :align: center
-  :alt: OMSA and check_openmanage temperature thresholds
+![OMSA and check_openmanage temperature thresholds](http://folk.uio.no/trondham/software/temp_plugin.png)
 
 If you wish to *narrow* the field of OK temperatures (e.g. setting the
 warning limit for the maximum temperature lower than the OMSA
 threshold), you can override the OMSA temperature warning and critical
 thresholds with the ``-w|--warning`` and ``-c|--critical`` options:
 
-.. parsed-literal::
-
-  $ **check_openmanage -H myhost -w 0=30 -c 0=40**
-  Temperature Probe 0 [System Board Ambient Temp] reads 31 C (custom max=30)
+```
+$ check_openmanage -H myhost -w 0=30 -c 0=40
+Temperature Probe 0 [System Board Ambient Temp] reads 31 C (custom max=30)
+```
 
 The option takes either a string or a file containing the string with
 the limits. Syntax is ``id1=max[/min],id2=max[/min],...``. Each of
@@ -1038,18 +1026,15 @@ these options can be specified multiple times if needed.
 
 You can also specify a custom minimum temperature:
 
-.. parsed-literal::
+```
+$ check_openmanage -H myhost -w 0=30/15 -c 0=40/10
+Temperature Probe 0 [System Board Ambient Temp] reads 14 C (custom min=15)
+```
 
-  $ **check_openmanage -H myhost -w 0=30/15 -c 0=40/10**
-  Temperature Probe 0 [System Board Ambient Temp] reads 14 C (custom min=15)
 
+####Expanding the field
 
-Expanding the field
-~~~~~~~~~~~~~~~~~~~
-
-.. image:: temp_omsa_custom.png
-  :align: center
-  :alt: OMSA expanded temperature thresholds
+![OMSA expanded temperature thresholds](http://folk.uio.no/trondham/software/temp_omsa_custom.png)
 
 If you wish to *expand* the field, the check_openmanage options
 mentioned above won't help you. In this case, use ``omconfig`` to adjust
@@ -1057,60 +1042,61 @@ the warning thresholds of OMSA itself. If, for the machine above, we
 wanted the warning threshold to be 45 degrees instead of 43 degrees
 (the default), we would say:
 
-.. parsed-literal::
-
-  myhost # **omconfig chassis temps index=0 maxwarnthresh=45**
-  Temperature probe warning threshold(s) set successfully.
+```
+# omconfig chassis temps index=0 maxwarnthresh=45
+Temperature probe warning threshold(s) set successfully.
+```
 
 If you want to reset the thresholds to the system default, use this
 command:
 
-.. parsed-literal::
-
-  myhost # **omconfig chassis temps index=0 warnthresh=default**
-  Temperature probe warning threshold(s) set successfully.
+```
+# omconfig chassis temps index=0 warnthresh=default
+Temperature probe warning threshold(s) set successfully.
+```
 
 Note that only the OMSA warning thresholds can be adjusted like
 this. The failure/critical thresholds are absolute and can't be set
 manually.
 
 
-Blacklisting
-------------
+###Blacklisting
 
 You can blacklist failed/missing components that you won't
 fix. Blacklisting means that the particular component is never
 checked. The option ``-b|--blacklist`` is used for blacklisting, takes
 either a string or file as input, and can be specified multiple times:
 
-.. parsed-literal::
-
-  $ **check_openmanage -s -H myhost**
-  WARNING: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
-  WARNING: Controller 1 [PERC 6/E Adapter]: Driver '00.00.03.15-RH1' is out of date
+```
+$ check_openmanage -s -H myhost
+WARNING: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
+WARNING: Controller 1 [PERC 6/E Adapter]: Driver '00.00.03.15-RH1' is out of date
   
-  $ **check_openmanage -s -H myhost -b ctrl_driver=0,1**
-  OK - System: 'PowerEdge 1950', SN: 'XXXXXXX', 4 GB ram (4 dimms), 2 logical drives, 8 physical drives
+$ check_openmanage -s -H myhost -b ctrl_driver=0,1
+OK - System: 'PowerEdge 1950', SN: 'XXXXXXX', 4 GB ram (4 dimms), 2 logical drives, 8 physical drives
+```
 
-Syntax for blacklisting is::
+Syntax for blacklisting is:
 
-  component1=<all|id1,id2,...>/component2=<all|id1,id2,..>/...
+```
+component1=<all|id1,id2,...>/component2=<all|id1,id2,..>/...
+```
 
 I.e. a single line separated by slashes. The component names are
-listed in the `manual page`_. Here is the list:
+listed in the manual page. Here is the list:
 
-+---------------+-------------------------------------------------------------+
-| Component     | Comment                                                     |
-+===============+=============================================================+
-| ctrl          | Controller                                                  |
-+---------------+-------------------------------------------------------------+
-| ctrl_fw       | Suppress the "special" warning message about                |
-|               | old controller firmware. Use this if you can't              |
-|               | or won't upgrade the firmware.                              |
-+---------------+-------------------------------------------------------------+
-| ctrl_driver   | Suppress the "special" warning message about old            |
-|               | controller driver.  Particularly useful on systems          |
-|               | where you can't upgrade the driver.                         |
+Component     | Comment
+--------------|--------
+ctrl          | Controller
+ctrl_fw       | Suppress the "special" warning message about
+              | old controller firmware. Use this if you can't
+              | or won't upgrade the firmware.
+ctrl_driver   | Suppress the "special" warning message about old
+              | controller driver.  Particularly useful on systems
+              | where you can't upgrade the driver.
+
+foo
+
 +---------------+-------------------------------------------------------------+
 | ctrl_stdr     | Suppress the "special" warning message about old            |
 |               | Windows storport driver.                                    |
