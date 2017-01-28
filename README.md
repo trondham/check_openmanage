@@ -1401,7 +1401,7 @@ together.
 
 In the example above, for the host "192.168.1.2" the value of **key1**
 will be **true** and **key2** will be **bar**. Any other host that
-matches "192.168.*" will have **key1 = false** and **key2 = bar**. All
+matches "192.168.\*" will have **key1 = false** and **key2 = bar**. All
 other hosts will have **key1 = true** and **key2 = foo**.
 
 Normal shell globbing may be used for the section names. This is
