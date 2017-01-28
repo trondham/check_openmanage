@@ -171,19 +171,19 @@ To use the `configuration file`_, you'll also need the perl module
 ``Config::Tiny``. This perl module is available for most Linux
 distributions:
 
-* For RHEL, CentOS and Fedora::
+* For RHEL, CentOS and Fedora:
 
   ```
   yum install perl-Config-Tiny
   ```
 
-* For SuSE::
+* For SuSE:
 
   ```
   rug install perl-Config-Tiny
   ```
 
-* For Debian and Ubuntu::
+* For Debian and Ubuntu:
 
   ```
   aptitude install libconfig-tiny-perl
@@ -1489,7 +1489,7 @@ The corresponding command line option is ``-t`` or ``--timeout``.
 
 Performance data can be turned on in the configuration file with
 ``performance_data``. Accepted values are boolean (TRUE/FALSE) or
-either of the keywords "minimal" and "multiline". Example::
+either of the keywords "minimal" and "multiline". Example:
 
 ```
 performance_data = true
@@ -1502,7 +1502,7 @@ The corresponding command line option is ``-p`` or ``--perfdata``.
 With version 3.7.0, performance data output changed. The new format
 is not compatible with the old format. Users who wish to postpone
 switching to the new performance data API may use this option. This
-option takes a boolean value. Example::
+option takes a boolean value. Example:
 
 ```
 legacy_performance_data = true
@@ -1532,7 +1532,7 @@ options **temp_threshold_warning**
 and **temp_threshold_critical**. These options corresponds to the
 command line options ``-w`` or ``--warning`` and ``-c`` or
 ``--critical``, respectively. They take the same arguments as the
-command line options. Examples::
+command line options. Examples:
 
 ```
 temp_threshold_warning = 0=30/10
@@ -1547,7 +1547,7 @@ configuration file may contain the following SNMP options:
 
 #####SNMP community string
 
-The SNMP community string can be set with **snmp_community**. Example::
+The SNMP community string can be set with **snmp_community**. Example:
 
 ```
 snmp_community = mycommunity
@@ -1557,7 +1557,7 @@ Corresponding command line option: ``-C`` or ``--community``
 
 #####SNMP protocol version
 
-The SNMP protocol version can be set with **snmp_version**. Example::
+The SNMP protocol version can be set with **snmp_version**. Example:
 
 ```
 snmp_version = 2
@@ -1568,7 +1568,7 @@ Corresponding command line option: ``-P`` or ``--protocol``
 #####SNMP port number
 
 The remote port number used with SNMP can be set with
-**snmp_port**. Example::
+**snmp_port**. Example:
 
 ```
 snmp_port = 161
@@ -1579,7 +1579,7 @@ Corresponding command line option: ``--port``
 #####Use IPv6 instead of IPv4
 
 The option **snmp_use_ipv6** instructs the plugin to use IPv6 instead
-of IPv4. This option takes a boolean value. Example::
+of IPv4. This option takes a boolean value. Example:
 
 ```
 snmp_use_ipv6 = true
@@ -1590,7 +1590,7 @@ Corresponding command line option: ``-6`` or ``--ipv6``
 #####Use TCP instead of UDP
 
 The option **snmp_use_tcp** instructs the plugin to use TCP instead
-of UDP. This option takes a boolean value. Example::
+of UDP. This option takes a boolean value. Example:
 
 ```
 snmp_use_tcp = true
@@ -1607,7 +1607,7 @@ These options gives some control over the output given by the plugin.
 
 The option **output_servicetag** will make the plugin include the
 servers servicetag (serial number) in every alert. This option takes
-a boolean value. Example::
+a boolean value. Example:
 
 ```
 output_servicetag = true
@@ -1619,7 +1619,7 @@ Corresponding command line option: ``-i`` or ``--info``
 
 The option **output_servicestate** will make the plugin include the
 service state in any alerts. This option takes a boolean
-value. Example::
+value. Example:
 
 ```
 output_servicestate = true
@@ -1631,7 +1631,7 @@ Corresponding command line option: ``-s`` or ``--state``
 
 The option **output_servicestate_abbr** will make the plugin include
 the abbreviated service state in any alerts. This option takes a
-boolean value. Example::
+boolean value. Example:
 
 ```
 output_servicestate_abbr = true
@@ -1642,7 +1642,7 @@ Corresponding command line option: ``-S`` or ``--short-state``
 #####Show system info with alerts
 
 The option **output_sysinfo** will make the plugin output some system
-information with alerts. This option takes a boolean value. Example::
+information with alerts. This option takes a boolean value. Example:
 
 ```
 output_sysinfo = true
@@ -1654,7 +1654,7 @@ Corresponding command line option: ``-e`` or ``--extinfo``
 
 The option **output_blacklist** will make the plugin show any
 blacklistings in the OK output. This option takes a boolean
-value. Example::
+value. Example:
 
 ```
 output_blacklist = true
@@ -1666,7 +1666,7 @@ Corresponding command line option: ``-B`` or ``--show-blacklist``
 
 The option **output_ok_verbosity** lets you adjust how much
 information is shown in the OK output. This option takes a positive
-integer as parameter. Example::
+integer as parameter. Example:
 
 ```
 output_ok_verbosity = 3
@@ -1678,7 +1678,7 @@ Corresponding command line option: ``-o`` or ``--ok-info``
 
 The output **output_html** makes the plugin produce HTML output. This
 option takes either a boolean value, or a country or area
-code. Example::
+code. Example:
 
 ```
 output_html = de
@@ -1690,7 +1690,7 @@ Corresponding command line option: ``-I`` or ``--htmlinfo``
 
 The option **output_post_message** lets you specify one line of
 information to be shown after any alerts. This option takes a string
-as parameter. Examples::
+as parameter. Examples:
 
 ```
 output_post_message = OS: %o %r
@@ -1704,7 +1704,7 @@ after the alert(s)`_.
 
 The option **output_hide_servicetag** will hide the serial number in
 any output from the plugin. This option takes a boolean
-value. Example::
+value. Example:
 
 ```
 output_hide_servicetag = true
@@ -1720,7 +1720,7 @@ Corresponding command line option: ``--hide-servicetag``
 If using a configuration file for the plugin does not appeal to you,
 you may want to look into the custom object variables feature of
 Nagios, to achieve a per-host configuration of the plugin. Consider
-the following example host definition::
+the following example host definition:
 
 ```
 define host {
@@ -1735,7 +1735,7 @@ define host {
 
 In this example, we are using the ``--no-storage`` option for this
 host only. This is achieved by the following command definition for
-check_openmanage::
+check_openmanage:
 
 ```
 define command {
@@ -1763,20 +1763,24 @@ gives a warning. What happens is this (assuming that the storage
 subsystem is checked, which is the default):
 
 1. The hardware senses that the battery has low power, reports it and
-   as a result check_openmanage outputs the following::
+   as a result check_openmanage outputs the following:
 
-     Cache battery 0 in controller 0 is Power Low [probably harmless]
+   ```
+   Cache battery 0 in controller 0 is Power Low [probably harmless]
+   ```
 
 2. After a while, the battery enters "learning state", where the
    battery learns its capacity, and check_openmanage will report this
-   as::
-
-     Cache battery 0 in controller 0 is Learning (Active) [probably harmless]
+   as:
+   ```
+   Cache battery 0 in controller 0 is Learning (Active) [probably harmless]
+   ```
 
 3. The battery then enters a recharge state, which check_openmanage
-   will also report::
-
-     Cache battery 0 in controller 0 is Charging [probably harmless]
+   will also report:
+   ```
+   Cache battery 0 in controller 0 is Charging [probably harmless]
+   ```
 
 One could argue that check_openmanage should simply ignore these
 warnings, as they occur regularly on all controllers with a cache
@@ -1875,7 +1879,7 @@ off by default, as it often does more damage than good.)
 Yes, check_openmanage if fully ePN compatible, and should work fine
 with or without ePN. If your Nagios server has ePN turned on, and for
 some reason you want to disable ePN for this plugin, add the following
-line among the first 10 lines of the script::
+line among the first 10 lines of the script:
 
 ```
 # nagios: -epn
@@ -1955,7 +1959,7 @@ This error normally indicates that OpenManage is not installed on the
 host. However, it may be that OpenManage is installed in a location
 other than the default. In this case, the omreport binary is not in
 the search path of check_openmanage. You can work around this by using
-the ``--omreport`` option, like this::
+the ``--omreport`` option, like this:
 
 ```
 check_openmanage --omreport /usr/local/bin/omreport
@@ -1963,7 +1967,7 @@ check_openmanage --omreport /usr/local/bin/omreport
 
 The above should be configured in ``nrpe.cfg`` if you're using
 NRPE. If you're using the .exe file for Windows with NSClient++, you
-should configure this in the file ``nsc.ini`` on the host. Example::
+should configure this in the file ``nsc.ini`` on the host. Example:
 
 ```
 check_openmanage.exe --omreport P:\dellopenmanage\oma\bin\omreport.exe
@@ -2002,7 +2006,7 @@ The error could be caused by different problems. OpenManage could
 simply not be running. The SNMP daemon may not be configured with
 OpenManage OIDs. The SNMP part of OpenManage may not be installed or
 running. For Linux, the ``snmpd.conf`` file should have the
-following::
+following:
 
 ```
 smuxpeer .1.3.6.1.4.1.674.10892.1
@@ -2088,7 +2092,7 @@ semaphores. There are three workarounds for this problem:
 
 3. Periodically remove allocated semaphores which belong to the user
    running the plugin. This can be achieved like this (example for the
-   user "nrpe")::
+   user "nrpe"):
 
    ```
    ipcrm $(ipcs -s | awk '/nrpe/ {print "-s ",$2}')
@@ -2114,7 +2118,7 @@ There may be cases where this alert is a false positive:
 If you get this alert and your system falls into one of the above
 categories, you should specify either **--no-storage** or **--check
 storage=0** to prevent check_openmanage to check the storage system in
-the first place::
+the first place:
 
 ```
 check_openmanage --no-storage [other options...]
