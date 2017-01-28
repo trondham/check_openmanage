@@ -98,7 +98,7 @@ one temperature probe, but not all servers have logical drives
 
 ![Screenshot](http://folk.uio.no/trondham/software/check_openmanage-example1.png)
 
-This nagios plugin is designed to be used by either NRPE_ or with
+This nagios plugin is designed to be used by either [NRPE](http://nagios.sourceforge.net/docs/3_0/addons.html#nrpe) or with
 SNMP. It is written in perl. In NRPE mode, it uses omreport to display
 status on various hardware components. In SNMP mode, it checks the
 same components as with omreport. Output is parsed and reported in a
@@ -301,7 +301,7 @@ remotely on the Nagios server, probing the Dell servers via SNMP, or
 you can use NRPE, check_by_ssh etc. and run the plugin locally on the
 Dell servers. This should be an informed choice, but you can always
 change it later. If you have mostly Linux boxes, you may want to use
-NRPE_ and run the plugin locally. If you have mostly Windows boxes,
+[NRPE](http://nagios.sourceforge.net/docs/3_0/addons.html#nrpe) and run the plugin locally. If you have mostly Windows boxes,
 you may want to check via SNMP. You can easily do both, e.g. NRPE for
 Linux and SNMP for Windows, but you'll have to define different
 commands in your Nagios config for each mechanism.
@@ -403,11 +403,11 @@ The ``notes_url`` statement is optional.
 
 ###Local check via NRPE
 
-If you want to use NRPE_, I assume that you have defined a check_nrpe
+If you want to use [NRPE](http://nagios.sourceforge.net/docs/3_0/addons.html#nrpe), I assume that you have defined a check_nrpe
 command elsewhere in your config and are ready to use it. Usually, we
 don't define a
 [command](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#command)
-for check_openmanage when using NRPE_, so we go right to the
+for check_openmanage when using [NRPE](http://nagios.sourceforge.net/docs/3_0/addons.html#nrpe), so we go right to the
 [service](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#service)
 definition:
 
@@ -429,7 +429,7 @@ servers that can't run OMSA). Refer to the [Nagios
 documentation](http://nagios.sourceforge.net/docs/3_0/toc.html) to
 read up on hostgroups.
 
-The NRPE_ config has the following:
+The [NRPE](http://nagios.sourceforge.net/docs/3_0/addons.html#nrpe) config has the following:
 
 ```
 command[check_openmanage]=/path/to/check_openmanage
@@ -439,7 +439,7 @@ command[check_openmanage]=/path/to/check_openmanage
 or a correct macro such as ``$USER1$``.)
 
 Note that is is a very basic example of check_openmanage usage. Refer
-to the Usage_ section for info about the different options that alters
+to the Usage section for info about the different options that alters
 the behaviour of check_openmanage.
 
 
