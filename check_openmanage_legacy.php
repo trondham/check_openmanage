@@ -3,7 +3,7 @@
 # PNP4Nagios template for check_openmanage 
 # Author: 	Trond Hasle Amundsen
 # Contact: 	t.h.amundsen@usit.uio.no
-# Website:      http://folk.uio.no/trondham/software/check_openmanage.html
+# Website:      https://github.com/trondham/check_openmanage
 # Date: 	2010-03-16
 
 # Array with different colors

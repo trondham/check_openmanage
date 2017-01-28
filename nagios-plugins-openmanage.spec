@@ -23,7 +23,7 @@ Summary:       Nagios plugin to monitor hardware health on Dell servers
 
 Group:         Applications/System
 License:       GPLv3+
-URL:           http://folk.uio.no/trondham/software/%{plugin}.html
+URL:           https://github.com/trondham/%{plugin}
 Source0:       http://folk.uio.no/trondham/software/files/%{plugin}-%{version}.tar.gz
 
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)

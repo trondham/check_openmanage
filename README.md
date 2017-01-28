@@ -22,7 +22,7 @@
 
 * **Performance data**
 
-  The plugin can give `performance data`_ with the ``-p`` or
+  The plugin can give performance data with the ``-p`` or
   ``--perfdata`` switch. Performance data collected include
   temperatures, fan speeds and power usage (on servers that support
   it).
@@ -394,7 +394,7 @@ define service {
     servicegroups             dell-openmanage
     service_description       Dell OMSA
     check_command             check_openmanage
-    notes_url                 http://folk.uio.no/trondham/software/check_openmanage.html
+    notes_url                 https://github.com/trondham/check_openmanage
 }
 ```
 
@@ -419,7 +419,7 @@ define service {
     servicegroups             dell-openmanage
     service_description       Dell OMSA
     check_command             check_nrpe!check_openmanage
-    notes_url                 http://folk.uio.no/trondham/software/check_openmanage.html
+    notes_url                 https://github.com/trondham/check_openmanage
 }
 ```
 
@@ -495,7 +495,7 @@ CHECK CONTROL AND BLACKLISTING:
    --no-storage         Don't check storage
 
 For more information and advanced options, see the manual page or URL:
-  http://folk.uio.no/trondham/software/check_openmanage.html
+  https://github.com/trondham/check_openmanage
 ```
 
 

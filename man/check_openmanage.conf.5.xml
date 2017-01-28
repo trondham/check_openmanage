@@ -673,7 +673,7 @@ output_html = us
 	<refentrytitle>check_openmanage</refentrytitle><manvolnum>8</manvolnum>
       </citerefentry>,
       <uri>
-	http://folk.uio.no/trondham/software/check_openmanage.html
+	https://github.com/trondham/check_openmanage
       </uri>
     </para>
   </refsect1>

@@ -1456,7 +1456,7 @@ check_openmanage --check storage=0,intrusion=1
 	<refentrytitle>Net::SNMP</refentrytitle><manvolnum>3</manvolnum>
 	</citerefentry>,
 	<uri>
-	  http://folk.uio.no/trondham/software/check_openmanage.html
+	  https://github.com/trondham/check_openmanage
 	</uri>
 <!--
       <citerefentry>

@@ -5,7 +5,7 @@
 # Monitor Dell server hardware status using Dell OpenManage Server
 # Administrator, either locally via NRPE, or remotely via SNMP.
 #
-# Copyright (C) 2008-2015 Trond H. Amundsen
+# Copyright (C) 2008-2017 Trond H. Amundsen
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -112,13 +112,13 @@ CHECK CONTROL AND BLACKLISTING:
    --vdisk-critical     Make any alerts on virtual disks critical
 
 For more information and advanced options, see the manual page or URL:
-  http://folk.uio.no/trondham/software/check_openmanage.html
+  https://github.com/trondham/check_openmanage
 END_HELP
 
 # Version and license text
 $LICENSE = <<"END_LICENSE";
 $NAME $VERSION
-Copyright (C) 2008-2015 $AUTHOR
+Copyright (C) 2008-2017 $AUTHOR
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
