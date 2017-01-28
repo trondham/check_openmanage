@@ -514,10 +514,6 @@ mechanisms or similar.
 
 ####Local check on Windows
 
-.. _`PAR::Packer`: http://search.cpan.org/dist/PAR-Packer/
-.. _this howto: http://sam-pointer.com/2009/03/06/compiling-windows-executables-with-par
-.. _NSClient++: http://exchange.nagios.org/directory/Addons/Monitoring-Agents/NSClient%2B%2B/details
-
 If SNMP just isn't your cup of tea, you can use check_openmanage
 natively on Windows by either
 
@@ -529,7 +525,7 @@ natively on Windows by either
 
 The file ``check_openmanage.exe`` is a Win32 executable binary
 produced with Microsoft Visual Studio 2010, Strawberry Perl and the
-perl module PAR::Packer. See also [this
+perl module [PAR::Packer[(http://search.cpan.org/dist/PAR-Packer/). See also [this
 howto](http://sam-pointer.com/2009/03/06/compiling-windows-executables-with-par).
 
 The Win32 executable can be utilized via the **[External Scripts]**
@@ -554,16 +550,16 @@ check_command check_nrpe!check_openmanage
 
 ###Remote check
 
-.. NOTE::
-
-   If the ``-H`` or ``--hostname`` option is present, the plugin will
-   automatically use SNMP to communicate with the monitored system.
-
-   The perl module Net::SNMP must be installed for check_openmanage to
-   work in SNMP mode. See prerequisites_.
-
-   check_openmanage is fully compatible with Nagios' embedded perl
-   interpreter (ePN).
+> **NOTE:**
+>
+> If the ``-H`` or ``--hostname`` option is present, the plugin will
+> automatically use SNMP to communicate with the monitored system.
+>
+> The perl module Net::SNMP must be installed for check_openmanage to
+> work in SNMP mode. See prerequisites.
+>
+> check_openmanage is fully compatible with Nagios' embedded perl
+> interpreter (ePN).
 
 The plugin can query the monitored host remotely via
 SNMP. Prerequisites for this are that the monitored host is running an
@@ -603,15 +599,13 @@ For details on how to enable SNMP on Windows 2003 server, refer to
 * How to install and configure Windows SNMP agent (2000 -XP): http://www.loriotpro.com/ServiceAndSupport/How_to/InstallWXPAgent_EN.php
 
 
-.. CAUTION::
-
-   **SNMP daemon on Windows is unstable with some OMSA versions**
-
-   Many users have reported that the SNMP daemon on Windows dies
-   occasionally. It seems that OMSA versions prior to 5.5.0 have this
-   problem, while 5.5.0 (or better yet: 5.5.0.1) and later versions do
-   not. If you're using check_openmanage with SNMP to monitor Windows
-   hosts, make sure that you have a recent OMSA version running.
+> **CAUTION: SNMP daemon on Windows is unstable with some OMSA versions**
+>
+> Many users have reported that the SNMP daemon on Windows dies
+> occasionally. It seems that OMSA versions prior to 5.5.0 have this
+> problem, while 5.5.0 (or better yet: 5.5.0.1) and later versions do
+> not. If you're using check_openmanage with SNMP to monitor Windows
+> hosts, make sure that you have a recent OMSA version running.
 
 
 ###Output control
