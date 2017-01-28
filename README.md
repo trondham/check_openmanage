@@ -525,7 +525,7 @@ natively on Windows by either
 
 The file ``check_openmanage.exe`` is a Win32 executable binary
 produced with Microsoft Visual Studio 2010, Strawberry Perl and the
-perl module [PAR::Packer[(http://search.cpan.org/dist/PAR-Packer/). See also [this
+perl module [PAR::Packer](http://search.cpan.org/dist/PAR-Packer/). See also [this
 howto](http://sam-pointer.com/2009/03/06/compiling-windows-executables-with-par).
 
 The Win32 executable can be utilized via the **[External Scripts]**
