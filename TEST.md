@@ -853,7 +853,7 @@ If given option ``-d`` or ``--debug``, check_openmanage will
 output messages about all the checked components, along with their
 respectible alert states and a unique identifier, if applicable. The
 identifier is used whenever you want to blacklist a component,
-i.e. prevent it from being checked. Blacklisting_ is discussed
+i.e. prevent it from being checked. Blacklisting is discussed
 later. An example debug output is given below.
 
 ```
@@ -1459,8 +1459,6 @@ checks. Setting this option to "true" will effectively negate any
 other check options. This option corresponds to the ``-a`` or
 ``--all`` command line option.
 
-For more information about check control, see `check control`_.
-
 #####Blacklisting
 
 For blacklisting the keyword **blacklist** is used, and the value is
@@ -1474,9 +1472,6 @@ blacklist = ctrl_fw=all/pdisk=0:0:1
 If used together with the ``-b`` or ``--blacklist`` command line
 option, the two blacklists from the config file and command line are
 merged together.
-
-For more information about blacklisting, including syntax, see
-`blacklisting`_.
 
 #####Timeout
 
@@ -1817,7 +1812,7 @@ The template used to generate these graphs are available as
 ####Why did you make check_openmanage?
 
 I wanted a monitoring tool for our Dell servers that was as good as
-Gerhard Lausser's `check_hpasm`_ plugin is for HP servers. None of the
+Gerhard Lausser's check_hpasm plugin is for HP servers. None of the
 existing Dell plugins offered the features and detailed output that I
 needed, so I made my own plugin. After a while, I decided to share it
 with the community, and I've never regretted this
@@ -1857,7 +1852,7 @@ faster execution time, and are probably also less error prone.
 
 ####Is there a compiled executable for Windows that can be used with NSClient++?
 
-Yes. See the paragraph about `local check on windows`_
+Yes. See the paragraph about local check on windows.
 
 ####Is VMware ESXi supported?
 
@@ -1945,7 +1940,7 @@ $ check_openmanage -H myhost -d | head -n 3
 
 ####My boss won't let me upgrade OMSA
 
-Your boss is a moron. Also, that wasn't technically a question.
+Your boss don't get it. Also, that wasn't technically a question.
 
 ####Our security policy doesn't allow OMSA upgrades
 
