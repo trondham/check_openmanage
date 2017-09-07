@@ -3251,8 +3251,12 @@ sub check_memory {
 		  $index, $location, $size, $status;
 	    }
 	    else {
+		my $failures = join(q{, }, @failures);
+		if (index($failures, 'Single-bit failure error rate exceeded') != -1) {
+			next DIMM if blacklisted('memory', 'single_bit');
+                }
 		$msg = sprintf 'Memory module %d [%s, %s]: %s',
-		  $index, $location, $size, (join q{, }, @failures);
+		  $index, $location, $size, $failures;
 	    }
 
 	    report('chassis', $msg, $status2nagios{$status}, $index);
