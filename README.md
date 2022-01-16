@@ -2131,8 +2131,6 @@ have to check OMSA, particularly which components of it are installed.
 
 ## Reporting bugs, proposing new features etc.
 
-.. _University of Oslo: http://www.uio.no/english/
-
 Please let me know if you are experiencing bugs, have feature
 requests, or suggestions on how to improve check_openmanage. We use
 this plugin in production at the [University of Oslo](http://www.uio.no/english/), on many Dell
