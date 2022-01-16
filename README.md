@@ -1,8 +1,8 @@
-#check_openmanage
+# check_openmanage
 
 **Dell™ Server Hardware Monitoring with OpenManage™ and Nagios®**
 
-##Main features
+## Main features
 
 * **Advanced hardware discovery**
 
@@ -34,7 +34,7 @@
 
 
 
-##Basic Overview
+## Basic Overview
 
 check_openmanage is a plugin for [Nagios](http://www.nagios.org/)
 which checks the hardware health of Dell
@@ -121,9 +121,9 @@ runs successfully on the following Dell PowerEdge models at our site:
 R815, R900, R910, R620, R720.
 
 
-##Prerequisites
+## Prerequisites
 
-###Perl interpreter
+### Perl interpreter
 
 check_openmanage needs a normal perl interpreter, version 5.6.0 or
 later. The plugin assumes that perl is available as ``/usr/bin/perl``,
@@ -190,7 +190,7 @@ distributions:
   ```
 
 
-###Dell Openmanage Server Administrator
+### Dell Openmanage Server Administrator
 
 check_openmanage relies heavily on Dell Openmanage Server
 Administrator (OMSA) and will not function if this software is not
@@ -206,7 +206,7 @@ There are also official Dell repositories for Red Hat and SuSE. For
 information about these, look here: http://linux.dell.com/repo/hardware/
 
 
-##Intelligent plugin
+## Intelligent plugin
 
 check_openmanage is an intelligent plugin. It will by itself discover
 which hardware components are present in the server and monitor
@@ -238,7 +238,7 @@ removing checks with the ``--check`` option, check_openmanage will
 also check the global health status for added security.
 
 
-##Multiline output
+## Multiline output
 
 Since check_openmanage monitors several things, the plugin's output
 will sometime contain multiple lines. These lines will be separated by
@@ -279,7 +279,7 @@ regular linebreaks, but only the first line is shown in the web
 interface (status.cgi).
 
 
-##Getting started
+## Getting started
 
 This is a short HOWTO that describes how to get started with using
 check_openmanage. This HOWTO assumes that the prerequisites are met,
@@ -307,7 +307,7 @@ Linux and SNMP for Windows, but you'll have to define different
 commands in your Nagios config for each mechanism.
 
 
-###Creating a hostgroup
+### Creating a hostgroup
 
 The first thing you want to do is create a
 [hostgroup](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#hostgroup)
@@ -325,7 +325,7 @@ define hostgroup {
 }
 ```
 
-###Defining the hosts
+### Defining the hosts
 
 You'll need a host definition for each of the servers. You probably
 already have this in place, but for the sake of completeness it is
@@ -342,7 +342,7 @@ define host {
 }
 ```
 
-###Creating a servicegroup
+### Creating a servicegroup
 
 Next you want to create a
 [servicegroup](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#servicegroup)
@@ -361,9 +361,9 @@ define servicegroup {
 The servicegroup is used later in the service definition.
 
 
-###Remote check via SNMP
+### Remote check via SNMP
 
-####Defining a command
+#### Defining a command
 
 The next step is to define a [command](http://nagios.sourceforge.net/docs/3_0/objectdefinitions.html#command) for check_openmanage:
 
@@ -382,7 +382,7 @@ to the **usage** section for info about the different options that alters
 the behaviour of check_openmanage.
 
 
-####Defining the service
+#### Defining the service
 
 Finally, you define the service:
 
@@ -401,7 +401,7 @@ define service {
 The ``notes_url`` statement is optional.
 
 
-###Local check via NRPE
+### Local check via NRPE
 
 If you want to use [NRPE](http://nagios.sourceforge.net/docs/3_0/addons.html#nrpe), I assume that you have defined a check_nrpe
 command elsewhere in your config and are ready to use it. Usually, we
@@ -443,9 +443,9 @@ to the Usage section for info about the different options that alters
 the behaviour of check_openmanage.
 
 
-##Usage
+## Usage
 
-###Help output
+### Help output
 
 The option ``-h`` or ``--help`` will give a short usage information,
 that includes the most commonly used options. For more information,
@@ -499,7 +499,7 @@ For more information and advanced options, see the manual page or URL:
 ```
 
 
-###Local check
+### Local check
 
 Run locally or via NRPE, check_openmanage will use omreport to display
 info on hardware components, and report the result:
@@ -512,7 +512,7 @@ OK - System: 'PowerEdge R710', SN: 'XXXXXX', 24 GB ram (6 dimms), 1 logical driv
 Any user is allowed to run omreport, so you don't need any sudo
 mechanisms or similar.
 
-####Local check on Windows
+#### Local check on Windows
 
 If SNMP just isn't your cup of tea, you can use check_openmanage
 natively on Windows by either
@@ -548,7 +548,7 @@ check_command check_nrpe!check_openmanage
 ```
 
 
-###Remote check
+### Remote check
 
 > **NOTE:**
 >
@@ -608,7 +608,7 @@ For details on how to enable SNMP on Windows 2003 server, refer to
 > hosts, make sure that you have a recent OMSA version running.
 
 
-###Output control
+### Output control
 
 The default behaviour of the plugin is to print all alerts on separate
 lines with no extra fuzz:
@@ -622,7 +622,7 @@ Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
 There are several options that allows you to alter this, as listed below.
 
 
-####Prefix alerts with the service state
+#### Prefix alerts with the service state
 
 The ``-s`` or ``--state`` option will prefix each alert with the full
 service state:
@@ -633,7 +633,7 @@ CRITICAL: Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
 WARNING: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
 ```
 
-####Prefix alerts with the service state (abbreviated)
+#### Prefix alerts with the service state (abbreviated)
 
 Example output with the ``-S`` or ``--short-state`` option, which does
 the same, except that the service state is abbreviated to only one
@@ -645,7 +645,7 @@ C: Power Supply 0 [AC]: Presence Detected, Failure Detected, AC Lost
 W: Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
 ```
 
-####Prefix alerts with the service tag
+#### Prefix alerts with the service tag
 
 The option ``-i`` or ``--info`` will prefix all alerts with the
 service tag:
@@ -656,7 +656,7 @@ $ check_openmanage -i
 [JV8KH0J] Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
 ```
 
-####System info after the alert(s)
+#### System info after the alert(s)
 
 The option ``-e`` or ``--extinfo`` will print the server model and
 service tag on a separate line at the end of the alert:
@@ -668,7 +668,7 @@ Controller 0 [PERC 6/i Integrated]: Driver '00.00.03.15-RH1' is out of date
 ------ SYSTEM: PowerEdge 1950, SN: JV8KH0J
 ```
 
-####Custom line after the alert(s)
+#### Custom line after the alert(s)
 
 If this isn't exactly what you want, you can also specify your own
 string to be shown on a separate line at the end of the alert, with
@@ -701,7 +701,7 @@ Code | Replaced with
 The full range of the control format for ``--postmsg`` is also
 available in the manual page.
 
-####Combination of output options
+#### Combination of output options
 
 You can combine any of these options. A simple example:
 
@@ -724,7 +724,7 @@ NOTE: Handled in RT ticket #123456
 Which (combination) of these options you choose to use, if any,
 depends on how you use Nagios and your personal preference.
 
-####Clickable links in the alerts
+#### Clickable links in the alerts
 
 Using the ``-I`` or ``--htmlinfo`` option will make the servicetag and model
 name into clickable HTML links in the output. The model name link will
@@ -755,7 +755,7 @@ your country code is not supported, send me an email and I'll add
 it in the next release.
 
 
-####Verbosity when everything is ok
+#### Verbosity when everything is ok
 
 The default behaviour of the plugin is to output a single line when
 there are no alerts:
@@ -819,7 +819,7 @@ Most would go for the default (value of ``0``), i.e. a single line.
 > SNMP, this is not an issue.
 
 
-####Show blacklistings in OK output
+#### Show blacklistings in OK output
 
 When blacklistings are used to mask faulty components, it is easy to
 forget which components and on which servers. If the ``-B`` or
@@ -835,7 +835,7 @@ OK - System: 'PowerEdge R610 II', SN: 'G7YCX4J', 16 GB ram (4 dimms), 1 logical 
 If no blacklisting is used, this option has no effect.
 
 
-####Hide the servicetag (serial number)
+#### Hide the servicetag (serial number)
 
 If you for some reason wish to hide the servicetag in the output,
 e.g. if your customers have Nagios access but you don't want them to
@@ -847,7 +847,7 @@ $ check_openmanage -H dell-server02 --hide-servicetag
 OK - System: 'PowerEdge R710 II', SN: 'XXXXXXX', 96 GB ram (12 dimms), 2 logical drives, 26 physical drives
 ```
 
-###Debug output
+### Debug output
 
 If given option ``-d`` or ``--debug``, check_openmanage will
 output messages about all the checked components, along with their
@@ -958,7 +958,7 @@ server with an attached MD1220 shelf.
 > within Nagios, i.e. in your Nagios config.
 
 
-###Custom temperature thresholds
+### Custom temperature thresholds
 
 ![OMSA temperature thresholds](http://folk.uio.no/trondham/software/temp_omsa.png)
 
@@ -1005,7 +1005,7 @@ i.e. if the temperature is beyond these limits, the plugin will issue
 an alert.
 
 
-####Narrowing the field
+#### Narrowing the field
 
 ![OMSA and check_openmanage temperature thresholds](http://folk.uio.no/trondham/software/temp_plugin.png)
 
@@ -1031,7 +1031,7 @@ Temperature Probe 0 [System Board Ambient Temp] reads 14 C (custom min=15)
 ```
 
 
-####Expanding the field
+#### Expanding the field
 
 ![OMSA expanded temperature thresholds](http://folk.uio.no/trondham/software/temp_omsa_custom.png)
 
@@ -1059,7 +1059,7 @@ this. The failure/critical thresholds are absolute and can't be set
 manually.
 
 
-###Blacklisting
+### Blacklisting
 
 You can blacklist failed/missing components that you won't
 fix. Blacklisting means that the particular component is never
@@ -1149,7 +1149,7 @@ $ check_openmanage -b ctrl_driver=all
 ```
 
 
-###Check control
+### Check control
 
 check_openmanage lets you fine-tune which components you want to check
 via the ``--check`` option. By default almost everything is checked (as
@@ -1211,7 +1211,7 @@ for the ``--only`` option described below, except for "critical" and
 "warning". The full list is also given in the `manual page`_.
 
 
-###Only check one component type or alert type
+### Only check one component type or alert type
 
 You can use the option ``--only`` to specify what type of component is
 desired. If this option is used, only that type of component is
@@ -1259,7 +1259,7 @@ MEMORY OK - 6 memory modules, 24576 MB total memory
 ```
 
 
-###Check everything
+### Check everything
 
 Use the option ``-a`` or ``--all`` to turn on checking of everything,
 even log content:
@@ -1269,14 +1269,14 @@ $ check_openmanage -a
 ESM log content: 3 critical, 0 non-critical, 4 ok
 ```
 
-##SELinux considerations
+## SELinux considerations
 
 If you plan on using the plugin on a system with SELinux in enforcing
 mode, you need to set a proper file context (label) on the
 plugin. Which label to choose depends on how you plan to use the
 plugin, via SNMP or locally via NRPE or similar.
 
-###SNMP check
+### SNMP check
 
 With SNMP, the following label should suffice:
 
@@ -1291,7 +1291,7 @@ semanage fcontext -a -t nagios_services_plugin_exec_t '/usr/lib(64)?/nagios/plug
 restorecon -v /usr/lib*/nagios/plugins/check_openmanage
 ```
 
-###Local check
+### Local check
 
 If using a local check via NRPE or similar, the plugin
 executes **omreport** which is part of Dell OMSA, which in turn is a
@@ -1310,7 +1310,7 @@ restorecon -v /usr/lib*/nagios/plugins/check_openmanage
 ```
 
 
-##Configuration file
+## Configuration file
 
 > IMPORTANT: This section describes a feature that is present in
 > version 3.7.0 and later versions.
@@ -1331,7 +1331,7 @@ its strengths are mostly present when using SNMP. It allows setting
 different options, such as blacklisting, on single hosts or groups of
 hosts using glob patterns.
 
-###File format
+### File format
 
 The file has an ini-style syntax and consists of sections and
 parameters. A section begins with the name of the section in square
@@ -1370,7 +1370,7 @@ are blank lines.
 The configuration file must be a regular file. Owner and group does
 not matter, but the Nagios user must have read access.
 
-###Sections and ordering
+### Sections and ordering
 
 The section name should correspond to the hostname, i.e. the value
 passed to the ``-H`` or ``--hostname`` parameter. The section name
@@ -1422,11 +1422,11 @@ Be careful not to have more than one glob pattern section match any
 single host. This may lead to unpredictable results.
 
 
-###Configuration
+### Configuration
 
-####General
+#### General
 
-#####Check control
+##### Check control
 
 Any keyword to the ``--check`` parameter are accepted in the
 configuration file, as "check_KEYWORD". These options take boolean
@@ -1459,7 +1459,7 @@ checks. Setting this option to "true" will effectively negate any
 other check options. This option corresponds to the ``-a`` or
 ``--all`` command line option.
 
-#####Blacklisting
+##### Blacklisting
 
 For blacklisting the keyword **blacklist** is used, and the value is
 a string that uses the same syntax as the ``-b`` or ``--blacklist``
@@ -1473,7 +1473,7 @@ If used together with the ``-b`` or ``--blacklist`` command line
 option, the two blacklists from the config file and command line are
 merged together.
 
-#####Timeout
+##### Timeout
 
 The plugin timeout can be configured with the **timeout**
 keyword. The argument is number of seconds and should be a positive
@@ -1485,7 +1485,7 @@ timeout = 60
 
 The corresponding command line option is ``-t`` or ``--timeout``.
 
-#####Performance data
+##### Performance data
 
 Performance data can be turned on in the configuration file with
 ``performance_data``. Accepted values are boolean (TRUE/FALSE) or
@@ -1497,7 +1497,7 @@ performance_data = true
 
 The corresponding command line option is ``-p`` or ``--perfdata``.
 
-#####Legacy Performance data
+##### Legacy Performance data
 
 With version 3.7.0, performance data output changed. The new format
 is not compatible with the old format. Users who wish to postpone
@@ -1510,7 +1510,7 @@ legacy_performance_data = true
 
 The corresponding command line option is ``--legacy-perfdata``.
 
-#####Temperature unit
+##### Temperature unit
 
 The temperature unit used for reporting, performance data etc. can
 be set with the **temperature_unit** option. Allowed values are ``F``
@@ -1525,7 +1525,7 @@ The corresponding command line option is ``--tempunit``. Note that
 the command line option ``-F`` or ``--fahrenheit`` will override
 both the command line option and the configuration file option.
 
-#####Temperature limits
+##### Temperature limits
 
 Custom temperature limits may be configured with the
 options **temp_threshold_warning**
@@ -1540,12 +1540,12 @@ temp_threshold_critical = 0=35/8
 ```
 
 
-####SNMP
+#### SNMP
 
 Several SNMP related options may be set in the configuration file. The
 configuration file may contain the following SNMP options:
 
-#####SNMP community string
+##### SNMP community string
 
 The SNMP community string can be set with **snmp_community**. Example:
 
@@ -1555,7 +1555,7 @@ snmp_community = mycommunity
 
 Corresponding command line option: ``-C`` or ``--community``
 
-#####SNMP protocol version
+##### SNMP protocol version
 
 The SNMP protocol version can be set with **snmp_version**. Example:
 
@@ -1565,7 +1565,7 @@ snmp_version = 2
 
 Corresponding command line option: ``-P`` or ``--protocol``
 
-#####SNMP port number
+##### SNMP port number
 
 The remote port number used with SNMP can be set with
 **snmp_port**. Example:
@@ -1576,7 +1576,7 @@ snmp_port = 161
 
 Corresponding command line option: ``--port``
 
-#####Use IPv6 instead of IPv4
+##### Use IPv6 instead of IPv4
 
 The option **snmp_use_ipv6** instructs the plugin to use IPv6 instead
 of IPv4. This option takes a boolean value. Example:
@@ -1587,7 +1587,7 @@ snmp_use_ipv6 = true
 
 Corresponding command line option: ``-6`` or ``--ipv6``
 
-#####Use TCP instead of UDP
+##### Use TCP instead of UDP
 
 The option **snmp_use_tcp** instructs the plugin to use TCP instead
 of UDP. This option takes a boolean value. Example:
@@ -1599,11 +1599,11 @@ snmp_use_tcp = true
 Corresponding command line option: ``--tcp``
 
 
-####Output control
+#### Output control
 
 These options gives some control over the output given by the plugin.
 
-#####Include servicetag in alerts
+##### Include servicetag in alerts
 
 The option **output_servicetag** will make the plugin include the
 servers servicetag (serial number) in every alert. This option takes
@@ -1615,7 +1615,7 @@ output_servicetag = true
 
 Corresponding command line option: ``-i`` or ``--info``
 
-#####Include service state in alerts
+##### Include service state in alerts
 
 The option **output_servicestate** will make the plugin include the
 service state in any alerts. This option takes a boolean
@@ -1627,7 +1627,7 @@ output_servicestate = true
 
 Corresponding command line option: ``-s`` or ``--state``
 
-#####Include abbreviated service state in alerts
+##### Include abbreviated service state in alerts
 
 The option **output_servicestate_abbr** will make the plugin include
 the abbreviated service state in any alerts. This option takes a
@@ -1639,7 +1639,7 @@ output_servicestate_abbr = true
 
 Corresponding command line option: ``-S`` or ``--short-state``
 
-#####Show system info with alerts
+##### Show system info with alerts
 
 The option **output_sysinfo** will make the plugin output some system
 information with alerts. This option takes a boolean value. Example:
@@ -1650,7 +1650,7 @@ output_sysinfo = true
 
 Corresponding command line option: ``-e`` or ``--extinfo``
 
-#####Show blacklistings in OK output
+##### Show blacklistings in OK output
 
 The option **output_blacklist** will make the plugin show any
 blacklistings in the OK output. This option takes a boolean
@@ -1662,7 +1662,7 @@ output_blacklist = true
 
 Corresponding command line option: ``-B`` or ``--show-blacklist``
 
-#####Verbosity of OK output
+##### Verbosity of OK output
 
 The option **output_ok_verbosity** lets you adjust how much
 information is shown in the OK output. This option takes a positive
@@ -1674,7 +1674,7 @@ output_ok_verbosity = 3
 
 Corresponding command line option: ``-o`` or ``--ok-info``
 
-#####HTML output
+##### HTML output
 
 The output **output_html** makes the plugin produce HTML output. This
 option takes either a boolean value, or a country or area
@@ -1686,7 +1686,7 @@ output_html = de
 
 Corresponding command line option: ``-I`` or ``--htmlinfo``
 
-#####Custom line after alerts
+##### Custom line after alerts
 
 The option **output_post_message** lets you specify one line of
 information to be shown after any alerts. This option takes a string
@@ -1700,7 +1700,7 @@ output_post_message = NOTE: Handled in ticket 123456
 For more information about codes and formatting, see `Custom line
 after the alert(s)`_.
 
-#####Hide service tag (serial number)
+##### Hide service tag (serial number)
 
 The option **output_hide_servicetag** will hide the serial number in
 any output from the plugin. This option takes a boolean
@@ -1713,7 +1713,7 @@ output_hide_servicetag = true
 Corresponding command line option: ``--hide-servicetag``
 
 
-##Alternative to configuration file: Custom object variables
+## Alternative to configuration file: Custom object variables
 
 *Contributed by Rudolf Kleijwegt*
 
@@ -1754,7 +1754,7 @@ Nagios documentation:
 * http://nagios.sourceforge.net/docs/3_0/customobjectvars.html
 
 
-##A note about charging cache batteries
+## A note about charging cache batteries
 
 The Dell RAID controllers usually have a cache battery, which is
 useful in case of a sudden power outage. This battery will on occasion
@@ -1796,7 +1796,7 @@ If the state never changes, e.g. if the warning persists for days, you
 should act on it. Otherwise, the warnings can be ignored.
 
 
-##Performance data
+## Performance data
 
 check_openmanage will output performance data if the ``--perfdata`` or
 ``-p`` option is used. The performance data gathered will vary
@@ -1809,11 +1809,11 @@ The template used to generate these graphs are available as
 ``check_openmanage.php`` in the downloadable ZIP archive and tarball.
 
 
-##Frequently Asked Questions (FAQ)
+## Frequently Asked Questions (FAQ)
 
-###General
+### General
 
-####Why did you make check_openmanage?
+#### Why did you make check_openmanage?
 
 I wanted a monitoring tool for our Dell servers that was as good as
 Gerhard Lausser's check_hpasm plugin is for HP servers. None of the
@@ -1823,7 +1823,7 @@ with the community, and I've never regretted this
 decision. Constructive feedback from users have improved this plugin
 immensely.
 
-####How does check_openmanage compare to other Dell plugins?
+#### How does check_openmanage compare to other Dell plugins?
 
 Like most Nagios plugins that check the hardware health of Dell
 servers, check_openmanage uses OpenManage Server Administrator (OMSA)
@@ -1833,7 +1833,7 @@ subsystems and return the status code, while check_openmanage also
 tries to figure out exactly what is wrong and report it in a detailed
 and concise manner.
 
-####Why both 32bit and 64bit RPM packages?
+#### Why both 32bit and 64bit RPM packages?
 
 This is a perl script, which is architecture independent by itself, so
 one would think that the RPM arch would be "noarch". However, since
@@ -1842,7 +1842,7 @@ Nagios plugins under ``/usr/lib`` for 32bit and ``/usr/lib64`` for
 64bit platforms, I wanted to apply this to check_openmanage as
 well. This is the *only* difference between the two RPM packages.
 
-####I don't like check_openmanage, are there other Dell plugins that you would recommend?
+#### I don't like check_openmanage, are there other Dell plugins that you would recommend?
 
 There are many plugins out there. The ones I would recommend are Jason
 Ellison's excellent
@@ -1854,11 +1854,11 @@ that they don't check as many OIDs and don't use as many features of
 OMSA. That way, they are less dependent on recent OMSA versions, have
 faster execution time, and are probably also less error prone.
 
-####Is there a compiled executable for Windows that can be used with NSClient++?
+#### Is there a compiled executable for Windows that can be used with NSClient++?
 
 Yes. See the paragraph about local check on windows.
 
-####Is VMware ESXi supported?
+#### Is VMware ESXi supported?
 
 Unfortunately, no. OMSA for ESXi has serious limitations that impacts
 monitoring with check_openmanage. The following quote is from the [OMSA
@@ -1871,7 +1871,7 @@ For ESXi you can't use check_openmanage. Options for monitoring ESXi
 include setting up an SNMP trap receiver on the Nagios server, and
 configuring it as the trap destination on the ESXi hosts.
 
-####Is check_openmanage ePN compatible?
+#### Is check_openmanage ePN compatible?
 
 ("ePN" is the Nagios' embedded perl interpreter. Many people turn this
 off by default, as it often does more damage than good.)
@@ -1890,23 +1890,23 @@ your Nagios config if you have ePN enabled and want to disable it for
 this plugin.
 
 
-####How can I contact you if I have problems, bug reports, feature requests etc.?
+#### How can I contact you if I have problems, bug reports, feature requests etc.?
 
 You can contact me via email (see the manual page). Depending on the
 time of day etc., you can also reach me on the IRC, as ``trondham`` on
 the ``#nagios`` channel on Freenode.
 
 
-###OpenManage (OMSA)
+### OpenManage (OMSA)
 
-####Which version of OMSA is OK?
+#### Which version of OMSA is OK?
 
 Check_openmanage is tested with OMSA versions 5.3 and later. All these
 should be OK to use. Note that some versions don't play well with
 Windows and SNMP. For the best results, use the newest release
 available.
 
-####Why do I get weird results from check_openmanage on my old server and/or old OMSA version?
+#### Why do I get weird results from check_openmanage on my old server and/or old OMSA version?
 
 Upgrade your Openmanage (OMSA) version. Check_openmanage is developed
 with OMSA versions 5.3 and later. You should always try to use
@@ -1917,7 +1917,7 @@ Some really old servers (5.generation and older, e.g. 2550, 2450)
 can't run newer OMSA than 4.5. Hence, these old servers are not
 supported by check_openmanage.
 
-####How can I find out which version of OMSA my server is running?
+#### How can I find out which version of OMSA my server is running?
 
 This can be done in many ways. Log in to your server and type the
 command ``omreport about`` (or ``omreport.exe about`` on Windows):
@@ -1942,18 +1942,18 @@ $ check_openmanage -H myhost -d | head -n 3
 ```
 
 
-####My boss won't let me upgrade OMSA
+#### My boss won't let me upgrade OMSA
 
 Your boss don't get it. Also, that wasn't technically a question.
 
-####Our security policy doesn't allow OMSA upgrades
+#### Our security policy doesn't allow OMSA upgrades
 
 Your security policy is broken. That wasn't a question either.
 
 
-###Common Errors
+### Common Errors
 
-####ERROR: Dell OpenManage Server Administrator (OMSA) is not installed
+#### ERROR: Dell OpenManage Server Administrator (OMSA) is not installed
 
 This error normally indicates that OpenManage is not installed on the
 host. However, it may be that OpenManage is installed in a location
@@ -1977,13 +1977,13 @@ If the omreport or omreport.exe binary is installed in a place where
 you think that check_openmanage should look by default, send me a
 note.
 
-####ERROR: You need perl module Net::SNMP to run check_openmanage in SNMP mode
+#### ERROR: You need perl module Net::SNMP to run check_openmanage in SNMP mode
 
 The perl module ``Net::SNMP`` is not installed, or not available to
 the perl interpreter. This module is required for SNMP. See the
 prerequisites_ section.
 
-####SNMP CRITICAL: No response from remote host '10.1.2.3'
+#### SNMP CRITICAL: No response from remote host '10.1.2.3'
 
 This error indicates that the SNMP daemon is not running or not
 responding. There is no reply from the monitored server on port 161
@@ -1995,7 +1995,7 @@ match. If this is the case, inspect the SNMP settings on the server
 and verify that the community name matches the ``-C`` option given to
 the plugin.
 
-####ERROR: (SNMP) OpenManage is not installed or is not working correctly
+#### ERROR: (SNMP) OpenManage is not installed or is not working correctly
 
 This error indicates that the SNMP service is responding, but
 OpenManage OIDs are not present. To be specific, check_openmanage
@@ -2016,7 +2016,7 @@ This should be added by OpenManage at install time. The simple
 solution may be to reinstall OpenManage and look for errors during
 installation.
 
-####SNMP CRITICAL: Received genError(5) error-status at error-index 1
+#### SNMP CRITICAL: Received genError(5) error-status at error-index 1
 
 Some OpenManage versions perform poorly on Windows, especially
 versions 5.4.0 and earlier. If you get this error on a Windows host,
@@ -2025,7 +2025,7 @@ check the OpenManage version and consider upgrading.
 This error is from the Net::SNMP perl module.
 
 
-####PLUGIN TIMEOUT: check_openmanage timed out after 30 seconds
+#### PLUGIN TIMEOUT: check_openmanage timed out after 30 seconds
 
 If your server is under very heavy load, it may take some time for
 check_openmanage to finish, especially if you run the plugin locally
@@ -2037,7 +2037,7 @@ locally. Checking via SNMP is even faster.
 Be aware that NRPE has it's own timeout, also adjustable.
 
 
-####INTERNAL ERROR: blah blah
+#### INTERNAL ERROR: blah blah
 
 The plugin will output any perl warnings that occur during execution
 as internal errors with unknown state. If you get one or more internal
@@ -2045,7 +2045,7 @@ errors like this, you may have hit a bug in the plugin. Please contact
 me if you get internal errors.
 
 
-####UNKNOWN: Problem running 'omreport foo bar'
+#### UNKNOWN: Problem running 'omreport foo bar'
 
 ```
 UNKNOWN: Problem running 'omreport chassis fans': Error! No fan probes found on this system.
@@ -2101,7 +2101,7 @@ semaphores. There are three workarounds for this problem:
    This approach is a last resort. The commands above can be run
    manually whenever the issue appears, or periodically by crond.
 
-####Storage Error! No controllers found
+#### Storage Error! No controllers found
 
 From version 3.6.0 of the plugin, storage is no longer allowed to be
 absent. The reason for this is that there have been several issues
@@ -2129,9 +2129,7 @@ If the server in question has storage that should be monitored, you'll
 have to check OMSA, particularly which components of it are installed.
 
 
-##Reporting bugs, proposing new features etc.
-
-.. _University of Oslo: http://www.uio.no/english/
+## Reporting bugs, proposing new features etc.
 
 Please let me know if you are experiencing bugs, have feature
 requests, or suggestions on how to improve check_openmanage. We use
@@ -2147,6 +2145,6 @@ Depending on the time of day etc., you can also reach me on the
 IRC, on the ``#nagios`` channel on Freenode.
 
 
-##Disclaimer
+## Disclaimer
 
 This is free software. Use at your own risk.
